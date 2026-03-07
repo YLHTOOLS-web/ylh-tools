@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Build Babel — YLH Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Syne:wght@400;700;800&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink: #0e0c09;
+  --parchment: #f2ead8;
+  --ember: #c94a1a;
+  --gold: #c9943a;
+  --ash: #3a3630;
+  --smoke: #7a7060;
+  --light-smoke: #b8ae9e;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink);
+  color: var(--parchment);
+  font-family: 'IM Fell English', Georgia, serif;
+  min-height: 100vh;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.3;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+}
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+  background: rgba(14,12,9,0.97); border-bottom: 1px solid var(--ash);
+  padding: 0 1.5rem; height: 36px; display: flex; align-items: center; gap: 1rem;
+}
+.nav-brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: var(--parchment); text-decoration: none; }
+.nav-brand span { color: var(--ember); }
+.nav-back { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em; color: var(--smoke); text-decoration: none; text-transform: uppercase; }
+.nav-back:hover { color: var(--gold); }
+
+.hero {
+  padding: 5rem 2rem 2.5rem;
+  text-align: center;
+  border-bottom: 1px solid var(--ash);
+  background: linear-gradient(180deg, #131109 0%, var(--ink) 100%);
+  position: relative; overflow: hidden;
+}
+.hero-ruled {
+  position: absolute; inset: 0; opacity: 0.04;
+  background-image: repeating-linear-gradient(0deg, var(--parchment) 0px, var(--parchment) 1px, transparent 1px, transparent 28px);
+}
+.eyebrow { font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.25em; color: var(--ember); text-transform: uppercase; margin-bottom: 1rem; position: relative; }
+.hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(2.5rem, 6vw, 4rem); letter-spacing: -0.03em; margin-bottom: 0.75rem; position: relative; }
+.hero h1 em { font-family: 'IM Fell English', serif; color: var(--gold); font-weight: 400; font-style: italic; }
+.hero-sub { font-size: 0.95rem; color: var(--light-smoke); max-width: 580px; margin: 0 auto; line-height: 1.75; position: relative; }
+.hero-verse {
+  font-size: 0.82rem; color: var(--smoke); font-style: italic;
+  margin-top: 1.2rem; position: relative;
+}
+
+.main { max-width: 780px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+/* INSTRUCTIONS */
+.instructions {
+  background: #0a0906; border: 1px solid var(--ash); border-left: 3px solid var(--gold);
+  padding: 1.25rem 1.5rem; margin-bottom: 2.5rem; border-radius: 2px;
+}
+.instructions p { font-size: 0.88rem; color: var(--light-smoke); line-height: 1.75; }
+.instructions strong { color: var(--parchment); }
+.instructions em { color: var(--gold); }
+
+/* PROGRESS */
+.progress-row {
+  display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2.5rem;
+}
+.prog-step {
+  width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--ash);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--smoke);
+  transition: all 0.3s;
+}
+.prog-step.active { border-color: var(--ember); color: var(--ember); background: rgba(201,74,26,0.1); }
+.prog-step.done { border-color: var(--gold); color: var(--gold); background: rgba(201,148,58,0.1); }
+.prog-line { flex: 1; height: 1px; background: var(--ash); }
+.prog-label { font-family: 'Space Mono', monospace; font-size: 0.58rem; color: var(--smoke); text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* TOWER */
+.tower-wrap {
+  display: flex; gap: 2rem; align-items: flex-start; margin-bottom: 2rem;
+}
+.tower { flex: 1; }
+.foundation-column { width: 200px; flex-shrink: 0; }
+
+.level-label {
+  font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--smoke); margin-bottom: 0.5rem;
+  display: flex; justify-content: space-between;
+}
+.level-label span { color: var(--ash); }
+
+/* TOWER BRICK SLOT */
+.tower-level { margin-bottom: 1rem; }
+.tower-slot {
+  width: 100%; min-height: 56px; border: 2px dashed var(--ash);
+  border-radius: 3px; display: flex; align-items: center; justify-content: center;
+  background: #0a0906; transition: all 0.2s; position: relative;
+  cursor: pointer;
+}
+.tower-slot.occupied { border-style: solid; cursor: default; }
+.tower-slot.glowing { border-color: var(--gold); box-shadow: 0 0 12px rgba(201,148,58,0.2); }
+.tower-slot-label {
+  font-family: 'Space Mono', monospace; font-size: 0.55rem; color: var(--ash);
+  text-transform: uppercase; letter-spacing: 0.1em;
+}
+
+/* TOWER BRICK (placed) */
+.tower-brick {
+  width: 100%; height: 100%; min-height: 52px;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  padding: 0.75rem 1rem; border-radius: 2px;
+  animation: brickLand 0.3s ease;
+}
+.tower-brick .brick-pole {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+.tower-brick .brick-context {
+  font-family: 'Space Mono', monospace; font-size: 0.55rem; color: rgba(255,255,255,0.6);
+  margin-top: 2px; letter-spacing: 0.05em;
+}
+
+/* APEX */
+.apex-slot {
+  width: 100%; min-height: 64px; border: 2px dashed var(--ash);
+  border-radius: 3px; display: flex; align-items: center; justify-content: center;
+  background: #0a0906; transition: all 0.3s; margin-bottom: 1.5rem;
+  position: relative;
+}
+.apex-slot.revealed {
+  border-color: var(--ember);
+  background: rgba(201,74,26,0.08);
+  box-shadow: 0 0 24px rgba(201,74,26,0.15);
+}
+.apex-label {
+  font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--ash);
+  text-transform: uppercase; letter-spacing: 0.15em;
+}
+.apex-revealed {
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8rem;
+  color: var(--ember); letter-spacing: 0.05em;
+  animation: apexReveal 0.8s ease;
+}
+.apex-sub {
+  font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--smoke);
+  letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px;
+}
+
+/* FOUNDATION COLUMN */
+.foundation-hd {
+  font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--smoke); margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem; border-bottom: 1px solid var(--ash);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.foundation-hd span { color: var(--gold); font-size: 0.65rem; }
+.foundation-items { display: flex; flex-direction: column; gap: 0.5rem; }
+.foundation-brick {
+  padding: 0.5rem 0.75rem; background: #0a0906; border: 1px solid var(--ash);
+  border-radius: 2px; border-left: 2px solid var(--smoke);
+  font-family: 'IM Fell English', serif; font-size: 0.82rem; color: var(--smoke);
+  font-style: italic; animation: fallDown 0.4s ease;
+  position: relative;
+}
+.foundation-brick .fb-binary { font-size: 0.7rem; color: var(--ash); font-family: 'Space Mono', monospace; font-style: normal; margin-top: 2px; }
+
+/* CHOICE CARDS */
+.choice-section { margin-bottom: 2.5rem; }
+.choice-prompt {
+  font-size: 0.88rem; color: var(--light-smoke); line-height: 1.7;
+  margin-bottom: 1.25rem; padding: 1rem 1.25rem;
+  background: rgba(201,148,58,0.05); border-left: 2px solid var(--gold);
+}
+.choice-prompt strong { color: var(--parchment); }
+.choice-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.choice-card {
+  padding: 1.25rem; background: #0a0906; border: 1px solid var(--ash);
+  border-radius: 3px; cursor: pointer; transition: all 0.2s;
+  display: flex; flex-direction: column; gap: 0.4rem;
+}
+.choice-card:hover { border-color: var(--gold); background: rgba(201,148,58,0.05); transform: translateY(-1px); }
+.choice-card .choice-pole {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem;
+  color: var(--parchment);
+}
+.choice-card .choice-desc {
+  font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--smoke);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.choice-card .choice-detail {
+  font-size: 0.8rem; color: var(--smoke); line-height: 1.55; margin-top: 0.25rem;
+}
+.choice-card.selected { border-color: var(--ember); background: rgba(201,74,26,0.08); }
+.choice-card.selected .choice-pole { color: var(--ember); }
+
+/* CONTROLS */
+.ctrl-row { display: flex; gap: 0.75rem; margin-bottom: 2.5rem; }
+.btn {
+  font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 0.6rem 1.2rem; border-radius: 2px;
+  cursor: pointer; transition: all 0.2s; border: 1px solid;
+}
+.btn-reset { background: transparent; border-color: var(--ash); color: var(--smoke); }
+.btn-reset:hover { border-color: var(--ember); color: var(--ember); }
+
+/* ANALYSIS */
+.analysis { display: none; }
+.analysis.visible { display: block; animation: fadeUp 0.6s ease; }
+
+.section-label {
+  font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ember); margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--ash), transparent); }
+
+.ylh-box {
+  background: rgba(201,74,26,0.06); border: 1px solid var(--ash);
+  border-left: 3px solid var(--ember); padding: 1.5rem;
+  margin-bottom: 2rem; border-radius: 2px;
+}
+.ylh-box .ylh-tag { font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ember); margin-bottom: 0.75rem; }
+.ylh-box p { font-size: 0.9rem; line-height: 1.8; color: var(--light-smoke); margin-bottom: 0.75rem; }
+.ylh-box p:last-child { margin-bottom: 0; }
+.ylh-box strong { color: var(--parchment); }
+.ylh-box em { color: var(--gold); font-style: italic; }
+
+/* CHOICE REVIEW */
+.choice-review { margin-bottom: 2rem; }
+.review-item {
+  background: #0a0906; border: 1px solid var(--ash); margin-bottom: 1px;
+  display: grid; grid-template-columns: 1fr 1fr; overflow: hidden;
+}
+.review-elevated {
+  padding: 1rem 1.25rem; border-right: 1px solid var(--ash);
+}
+.review-foundation { padding: 1rem 1.25rem; }
+.review-elevated h4 { font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ember); margin-bottom: 0.4rem; }
+.review-foundation h4 { font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--smoke); margin-bottom: 0.4rem; }
+.review-elevated .pole { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--parchment); }
+.review-foundation .pole { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--smoke); text-decoration: line-through; }
+.review-comment { font-size: 0.78rem; color: var(--smoke); line-height: 1.5; margin-top: 0.35rem; }
+
+/* COLLISION */
+.collision { background: #0a0906; border: 1px solid var(--ash); border-radius: 2px; margin-bottom: 2rem; overflow: hidden; }
+.collision-hd { padding: 1rem 1.5rem; border-bottom: 1px solid var(--ash); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--parchment); }
+.collision-body { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width: 600px) { .collision-body { grid-template-columns: 1fr; } .tower-wrap { flex-direction: column; } .foundation-column { width: 100%; } }
+.col-panel { padding: 1.25rem 1.5rem; border-right: 1px solid var(--ash); }
+.col-panel:last-child { border-right: none; }
+.col-panel h4 { font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.6rem; }
+.col-panel p { font-size: 0.8rem; line-height: 1.65; color: var(--smoke); }
+.col-lib h4 { color: var(--gold); }
+.col-imp h4 { color: var(--smoke); }
+.col-abs h4 { color: var(--ember); }
+
+/* CLOSING */
+.closing {
+  background: rgba(201,148,58,0.05); border: 1px solid var(--ash);
+  border-left: 3px solid var(--gold); padding: 1.5rem; margin-bottom: 2rem; border-radius: 2px;
+}
+.closing .ylh-tag { font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+.closing p { font-size: 0.9rem; line-height: 1.8; color: var(--light-smoke); margin-bottom: 0.75rem; }
+.closing p:last-child { margin-bottom: 0; }
+.closing strong { color: var(--parchment); }
+.closing em { color: var(--gold); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes brickLand { from { opacity: 0; transform: scaleY(0.7); } to { opacity: 1; transform: scaleY(1); } }
+@keyframes apexReveal { 0% { opacity: 0; transform: scale(0.5); } 60% { transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes fallDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+footer { border-top: 1px solid var(--ash); padding: 1.5rem 2rem; text-align: center; font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; color: var(--ash); text-transform: uppercase; }
+footer a { color: var(--smoke); text-decoration: none; }
+footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="ylh-tools.html">YLH<span>.</span>Tools</a>
+  <a class="nav-back" href="ylh-tools.html">← All Tools</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-ruled"></div>
+  <p class="eyebrow">Tool 01 / 05 · Interactive Game</p>
+  <h1>Build <em>Babel</em></h1>
+  <p class="hero-sub">Every empire climbs the same tower. Rome built it. America built it. You are about to build it too — one binary at a time.</p>
+  <p class="hero-verse">"Come, let us build ourselves a city, with a tower that reaches to the heavens." — Genesis 11:4</p>
+</div>
+
+<div class="main">
+
+  <!-- Instructions -->
+  <div class="instructions">
+    <p>At each level of the tower, you will be given a binary pair that <strong>both Rome and the United States used</strong> to organize their society. Choose which pole belongs <em>above</em> — elevated, privileged, normalized. The other pole becomes <strong>The Foundation</strong>: the suppressed term that holds the tower up but is never acknowledged.</p>
+    <p style="margin-top:0.6rem">When the tower is complete, the apex will be revealed. Then the full analysis begins.</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-row" id="progress-row"></div>
+
+  <!-- Tower + Foundation -->
+  <div class="tower-wrap">
+    <div class="tower">
+      <!-- Apex -->
+      <div class="tower-level">
+        <div class="level-label">Apex <span>— what the climb was for</span></div>
+        <div class="apex-slot" id="apex-slot">
+          <span class="apex-label">???</span>
+        </div>
+      </div>
+      <!-- Levels rendered by JS -->
+      <div id="tower-levels"></div>
+    </div>
+
+    <div class="foundation-column">
+      <div class="foundation-hd">The Foundation <span>↓</span></div>
+      <div class="foundation-items" id="foundation-items">
+        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--ash);font-style:italic;">
+          Suppressed poles appear here as you build.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Choice Section -->
+  <div class="choice-section" id="choice-section"></div>
+
+  <!-- Controls -->
+  <div class="ctrl-row">
+    <button class="btn btn-reset" onclick="resetGame()">↺ Start Over</button>
+  </div>
+
+  <!-- Analysis -->
+  <div class="analysis" id="analysis"></div>
+
+</div>
+
+<footer>
+  <p>YLH Tools · Yahwist Liberation Hermeneutic · Open Scholarship</p>
+  <p style="margin-top:0.4rem"><a href="ylh-tools.html">← Return to Atlas Home</a></p>
+</footer>
+
+<script>
+// ── BINARY DATA ───────────────────────────────────────────────────────────────
+const BINARIES = [
+  {
+    id: 'sacred-profane',
+    pair: ['Sacred', 'Profane'],
+    rome: ['Roman priests, temples, imperial cult', 'Foreign religions, "barbarian" rites, the conquered'],
+    us: ['White Protestant Christianity', 'Indigenous spirituality, African religion, Islam'],
+    elevateDesc: ['Legitimate, protected, state-sponsored religion', 'State religion — the language of law and belonging'],
+    suppressDesc: ['Criminalized, mocked, or erased', 'Excluded from civic life, forced underground'],
+    whyMatters: 'Control of the sacred is control of meaning itself. What is sacred is protected; what is profane is expendable.',
+  },
+  {
+    id: 'citizen-subject',
+    pair: ['Citizen', 'Subject'],
+    rome: ['Roman citizens with legal rights', 'Conquered peoples, non-citizens, slaves'],
+    us: ['White propertied men (original constitution)', 'Enslaved people, women, Indigenous nations, immigrants'],
+    elevateDesc: ['Rights, legal protection, civic participation', 'Full legal personhood — the law works for you'],
+    suppressDesc: ['Administered, extracted from, disposable', 'Administered by law but not protected by it'],
+    whyMatters: 'Citizenship is the mechanism that makes some lives legally grievable and others not.',
+  },
+  {
+    id: 'civilized-savage',
+    pair: ['Civilized', 'Savage'],
+    rome: ['Romans and Hellenized peoples', '"Barbarians" — Germanic tribes, Celts, Africans'],
+    us: ['White European settlers', 'Indigenous peoples, enslaved Africans, Asian immigrants'],
+    elevateDesc: ['Rational, ordered, deserving of self-governance', 'The justification for conquest — "we are improving them"'],
+    suppressDesc: ['Emotional, chaotic, requiring domination "for their own good"', 'Framed as needing civilization before deserving rights'],
+    whyMatters: 'The civilized/savage binary is the primary ideological technology of colonialism. It makes genocide legible as mercy.',
+  },
+  {
+    id: 'free-enslaved',
+    pair: ['Free', 'Enslaved'],
+    rome: ['Free Roman citizens and freedmen', 'Enslaved people — 30-40% of Roman population'],
+    us: ['White free laborers', 'Enslaved African people — 4 million by 1860'],
+    elevateDesc: ['Legal personhood, right to own property and family', 'The foundation of the entire economic system'],
+    suppressDesc: ['Legal property — no family, no body, no self', 'Their labor builds the wealth that funds the freedom above'],
+    whyMatters: 'The freedom at the top of this binary was only possible because of the enslavement at the bottom. This is not metaphor.',
+  },
+  {
+    id: 'order-chaos',
+    pair: ['Order', 'Chaos'],
+    rome: ['Pax Romana — Roman peace enforced by military', 'Resistance, revolt, "disorder" among the conquered'],
+    us: ['Law and Order — policing, criminal justice system', 'Protest, resistance, "riots," rebellion'],
+    elevateDesc: ['Stability, civilization, the proper state of things', 'What power always calls resistance — "they are the real threat"'],
+    suppressDesc: ['Criminalized disruption — any challenge to hierarchy', 'Named as chaos so the violence that suppresses it looks like peace'],
+    whyMatters: '"Order" has always meant the orderly continuation of the hierarchy. What empire calls chaos is what liberation calls justice.',
+  },
+  {
+    id: 'conqueror-conquered',
+    pair: ['Conqueror', 'Conquered'],
+    rome: ['Rome and its allies', 'Every nation Rome absorbed into empire'],
+    us: ['Manifest Destiny — settlers moving westward', 'Indigenous nations — 500+ distinct peoples'],
+    elevateDesc: ['Victors who write history and name the land', 'The engine of expansion — "we are destined for this"'],
+    suppressDesc: ['Erased, relocated, renamed, or absorbed', 'Their erasure is required for the conqueror\'s origin story'],
+    whyMatters: 'The conqueror/conquered binary requires the erasure of the conquered\'s full humanity. Genocide is its logical endpoint.',
+  },
+  {
+    id: 'chosen-cursed',
+    pair: ['Chosen', 'Cursed'],
+    rome: ['Romans as descendants of gods, favored by Jupiter', 'Enemies of Rome as standing against divine order'],
+    us: ['Manifest Destiny — God chose America', 'Indigenous peoples, enslaved Africans — framed as cursed (Ham)'],
+    elevateDesc: ['Divine favor — our power is God\'s will', 'The theological justification for every atrocity that follows'],
+    suppressDesc: ['Divine punishment — their suffering is deserved', 'Religion weaponized: their oppression is reframed as their spiritual condition'],
+    whyMatters: 'Theological justification is the most durable form of hierarchy because it places the architecture beyond human challenge.',
+  },
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let currentLevel = 0;
+let choices = []; // { binary, elevated, suppressed }
+let complete = false;
+
+// ── RENDER PROGRESS ────────────────────────────────────────────────────────────
+function renderProgress() {
+  const row = document.getElementById('progress-row');
+  row.innerHTML = '';
+  BINARIES.forEach((b, i) => {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'prog-line';
+      row.appendChild(line);
+    }
+    const step = document.createElement('div');
+    step.className = 'prog-step' + (i === currentLevel && !complete ? ' active' : i < currentLevel || complete ? ' done' : '');
+    step.textContent = i + 1;
+    row.appendChild(step);
+  });
+  const label = document.createElement('div');
+  label.className = 'prog-label';
+  label.style.marginLeft = '0.5rem';
+  label.textContent = complete ? 'Complete' : `Level ${currentLevel + 1} of ${BINARIES.length}`;
+  row.appendChild(label);
+}
+
+// ── RENDER TOWER LEVELS ────────────────────────────────────────────────────────
+function renderTowerLevels() {
+  const container = document.getElementById('tower-levels');
+  container.innerHTML = '';
+  // Render from top of choices down (most recent at top)
+  const reversed = [...choices].reverse();
+  reversed.forEach((c, ri) => {
+    const actualIndex = choices.length - 1 - ri;
+    const level = document.createElement('div');
+    level.className = 'tower-level';
+    const lbl = document.createElement('div');
+    lbl.className = 'level-label';
+    lbl.innerHTML = `Level ${actualIndex + 1} <span>— ${c.binary.pair[0]} / ${c.binary.pair[1]}</span>`;
+    const slot = document.createElement('div');
+    slot.className = 'tower-slot occupied';
+    // Color based on level
+    const colors = ['#c94a1a','#c9943a','#4a7fc9','#4ac97a','#9b4ac9','#c94a7f','#4ac9c9'];
+    const col = colors[actualIndex % colors.length];
+    slot.style.borderColor = col;
+    const brick = document.createElement('div');
+    brick.className = 'tower-brick';
+    brick.style.background = col + '22';
+    brick.innerHTML = `<div class="brick-pole" style="color:${col}">${c.elevated}</div><div class="brick-context">ELEVATED · ROME & U.S.</div>`;
+    slot.appendChild(brick);
+    level.appendChild(lbl);
+    level.appendChild(slot);
+    container.appendChild(level);
+  });
+
+  // Empty slots for remaining levels
+  for (let i = choices.length; i < BINARIES.length; i++) {
+    const level = document.createElement('div');
+    level.className = 'tower-level';
+    const lbl = document.createElement('div');
+    lbl.className = 'level-label';
+    lbl.innerHTML = `Level ${i + 1} <span>— awaiting choice</span>`;
+    const slot = document.createElement('div');
+    slot.className = 'tower-slot' + (i === currentLevel ? ' glowing' : '');
+    slot.innerHTML = `<span class="tower-slot-label">${i === currentLevel ? 'Your choice goes here' : '—'}</span>`;
+    level.appendChild(lbl);
+    level.appendChild(slot);
+    container.appendChild(level);
+  }
+}
+
+// ── RENDER FOUNDATION ──────────────────────────────────────────────────────────
+function renderFoundation() {
+  const container = document.getElementById('foundation-items');
+  if (choices.length === 0) {
+    container.innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:0.6rem;color:var(--ash);font-style:italic;">Suppressed poles appear here as you build.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  [...choices].reverse().forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'foundation-brick';
+    item.innerHTML = `${c.suppressed}<div class="fb-binary">from ${c.binary.pair[0]} / ${c.binary.pair[1]}</div>`;
+    container.appendChild(item);
+  });
+}
+
+// ── RENDER CHOICE ──────────────────────────────────────────────────────────────
+function renderChoice() {
+  const section = document.getElementById('choice-section');
+  if (complete || currentLevel >= BINARIES.length) { section.innerHTML = ''; return; }
+  const b = BINARIES[currentLevel];
+  section.innerHTML = `
+    <div class="choice-prompt">
+      <strong>Level ${currentLevel + 1}: ${b.pair[0]} / ${b.pair[1]}</strong><br/>
+      Both Rome and the United States used this binary to organize power. Which pole did they elevate — the one that belonged above, that deserved protection, that defined the norm? Choose. The other becomes The Foundation.
+    </div>
+    <div class="choice-cards">
+      <div class="choice-card" onclick="makeChoice(0)">
+        <div class="choice-pole">${b.pair[0]}</div>
+        <div class="choice-desc">Rome: ${b.rome[0]}</div>
+        <div class="choice-detail">${b.elevateDesc[0]}</div>
+      </div>
+      <div class="choice-card" onclick="makeChoice(1)">
+        <div class="choice-pole">${b.pair[1]}</div>
+        <div class="choice-desc">U.S.: ${b.us[0]}</div>
+        <div class="choice-detail">${b.elevateDesc[1]}</div>
+      </div>
+    </div>
+    <div style="margin-top:0.75rem;font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--smoke);font-style:italic;">
+      There is no wrong answer. But notice: both empires made the same choice.
+    </div>
+  `;
+}
+
+// ── MAKE CHOICE ────────────────────────────────────────────────────────────────
+function makeChoice(poleIndex) {
+  const b = BINARIES[currentLevel];
+  const elevated = b.pair[poleIndex];
+  const suppressed = b.pair[1 - poleIndex];
+  choices.push({ binary: b, elevated, suppressed, poleIndex });
+  currentLevel++;
+  if (currentLevel >= BINARIES.length) {
+    complete = true;
+    revealApex();
+  }
+  renderProgress();
+  renderTowerLevels();
+  renderFoundation();
+  renderChoice();
+}
+
+// ── REVEAL APEX ────────────────────────────────────────────────────────────────
+function revealApex() {
+  const apex = document.getElementById('apex-slot');
+  apex.classList.add('revealed');
+  apex.innerHTML = `
+    <div style="text-align:center">
+      <div class="apex-revealed">POWER</div>
+      <div class="apex-sub">What the climb was always for</div>
+    </div>
+  `;
+  setTimeout(() => {
+    renderAnalysis();
+    document.getElementById('analysis').classList.add('visible');
+    setTimeout(() => document.getElementById('analysis').scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+  }, 1200);
+}
+
+// ── RENDER ANALYSIS ────────────────────────────────────────────────────────────
+function renderAnalysis() {
+  const section = document.getElementById('analysis');
+
+  // Build choice review HTML
+  const reviewHTML = choices.map((c, i) => `
+    <div class="review-item">
+      <div class="review-elevated">
+        <h4>↑ Elevated — Level ${i+1}</h4>
+        <div class="pole">${c.elevated}</div>
+        <div class="review-comment">${c.binary.whyMatters}</div>
+      </div>
+      <div class="review-foundation">
+        <h4>↓ The Foundation</h4>
+        <div class="pole">${c.suppressed}</div>
+        <div class="review-comment">Rome: ${c.binary.rome[1]}<br/>U.S.: ${c.binary.us[1]}</div>
+      </div>
+    </div>
+  `).join('');
+
+  section.innerHTML = `
+    <div class="section-label">The Tower You Built</div>
+
+    <div class="ylh-box">
+      <div class="ylh-tag">YLH Analysis</div>
+      <p>You just built <strong>the Tower of Babel</strong> — and it looks identical to every imperial hierarchy in the Western tradition. Rome built this tower. The United States built this tower. Augustine described it theologically. Plato described it philosophically. The names change. The architecture does not.</p>
+      <p>Notice what sits at the apex. Not God. Not civilization. Not freedom. <strong>Power</strong> — stripped of every justification that was layered over it as you climbed. The sacred, the citizen, the civilized, the free, the ordered, the conquering, the chosen — each was a way of naming power without saying the word.</p>
+      <p><em>The Yahwist Liberation Hermeneutic names the architecture so it can be dismantled.</em> You cannot dismantle what you cannot see. You just saw it.</p>
+    </div>
+
+    <div class="section-label">Your Choices</div>
+    <div class="choice-review">${reviewHTML}</div>
+
+    <div class="section-label">What Both Empires Had In Common</div>
+
+    <div class="collision">
+      <div class="collision-hd">The Collision That Built the Tower</div>
+      <div class="collision-body">
+        <div class="col-panel col-lib">
+          <h4>Liberation Claim</h4>
+          <p>Every human being bears the divine image — nephesh, the sacred breath breathed into every body without exception (Genesis 2:7). No position in a hierarchy can exhaust the worth of a person. The Yahwist tradition insists that the suppressed pole at the bottom of every binary you placed is as fully human as the elevated pole at the top.</p>
+        </div>
+        <div class="col-panel col-imp">
+          <h4>Imperial Demand</h4>
+          <p>Both Rome and the United States required the binary hierarchy to function. The sacred needed the profane to define itself. The citizen needed the subject to justify their privileges. The free needed the enslaved to produce their wealth. The tower is not incidental to empire — it is the structure of empire. Remove the Foundation and the tower falls.</p>
+        </div>
+        <div class="col-panel col-abs">
+          <h4>Emergent Abstraction</h4>
+          <p>The genius of Babel is that the hierarchy becomes invisible to those at the top. The elevated poles present themselves as natural — as simply what a person, a civilization, a religion, a nation is. The Foundation is rendered silent. The YLH framework names what empire has always unnamed: the tower is built on bodies, and the bodies remember even when history forgets.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">The Question Genesis Is Really Asking</div>
+
+    <div class="closing">
+      <div class="ylh-tag">The Babel Critique</div>
+      <p>Genesis 11 is not a story about God being threatened by human ambition. It is a story about what happens when human beings organize themselves into a vertical hierarchy aimed at a single apex — and call that apex God.</p>
+      <p><strong>The Yahwist author watched empire do exactly this.</strong> Babel is not ancient history. It is the structural description of every civilization that has pointed upward and called power divine, called hierarchy natural, called the Foundation expendable.</p>
+      <p>The tower is scattered not because God is jealous — but because <em>no human hierarchy can bear the weight of the divine image it is crushing at its foundation.</em></p>
+      <p style="margin-top:1rem;color:var(--parchment);font-size:0.95rem;">The binaries you elevated are still in place in American law, theology, and economy. The Foundation is still holding up the tower. The question the YLH framework puts to every institution, every church, every nation is this:</p>
+      <p><strong>What would you have to give up if you let the Foundation stand?</strong></p>
+    </div>
+
+    <div style="text-align:center;padding:1.5rem 0;">
+      <button class="btn btn-reset" onclick="resetGame()" style="font-size:0.7rem;padding:0.8rem 2rem;">↺ Build It Again — Try Different Choices</button>
+    </div>
+  `;
+}
+
+// ── RESET ──────────────────────────────────────────────────────────────────────
+function resetGame() {
+  currentLevel = 0;
+  choices = [];
+  complete = false;
+  document.getElementById('apex-slot').className = 'apex-slot';
+  document.getElementById('apex-slot').innerHTML = '<span class="apex-label">???</span>';
+  document.getElementById('analysis').classList.remove('visible');
+  document.getElementById('analysis').innerHTML = '';
+  renderProgress();
+  renderTowerLevels();
+  renderFoundation();
+  renderChoice();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────────
+renderProgress();
+renderTowerLevels();
+renderFoundation();
+renderChoice();
+</script>
+</body>
+</html>

@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>YLH Tools — Yahwist Liberation Hermeneutic</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Syne:wght@400;700;800&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0e0c09;
+    --parchment: #f2ead8;
+    --ember: #c94a1a;
+    --gold: #c9943a;
+    --ash: #3a3630;
+    --smoke: #7a7060;
+    --light-smoke: #b8ae9e;
+    --glow: rgba(201,148,58,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--ink);
+    color: var(--parchment);
+    font-family: 'IM Fell English', Georgia, serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: clamp(3rem, 8vw, 8rem) clamp(2rem, 8vw, 10rem);
+    overflow: hidden;
+  }
+
+  .header-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 50%, rgba(201,74,26,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(201,148,58,0.05) 0%, transparent 60%),
+      linear-gradient(170deg, #0e0c09 0%, #1a1712 50%, #0e0c09 100%);
+    z-index: 0;
+  }
+
+  /* decorative ruled lines */
+  .ruled-lines {
+    position: absolute;
+    top: 0; right: 0;
+    width: 45%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.06;
+    background-image: repeating-linear-gradient(
+      0deg,
+      var(--parchment) 0px,
+      var(--parchment) 1px,
+      transparent 1px,
+      transparent 28px
+    );
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+  }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.4s forwards;
+  }
+
+  h1 span.accent {
+    color: var(--ember);
+    font-style: italic;
+    font-family: 'IM Fell English', serif;
+    font-weight: 400;
+  }
+
+  .tagline {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.7;
+    color: var(--light-smoke);
+    max-width: 520px;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.6s forwards;
+  }
+
+  .tagline em {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .scroll-cue {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--smoke);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 1s forwards;
+  }
+
+  .scroll-cue::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--smoke);
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.3;
+  }
+
+  /* ── ABOUT STRIP ── */
+  .about-strip {
+    padding: clamp(4rem, 8vw, 7rem) clamp(2rem, 8vw, 10rem);
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 4rem;
+    align-items: start;
+    background: linear-gradient(180deg, #0e0c09 0%, #131109 100%);
+  }
+
+  @media (max-width: 768px) {
+    .about-strip { grid-template-columns: 1fr; gap: 2rem; }
+    .ruled-lines { width: 100%; opacity: 0.03; }
+  }
+
+  .about-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    padding-top: 0.4rem;
+  }
+
+  .about-body p {
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
+    line-height: 1.85;
+    color: var(--light-smoke);
+    margin-bottom: 1.2rem;
+  }
+
+  .about-body p strong {
+    color: var(--parchment);
+    font-style: italic;
+  }
+
+  /* ── TOOLS SECTION ── */
+  .tools-section {
+    padding: clamp(4rem, 8vw, 7rem) clamp(2rem, 8vw, 10rem);
+  }
+
+  .section-heading {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--ember);
+    text-transform: uppercase;
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .section-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--ash), transparent);
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5px;
+    background: var(--ash);
+    border: 1.5px solid var(--ash);
+  }
+
+  .tool-card {
+    background: #110f0c;
+    padding: 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+
+  .tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--ember);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.35s ease;
+  }
+
+  .tool-card:hover {
+    background: #191510;
+  }
+
+  .tool-card:hover::before {
+    transform: scaleY(1);
+  }
+
+  .tool-card:hover .tool-number {
+    color: var(--ember);
+  }
+
+  .tool-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--smoke);
+    letter-spacing: 0.15em;
+    margin-bottom: 1.2rem;
+    transition: color 0.3s;
+  }
+
+  .tool-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+    color: var(--parchment);
+  }
+
+  .tool-subtitle {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  .tool-desc {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--smoke);
+  }
+
+  .tool-tag {
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--smoke);
+    border: 1px solid var(--ash);
+    padding: 0.25rem 0.6rem;
+    border-radius: 2px;
+    transition: border-color 0.3s, color 0.3s;
+  }
+
+  .tool-card:hover .tool-tag {
+    border-color: var(--ember);
+    color: var(--ember);
+  }
+
+  /* ── PHILOSOPHY STRIP ── */
+  .philosophy-strip {
+    padding: clamp(4rem, 8vw, 7rem) clamp(2rem, 8vw, 10rem);
+    background: #0a0906;
+    border-top: 1px solid var(--ash);
+    border-bottom: 1px solid var(--ash);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 3rem;
+  }
+
+  .pillar {
+    padding-left: 1.2rem;
+    border-left: 2px solid var(--ash);
+    transition: border-color 0.3s;
+  }
+
+  .pillar:hover {
+    border-color: var(--gold);
+  }
+
+  .pillar-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .pillar-text {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--smoke);
+    font-style: italic;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 3rem clamp(2rem, 8vw, 10rem);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-brand {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    color: var(--smoke);
+  }
+
+  .footer-brand span { color: var(--ember); }
+
+  .footer-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--ash);
+    letter-spacing: 0.1em;
+    text-align: right;
+  }
+
+  /* ── MARQUEE ── */
+  .marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--ash);
+    border-bottom: 1px solid var(--ash);
+    padding: 0.85rem 0;
+    background: #0a0906;
+  }
+
+  .marquee-track {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee 28s linear infinite;
+    gap: 0;
+  }
+
+  .marquee-item {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ash);
+    padding: 0 2.5rem;
+    flex-shrink: 0;
+  }
+
+  .marquee-item.accent { color: var(--ember); opacity: 0.6; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ── COMING SOON BADGE ── */
+  .badge-soon {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--smoke);
+    border: 1px solid var(--ash);
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+  }
+
+  /* ── LIVE BADGE ── */
+  .badge-live {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ember);
+    border: 1px solid var(--ember);
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .live-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--ember);
+    border-radius: 50%;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-bg"></div>
+  <div class="ruled-lines"></div>
+  <div class="header-content">
+    <p class="eyebrow">Yahwist Liberation Hermeneutic · Digital Artifact Repository</p>
+    <h1>YLH<br/><span class="accent">Tools</span></h1>
+    <p class="tagline">
+      A collection of interactive instruments for reading scripture as a site of
+      <em>competing cosmologies</em> — where contradiction is data, consequence is the measure,
+      and liberation is the horizon.
+    </p>
+    <div class="scroll-cue">Explore the tools</div>
+  </div>
+</header>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">Yahwist Tradition</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Elohist Tradition</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Priestly Tradition</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Liberation Hermeneutic</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Decolonial Metaphysics</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Consequence Over Coherence</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Nephesh · Echad · Dabar</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Yahwist Tradition</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Elohist Tradition</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Priestly Tradition</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Liberation Hermeneutic</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Decolonial Metaphysics</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Consequence Over Coherence</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Nephesh · Echad · Dabar</span>
+    <span class="marquee-item accent">✦</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about-strip">
+  <div class="about-label">The Method</div>
+  <div class="about-body">
+    <p>
+      The <strong>Yahwist Liberation Hermeneutic</strong> is a polyphonic interpretive methodology
+      that reads biblical texts as sites of competing cosmologies shaped by distinct social,
+      political, and theological conditions.
+    </p>
+    <p>
+      Rather than seeking textual harmony or privileging the final canonical form,
+      YLH treats <strong>contradiction and tension as analytically productive</strong> —
+      distinguishing between traditions that resist domination and affirm human dignity,
+      and those that function to stabilize hierarchy, ritualized control, or imperial order.
+    </p>
+    <p>
+      Meaning is assessed not by coherence or intent alone, but by consequence:
+      <strong>how texts function to shape moral imagination, social organization, and structures of power.</strong>
+    </p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TOOLS -->
+<section class="tools-section">
+  <div class="section-heading">Interactive Tools</div>
+  <div class="tools-grid">
+
+    <!-- Tool 1 -->
+    <a class="tool-card" href="binary-builder.html">
+      <div class="badge-live"><span class="live-dot"></span> Live</div>
+      <div class="tool-number">01 / 04</div>
+      <div class="tool-title">Build Babel</div>
+      <div class="tool-subtitle">Every empire climbs the same tower.</div>
+      <p class="tool-desc">
+        An interactive game for examining how opposing poles function in metaphysical systems.
+        Build hierarchies, watch them calcify, and interrogate who benefits from the structure.
+      </p>
+      <span class="tool-tag">Interactive · Game · Imperial Analysis</span>
+    </a>
+
+    <!-- Tool 2 -->
+    <a class="tool-card" href="decolonial-atlas.html">
+      <div class="badge-live"><span class="live-dot"></span> Live</div>
+      <div class="tool-number">02 / 04</div>
+      <div class="tool-title">Decolonial Metaphysics Atlas</div>
+      <div class="tool-subtitle">Mapping 35 systems across 11 structural axes</div>
+      <p class="tool-desc">
+        Radar chart visualizations showing convergence between Hebrew covenantal theology,
+        Indigenous relational metaphysics, and Liberation Christianity — and where Empire
+        Christianity clusters with Greek/Roman imperial frameworks.
+      </p>
+      <span class="tool-tag">Data Viz · Charts</span>
+    </a>
+
+    <!-- Tool 3 -->
+    <a class="tool-card" href="https://ylhhistoryfinal.vercel.app" target="_blank">
+      <div class="badge-live"><span class="live-dot"></span> Live</div>
+      <div class="tool-number">03 / 05</div>
+      <div class="tool-title">Empire &amp; Liberation Systems Map</div>
+      <div class="tool-subtitle">Where do power and resistance collide?</div>
+      <p class="tool-desc">
+        A full interactive timeline mapping Liberation and Imperial metaphysics across U.S. History
+        and 7 centuries of early Christianity — with flashpoint collision analysis, Church Fathers
+        track, economic periods, and presidential data.
+      </p>
+      <span class="tool-tag">Interactive · Timeline · History</span>
+    </a>
+
+    <!-- Tool 4 -->
+    <a class="tool-card" href="#genesis-trainer">
+      <div class="badge-soon">Coming Soon</div>
+      <div class="tool-number">04 / 05</div>
+      <div class="tool-title">Genesis is Polemic Trainer</div>
+      <div class="tool-subtitle">The text is not neutral. Neither is the reader.</div>
+      <p class="tool-desc">
+        An interactive tool for examining what binary structures do when hardened versus held fluid.
+        Uses Genesis as a case study in competing creation cosmologies and their downstream consequences.
+      </p>
+      <span class="tool-tag">Interactive · Text Analysis</span>
+    </a>
+
+    <!-- Tool 5 -->
+    <a class="tool-card" href="#ylh-intro">
+      <div class="badge-live"><span class="live-dot"></span> Live</div>
+      <div class="tool-number">05 / 05</div>
+      <div class="tool-title">YLH Methodology</div>
+      <div class="tool-subtitle">A formal introduction to the framework</div>
+      <p class="tool-desc">
+        The full methodological overview: source traditions, interpretive axes, ethical register,
+        and how YLH positions itself within and against the dominant Western hermeneutical canon.
+      </p>
+      <span class="tool-tag">Explainer · Scholarship</span>
+    </a>
+
+  </div>
+</section>
+
+<!-- PHILOSOPHY PILLARS -->
+<section class="philosophy-strip">
+  <div class="pillar">
+    <div class="pillar-title">Consequence Over Coherence</div>
+    <p class="pillar-text">Texts are evaluated by what they produce in the world, not by their internal logical consistency.</p>
+  </div>
+  <div class="pillar">
+    <div class="pillar-title">Contradiction as Data</div>
+    <p class="pillar-text">Tension within the text is not a problem to be resolved — it is a record of competing voices and cosmologies.</p>
+  </div>
+  <div class="pillar">
+    <div class="pillar-title">Non-Western Epistemologies</div>
+    <p class="pillar-text">Hebrew, African, and Indigenous ways of knowing are treated as equally legitimate starting points.</p>
+  </div>
+  <div class="pillar">
+    <div class="pillar-title">Kingian Ethics</div>
+    <p class="pillar-text">The moral register is grounded in radical love, structural justice, and the Beloved Community as interpretive horizon.</p>
+  </div>
+</section>
+
+<!-- MARQUEE 2 -->
+<div class="marquee-wrap">
+  <div class="marquee-track" style="animation-direction: reverse; animation-duration: 36s;">
+    <span class="marquee-item">James Cone</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Howard Thurman</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Delores Williams</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Frantz Fanon</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Martin Luther King Jr.</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Source Criticism</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Post-Colonial Resistance</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">James Cone</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Howard Thurman</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Delores Williams</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Frantz Fanon</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Martin Luther King Jr.</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Source Criticism</span>
+    <span class="marquee-item accent">✦</span>
+    <span class="marquee-item">Post-Colonial Resistance</span>
+    <span class="marquee-item accent">✦</span>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">YLH<span>.</span>Tools</div>
+  <div class="footer-note">
+    Yahwist Liberation Hermeneutic<br/>
+    Digital Artifact Repository · Open Scholarship
+  </div>
+</footer>
+
+</body>
+</html>
