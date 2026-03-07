@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Decolonial Metaphysics Atlas — YLH Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Syne:wght@400;700;800&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0e0c09; --parchment: #f2ead8; --ember: #c94a1a;
+    --gold: #c9943a; --ash: #3a3630; --smoke: #7a7060; --light-smoke: #b8ae9e;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--ink); color: var(--parchment); font-family: 'IM Fell English', Georgia, serif; min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.3;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  }
+  nav {
+    padding: 1.2rem 2rem; border-bottom: 1px solid var(--ash);
+    display: flex; align-items: center; gap: 2rem;
+    background: rgba(14,12,9,0.97); position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--parchment); text-decoration: none; }
+  .nav-brand span { color: var(--ember); }
+  .nav-back { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--smoke); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
+  .nav-back:hover { color: var(--gold); }
+  .hero { padding: 2.5rem 2rem 2rem; text-align: center; border-bottom: 1px solid var(--ash); background: linear-gradient(180deg,#131109 0%,var(--ink) 100%); }
+  .eyebrow { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.25em; color: var(--ember); text-transform: uppercase; margin-bottom: 1rem; }
+  .hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.6rem,3.5vw,2.8rem); letter-spacing: -0.03em; margin-bottom: 0.75rem; }
+  .hero h1 em { font-family: 'IM Fell English', serif; color: var(--gold); font-weight: 400; }
+  .hero-sub { font-size: 0.95rem; color: var(--light-smoke); max-width: 680px; margin: 0 auto 1.5rem; line-height: 1.7; }
+  .line-legend { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; color: var(--smoke); text-transform: uppercase; }
+  .line-legend span { display: flex; align-items: center; gap: 0.5rem; }
+  .layout { display: grid; grid-template-columns: 270px 1fr; min-height: calc(100vh - 180px); }
+  @media(max-width:900px){ .layout { grid-template-columns: 1fr; } }
+  .sidebar { border-right: 1px solid var(--ash); padding: 1.2rem; overflow-y: auto; max-height: calc(100vh - 120px); position: sticky; top: 62px; background: #0a0906; }
+  .ctrl-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+  .btn { font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.45rem; border: 1px solid var(--ash); background: transparent; color: var(--light-smoke); cursor: pointer; transition: all 0.2s; border-radius: 2px; }
+  .btn:hover { border-color: var(--gold); color: var(--gold); }
+  .btn.em { border-color: var(--ember); color: var(--ember); }
+  .btn.em:hover { background: rgba(201,74,26,0.1); }
+  .group-hd { font-family: 'Space Mono', monospace; font-size: 0.56rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin: 1rem 0 0.5rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--ash); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
+  .group-hd input { cursor: pointer; accent-color: var(--ember); }
+  .sys-item { display: flex; align-items: center; gap: 0.4rem; padding: 0.18rem 0.3rem; cursor: pointer; border-radius: 2px; transition: background 0.15s; margin-bottom: 0.05rem; }
+  .sys-item:hover { background: rgba(201,148,58,0.06); }
+  .sys-item input { cursor: pointer; accent-color: var(--ember); flex-shrink: 0; }
+  .sys-name { font-family: 'IM Fell English', serif; font-size: 0.78rem; color: var(--light-smoke); line-height: 1.3; transition: color 0.15s; }
+  .sys-item.off .sys-name { color: var(--smoke); opacity: 0.45; }
+  .info-btn { font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.55rem 1rem; border: 1px solid var(--ash); background: transparent; color: var(--smoke); cursor: pointer; transition: all 0.2s; width: 100%; margin-top: 1rem; border-radius: 2px; }
+  .info-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .chart-area { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+  .chart-box { background: #0a0906; border: 1px solid var(--ash); border-radius: 2px; padding: 1.5rem; display: flex; justify-content: center; }
+  svg.radar text { font-family: 'Space Mono', monospace; }
+  .insights { background: #0a0906; border: 1px solid var(--ash); border-left: 3px solid var(--ember); padding: 1.8rem; border-radius: 2px; }
+  .ins-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--parchment); margin-bottom: 0.6rem; }
+  .ins-desc { font-size: 0.88rem; color: var(--light-smoke); line-height: 1.7; margin-bottom: 0.9rem; }
+  .ins-body { font-size: 0.85rem; color: var(--smoke); line-height: 1.85; }
+  .ins-body strong { color: var(--parchment); }
+  .ins-body h4 { font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.08em; margin: 1rem 0 0.4rem; }
+  .ins-body p { margin-bottom: 0.6rem; }
+  .ins-body ul { margin: 0.3rem 0 0.6rem 1.5rem; }
+  .ins-body li { margin-bottom: 0.3rem; }
+  .ins-hint { font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em; color: var(--ash); text-transform: uppercase; margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--ash); text-align: center; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  .modal { background: #131109; border: 1px solid var(--ash); max-width: 680px; width: 100%; max-height: 85vh; overflow-y: auto; border-radius: 2px; }
+  .modal-hd { padding: 1.4rem 1.5rem; border-bottom: 1px solid var(--ash); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: #131109; }
+  .modal-hd h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--parchment); }
+  .modal-close { background: none; border: 1px solid var(--ash); color: var(--smoke); padding: 0.35rem 0.7rem; cursor: pointer; font-family: 'Space Mono', monospace; font-size: 0.58rem; transition: all 0.2s; border-radius: 2px; }
+  .modal-close:hover { border-color: var(--ember); color: var(--ember); }
+  .modal-body { padding: 1.8rem; }
+  .modal-body h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.78rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin: 1.4rem 0 0.6rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--ash); }
+  .modal-body p { font-size: 0.88rem; color: var(--light-smoke); line-height: 1.75; margin-bottom: 0.6rem; }
+  .modal-body strong { color: var(--parchment); }
+  .modal-kq { background: rgba(201,74,26,0.08); border-left: 3px solid var(--ember); padding: 1rem 1.4rem; margin-top: 1.4rem; border-radius: 0 2px 2px 0; }
+  .modal-kq p { font-style: italic; margin: 0; }
+  footer { border-top: 1px solid var(--ash); padding: 1.8rem 2rem; text-align: center; font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; color: var(--ash); text-transform: uppercase; }
+  footer a { color: var(--smoke); text-decoration: none; }
+  footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="ylh-tools.html">YLH<span>.</span>Tools</a>
+  <a class="nav-back" href="ylh-tools.html">← All Tools</a>
+</nav>
+
+<div class="hero">
+  <p class="eyebrow">Tool 02 / 04 · Interactive Visualization</p>
+  <h1><em>The Decolonial Metaphysics Atlas</em></h1>
+  <p class="hero-sub">A global comparative mapping of Hebrew, Indigenous, Syncretic, Imperial, Modern, and Decolonial metaphysical worlds across 11 structural axes.</p>
+  <div class="line-legend">
+    <span><svg width="28" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="#c9943a" stroke-width="2"/></svg>Solid = Relational</span>
+    <span><svg width="28" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="#c9943a" stroke-width="2" stroke-dasharray="6 3"/></svg>Dashed = Imperial</span>
+    <span><svg width="28" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="#c9943a" stroke-width="2" stroke-dasharray="2 3"/></svg>Dotted = Hybrid</span>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="chart-area">
+    <div class="chart-box"><svg class="radar" id="radar-svg" width="660" height="660"></svg></div>
+    <div class="insights" id="insights-panel"></div>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+
+<footer>
+  <p>YLH Tools · Yahwist Liberation Hermeneutic · Open Scholarship</p>
+  <p style="margin-top:0.4rem"><a href="ylh-tools.html">← Return to Atlas Home</a></p>
+</footer>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const AXES = ['Ontology','Epistemology','Anthropology','Cosmology','Moral/Ethical Logic','Binaries','Static/Dynamic','Power','Relationships','Matter/Spirit','Source of Creation'];
+
+const D = {
+  'Genesis 1':       [6,6,8,7,9,3,9,5,10,9,10],
+  'John 1':          [9,9,7,9,8,9,3,9,6,5,9],
+  'Jesus':           [4,7,8,7,10,3,9,5,10,8,6],
+  'Empire Christianity':[9,8,5,9,4,9,3,10,3,2,9],
+  'Liberation Christianity':[5,9,9,7,10,2,10,4,10,9,6],
+  'Early Paul':      [4,8,7,8,9,3,9,5,9,8,7],
+  'Empire Paul':     [7,6,5,6,4,8,5,8,4,6,7],
+  'Yahwism':         [4,7,9,6,10,5,9,8,10,7,6],
+  'African Indigenous':[9,9,10,9,8,7,10,10,10,9,8],
+  'Indigenous Americas':[9,9,10,10,9,8,10,9,10,10,8],
+  'Pacific Islander':[9,9,10,9,9,7,10,9,10,10,9],
+  'South Asian Indigenous':[9,9,10,8,9,6,9,9,10,10,8],
+  'Southeast Asian Indigenous':[9,9,10,9,9,7,10,9,10,10,9],
+  'Afro-Caribbean Syncretic':[9,9,9,9,8,8,10,9,10,9,9],
+  'African American Survival':[9,8,9,8,9,8,10,10,10,9,8],
+  'Indigenous–Christian Syncretic':[9,8,9,9,8,7,9,9,10,9,9],
+  'Latin American Mestizo':[9,8,9,9,8,8,10,9,10,9,9],
+  'Pacific Christian–Indigenous':[9,9,9,9,8,8,10,8,10,9,9],
+  'South Asian Folk–Hindu':[9,9,9,9,8,8,8,9,10,9,9],
+  'East/SE Asian Hybrid':[10,9,9,10,9,8,10,9,10,9,9],
+  'Classical Greek': [9,8,7,8,9,8,6,6,7,8,6],
+  'Christian Imperial':[10,9,8,9,10,9,7,10,9,9,10],
+  'Enlightenment Rationalist':[8,10,8,8,9,7,7,7,7,7,6],
+  'Liberal Humanist':[8,9,9,6,9,6,8,7,8,6,7],
+  'Scientific Materialist':[10,10,8,9,6,7,9,7,8,10,10],
+  'Neoliberal Market':[8,9,7,6,6,8,8,10,7,6,7],
+  'Fascist/Ethno-Nationalist':[9,6,8,7,9,9,7,10,7,9,9],
+  'Techno-Colonial':[9,10,7,6,6,8,9,10,7,6,9],
+  'New Thought':     [9,7,8,6,3,4,7,8,5,2,9],
+};
+
+const COLORS = {
+  'Genesis 1':'#8B6F47','John 1':'#4169E1','Jesus':'#FF8C00','Empire Christianity':'#cc2200',
+  'Liberation Christianity':'#20B2AA','Early Paul':'#9370DB','Empire Paul':'#CD5C5C','Yahwism':'#4A7F2E',
+  'African Indigenous':'#DAA520','Indigenous Americas':'#A0522D','Pacific Islander':'#4682B4',
+  'South Asian Indigenous':'#B22222','Southeast Asian Indigenous':'#6B8E23',
+  'Afro-Caribbean Syncretic':'#9400D3','African American Survival':'#FF6347',
+  'Indigenous–Christian Syncretic':'#2E8B57','Latin American Mestizo':'#FF9500',
+  'Pacific Christian–Indigenous':'#00BFFF','South Asian Folk–Hindu':'#FF7F50','East/SE Asian Hybrid':'#5F9EA0',
+  'Classical Greek':'#7B68EE','Christian Imperial':'#DC143C','Enlightenment Rationalist':'#1E90FF',
+  'Liberal Humanist':'#32CD32','Scientific Materialist':'#708090','Neoliberal Market':'#FFA500',
+  'Fascist/Ethno-Nationalist':'#800000','Techno-Colonial':'#00CED1','New Thought':'#FFB347',
+};
+
+const TYPE = {
+  'Genesis 1':'r','Jesus':'r','Liberation Christianity':'r','Early Paul':'r','Yahwism':'r',
+  'African Indigenous':'r','Indigenous Americas':'r','Pacific Islander':'r','South Asian Indigenous':'r','Southeast Asian Indigenous':'r',
+  'Afro-Caribbean Syncretic':'h','African American Survival':'h','Indigenous–Christian Syncretic':'h',
+  'Latin American Mestizo':'h','Pacific Christian–Indigenous':'h','South Asian Folk–Hindu':'h','East/SE Asian Hybrid':'h',
+  'John 1':'i','Empire Christianity':'i','Empire Paul':'i','Christian Imperial':'i',
+  'Enlightenment Rationalist':'i','Scientific Materialist':'i','Neoliberal Market':'i',
+  'Fascist/Ethno-Nationalist':'i','Techno-Colonial':'i','New Thought':'i','Classical Greek':'i','Liberal Humanist':'i',
+};
+const DASH = s => TYPE[s]==='r'?'none':TYPE[s]==='i'?'8,4':'2,4';
+
+const GROUPS = [
+  {title:'Hebrew + Christian Worlds', systems:['Genesis 1','John 1','Jesus','Empire Christianity','Liberation Christianity','Early Paul','Empire Paul','Yahwism']},
+  {title:'Indigenous Worlds', systems:['African Indigenous','Indigenous Americas','Pacific Islander','South Asian Indigenous','Southeast Asian Indigenous']},
+  {title:'Syncretic Worlds', systems:['Afro-Caribbean Syncretic','African American Survival','Indigenous–Christian Syncretic','Latin American Mestizo','Pacific Christian–Indigenous','South Asian Folk–Hindu','East/SE Asian Hybrid']},
+  {title:'Empire, Coloniality & Modernity', systems:['Classical Greek','Christian Imperial','Enlightenment Rationalist','Liberal Humanist','Scientific Materialist','Neoliberal Market','Fascist/Ethno-Nationalist','Techno-Colonial','New Thought']},
+];
+
+const ALL = GROUPS.flatMap(g=>g.systems);
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let visible = new Set(['Genesis 1','Jesus','Empire Christianity','Liberation Christianity','Yahwism']);
+let modalOpen = false;
+
+// ── SVG RADAR ────────────────────────────────────────────────────────────────
+function polarToXY(angle, r, cx, cy) {
+  const rad = (angle - 90) * Math.PI / 180;
+  return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+}
+
+function drawRadar() {
+  const svg = document.getElementById('radar-svg');
+  const W = 660, H = 660, cx = W/2, cy = H/2;
+  const maxR = 250;
+  const n = AXES.length;
+  const step = 360 / n;
+  let html = '';
+
+  // Grid rings
+  for (let ring = 2; ring <= 10; ring += 2) {
+    const pts = AXES.map((_,i)=>{ const [x,y]=polarToXY(i*step,maxR*ring/10,cx,cy); return `${x},${y}`; }).join(' ');
+    html += `<polygon points="${pts}" fill="none" stroke="#3a3630" stroke-width="0.8" opacity="0.7"/>`;
+  }
+
+  // Axis lines + labels
+  AXES.forEach((ax, i) => {
+    const angle = i * step;
+    const [x1,y1] = polarToXY(angle, 0, cx, cy);
+    const [x2,y2] = polarToXY(angle, maxR, cx, cy);
+    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#3a3630" stroke-width="0.8"/>`;
+
+    const [lx,ly] = polarToXY(angle, maxR + 22, cx, cy);
+    const anchor = lx < cx - 5 ? 'end' : lx > cx + 5 ? 'start' : 'middle';
+    const label = ax.length > 14 ? ax.replace('/','/\n').replace('Moral/Ethical','Moral/\nEthical') : ax;
+    const lines = label.split('\n');
+    const dy = lines.length > 1 ? -8 : 0;
+    html += `<text x="${lx}" y="${ly+dy}" text-anchor="${anchor}" fill="#b8ae9e" font-size="10" font-family="Space Mono, monospace">`;
+    lines.forEach((ln,li) => { html += `<tspan x="${lx}" dy="${li===0?0:14}">${ln}</tspan>`; });
+    html += `</text>`;
+  });
+
+  // Ring labels
+  for (let ring = 2; ring <= 10; ring += 2) {
+    const [lx,ly] = polarToXY(0, maxR*ring/10, cx, cy);
+    html += `<text x="${lx+4}" y="${ly-3}" fill="#7a7060" font-size="9" font-family="Space Mono, monospace">${ring}</text>`;
+  }
+
+  // System polygons
+  ALL.filter(s=>visible.has(s)).forEach(s => {
+    const vals = D[s];
+    const pts = vals.map((v,i)=>{ const [x,y]=polarToXY(i*step, maxR*v/10, cx, cy); return `${x},${y}`; }).join(' ');
+    html += `<polygon points="${pts}" fill="none" stroke="${COLORS[s]}" stroke-width="2.2" stroke-dasharray="${DASH(s)}" stroke-linejoin="round" opacity="0.9"/>`;
+    // dots
+    vals.forEach((v,i)=>{
+      const [x,y] = polarToXY(i*step, maxR*v/10, cx, cy);
+      html += `<circle cx="${x}" cy="${y}" r="3" fill="${COLORS[s]}" opacity="0.85"/>`;
+    });
+  });
+
+  svg.innerHTML = html;
+}
+
+// ── INSIGHTS ─────────────────────────────────────────────────────────────────
+function getInsights() {
+  const arr = [...visible];
+  if (!arr.length) return {title:'No Systems Selected',desc:'Select systems from the sidebar to begin.',body:''};
+
+  if (arr.length === 1) {
+    const s = arr[0];
+    const vals = D[s];
+    const pairs = AXES.map((ax,i)=>({ax,v:vals[i]})).sort((a,b)=>b.v-a.v);
+    const top = pairs.slice(0,3).map(p=>`<li><strong>${p.ax}</strong> — ${p.v}/10</li>`).join('');
+    const low = pairs.slice(-3).reverse().map(p=>`<li><strong>${p.ax}</strong> — ${p.v}/10</li>`).join('');
+    const t = TYPE[s]; const td = t==='r'?'Relational / Liberation':t==='i'?'Imperial / Colonial':'Hybrid / Syncretic';
+    return {
+      title:`Reading: ${s}`,
+      desc:`System type: ${td}. The line extends farthest on axes this system relies on most.`,
+      body:`<h4>Highest Scores</h4><ul>${top}</ul><p>These are the dimensions most central to how this system organizes reality, knowledge, and power.</p><h4>Lowest Scores</h4><ul>${low}</ul><p>These are the dimensions this system de-emphasizes or suppresses.</p><h4>Shape Analysis</h4><p>Where does the line spike outward? Where does it collapse inward? The shape reveals what this system maximizes — and what it costs.</p>`
+    };
+  }
+
+  if (arr.length === 2) {
+    const [a,b] = arr;
+    const da = D[a]; const db = D[b];
+    const deltas = AXES.map((ax,i)=>({ax,delta:Math.abs(da[i]-db[i]),sa:da[i],sb:db[i]}));
+    const similar = deltas.filter(d=>d.delta<=1).map(d=>`<li><strong>${d.ax}</strong>: ${a} = ${d.sa}, ${b} = ${d.sb}</li>`).join('');
+    const top = [...deltas].sort((a,b)=>b.delta-a.delta)[0];
+    const pi=7, bi=5, ri=8; // indices for Power, Binaries, Relationships
+    const pA=da[pi],bA=da[bi],rA=da[ri]; const pB=db[pi],bB=db[bi],rB=db[ri];
+    const pat = (p,b,r) => p>=7&&b>=7&&r<=3?'Imperial':p>=7&&b<=3&&r>=7?'Covenantal':'Distributed/Mixed';
+    return {
+      title:`Comparing: ${a} vs ${b}`,
+      desc:`Direct comparison across all 11 structural axes.`,
+      body:`<h4>Where They Align ${similar?'':'(Few Alignments)'}</h4>${similar?`<ul>${similar}</ul><p>Close scores (within 1 pt) mean both systems rely on these dimensions similarly.</p>`:'<p>These two systems organize reality very differently — minimal axis alignment.</p>'}<h4>Biggest Gap: ${top.ax}</h4><p>${a} scores <strong>${top.sa}</strong> vs ${b} scores <strong>${top.sb}</strong> — a gap of ${top.delta} points. This is the primary structural divergence between them.</p><h4>Power Triangle</h4><p><strong>${a}:</strong> Power ${pA} + Binaries ${bA} + Relationships ${rA} → <em>${pat(pA,bA,rA)}</em> pattern.</p><p><strong>${b}:</strong> Power ${pB} + Binaries ${bB} + Relationships ${rB} → <em>${pat(pB,bB,rB)}</em> pattern.</p>`
+    };
+  }
+
+  return {
+    title:`Multi-System View (${arr.length} active)`,
+    desc:`Select 1–2 systems for deep analysis. With many visible, look for clusters — which systems trace similar shapes?`,
+    body:`<h4>Active Systems</h4><p>${arr.join(' · ')}</p><h4>Reading Tip</h4><p>Convergence = shared metaphysical assumptions. Divergence = structural incompatibility. The outline cluster on the right side of the chart tends to be imperial systems. The cluster pulling toward Relationships and Matter/Spirit tends to be relational/indigenous systems.</p>`
+  };
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  let h = `<div class="ctrl-row">
+    <button class="btn em" onclick="showAll()">Show All</button>
+    <button class="btn" onclick="clearAll()">Clear All</button>
+  </div>`;
+
+  GROUPS.forEach((g,gi) => {
+    const allOn = g.systems.every(s=>visible.has(s));
+    h += `<div class="group-hd" onclick="toggleGroup(${gi})">
+      <input type="checkbox" ${allOn?'checked':''} onclick="event.stopPropagation();toggleGroup(${gi})"> ${g.title}
+    </div>`;
+    g.systems.forEach(s => {
+      const on = visible.has(s);
+      h += `<div class="sys-item ${on?'':'off'}" onclick="toggleSys('${s.replace(/'/g,"\\'")}')">
+        <input type="checkbox" ${on?'checked':''} onclick="event.stopPropagation();toggleSys('${s.replace(/'/g,"\\'")}')">
+        <svg width="22" height="10"><line x1="0" y1="5" x2="22" y2="5" stroke="${COLORS[s]}" stroke-width="2.5" stroke-dasharray="${DASH(s)}" opacity="${on?1:0.3}"/></svg>
+        <span class="sys-name">${s}</span>
+      </div>`;
+    });
+  });
+
+  h += `<button class="info-btn" onclick="openModal()">ℹ How to Read This Map</button>`;
+  sb.innerHTML = h;
+}
+
+function renderInsights() {
+  const panel = document.getElementById('insights-panel');
+  const ins = getInsights();
+  panel.innerHTML = `
+    <div class="ins-title">${ins.title}</div>
+    <div class="ins-desc">${ins.desc}</div>
+    ${ins.body?`<div class="ins-body">${ins.body}</div>`:''}
+    <div class="ins-hint">Select 1 system to analyze · 2 systems to compare · 3+ for pattern mapping</div>
+  `;
+}
+
+function renderModal() {
+  document.getElementById('modal-root').innerHTML = modalOpen ? `
+    <div class="modal-bg" onclick="closeModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-hd">
+          <h2>How to Read the Decolonial Metaphysics Atlas</h2>
+          <button class="modal-close" onclick="closeModal()">✕ Close</button>
+        </div>
+        <div class="modal-body">
+          <p>This visualization compares <strong>metaphysical worldviews</strong> — not beliefs, religions, or moral claims — across key dimensions that shape how societies organize power, knowledge, and human worth.</p>
+          <h3>The 11 Axes</h3>
+          <p><strong>Ontology</strong> – What is real? Fixed hierarchy vs. relational becoming.</p>
+          <p><strong>Epistemology</strong> – How truth is known. Elite authority vs. communal discernment.</p>
+          <p><strong>Anthropology</strong> – What it means to be human. Ranked value vs. shared dignity.</p>
+          <p><strong>Cosmology</strong> – How the universe is ordered. Static control vs. dynamic relation.</p>
+          <p><strong>Moral/Ethical Logic</strong> – Justice logic. Punitive vs. restorative.</p>
+          <p><strong>Binaries</strong> – Rigid oppositions: pure/impure, saved/damned, ruler/ruled.</p>
+          <p><strong>Static/Dynamic</strong> – Whether the system resists or adapts to change.</p>
+          <p><strong>Power</strong> – How authority is distributed. Concentrated vs. shared.</p>
+          <p><strong>Relationships</strong> – Primacy of relational obligation over abstraction.</p>
+          <p><strong>Matter/Spirit</strong> – Whether the material world is sacred or secondary.</p>
+          <p><strong>Source of Creation</strong> – Origin of life. Commanded order vs. emergent gift.</p>
+          <h3>Line Styles</h3>
+          <p><strong>Solid lines</strong> → Relational / Liberation systems</p>
+          <p><strong>Dashed lines</strong> → Imperial / Colonial systems</p>
+          <p><strong>Dotted lines</strong> → Hybrid / Syncretic systems</p>
+          <h3>What This Is (and Isn't)</h3>
+          <p>This is <strong>not</strong> a ranking of good vs. bad. It does <strong>not</strong> measure individual morality or sincerity. It <strong>does</strong> reveal how metaphysical assumptions scale when embedded in institutions.</p>
+          <div class="modal-kq"><p>"What kind of world does this metaphysics tend to produce — and who bears the cost?"</p></div>
+        </div>
+      </div>
+    </div>` : '';
+}
+
+function render() {
+  renderSidebar();
+  drawRadar();
+  renderInsights();
+  renderModal();
+}
+
+// ── ACTIONS ──────────────────────────────────────────────────────────────────
+function toggleSys(s) { visible.has(s)?visible.delete(s):visible.add(s); render(); }
+function toggleGroup(gi) {
+  const sys = GROUPS[gi].systems;
+  const allOn = sys.every(s=>visible.has(s));
+  sys.forEach(s=>allOn?visible.delete(s):visible.add(s));
+  render();
+}
+function showAll() { visible = new Set(ALL); render(); }
+function clearAll() { visible = new Set(); render(); }
+function openModal() { modalOpen=true; renderModal(); }
+function closeModal() { modalOpen=false; renderModal(); }
+
+render();
+</script>
+</body>
+</html>
