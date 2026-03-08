@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Genesis is Polemic — YLH Tools</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: #F3F5F9;
+  color: #020301;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+}
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+  background: rgba(243,245,249,0.98); border-bottom: 1px solid #E0E0DC;
+  padding: 0 1.5rem; height: 36px; display: flex; align-items: center; gap: 1rem;
+}
+.nav-brand { font-weight: 800; font-size: 1rem; color: #020301; text-decoration: none; }
+.nav-brand span { color: #FFDB15; }
+.nav-back { font-size: 0.6rem; letter-spacing: 0.15em; color: #B5A197; text-decoration: none; text-transform: uppercase; }
+.nav-back:hover { color: #020301; }
+
+.hero {
+  padding: 5rem 2rem 3rem;
+  text-align: center;
+  background: linear-gradient(180deg, #FFDB15 0%, #F3F5F9 100%);
+  border-bottom: 1px solid #E0E0DC;
+}
+.eyebrow { font-size: 0.62rem; letter-spacing: 0.25em; color: #020301; text-transform: uppercase; margin-bottom: 1rem; opacity: 0.6; }
+.hero h1 { font-weight: 800; font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: -0.03em; margin-bottom: 0.75rem; }
+.hero h1 em { color: #020301; font-style: italic; opacity: 0.5; }
+.hero-sub { font-size: 0.95rem; color: #6A6460; max-width: 560px; margin: 0 auto; line-height: 1.75; }
+
+.main { max-width: 860px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+/* PHASE INDICATOR */
+.phases { display: flex; align-items: center; gap: 0; margin-bottom: 3rem; border: 1px solid #E0E0DC; border-radius: 2px; overflow: hidden; }
+.phase {
+  flex: 1; padding: 0.65rem 1rem; font-size: 0.58rem; letter-spacing: 0.1em;
+  text-transform: uppercase; text-align: center; color: #B5A197;
+  background: #FFFFFF; border-right: 1px solid #E0E0DC; transition: all 0.3s;
+}
+.phase:last-child { border-right: none; }
+.phase.active { background: #020301; color: #FFDB15; }
+.phase.done { background: rgba(255,219,21,0.15); color: #020301; }
+
+/* SECTION */
+.section-title {
+  font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: #020301; margin-bottom: 0.5rem; opacity: 0.5;
+}
+.section-heading {
+  font-weight: 800; font-size: clamp(1.3rem, 3vw, 1.8rem);
+  margin-bottom: 0.75rem; line-height: 1.2;
+}
+.section-sub {
+  font-size: 0.9rem; color: #6A6460; line-height: 1.75; margin-bottom: 2rem;
+  max-width: 620px;
+}
+
+/* MERISM CARDS — Phase 1 */
+.merism-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1px; background: #E0E0DC; margin-bottom: 2rem; }
+
+.merism-card {
+  background: #FFFFFF; padding: 1.75rem; cursor: pointer;
+  transition: all 0.2s; position: relative; overflow: hidden;
+}
+.merism-card:hover { background: #FFFDE6; }
+.merism-card.active { background: #FFDB15; }
+.merism-card::before {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; background: #020301; transform: scaleX(0);
+  transition: transform 0.3s; transform-origin: left;
+}
+.merism-card.active::before { transform: scaleX(1); }
+
+.merism-poles {
+  font-weight: 800; font-size: 1.4rem; letter-spacing: -0.02em;
+  margin-bottom: 0.5rem; line-height: 1.1;
+}
+.merism-poles .sep { color: #B5A197; font-weight: 400; margin: 0 0.3rem; }
+.merism-question { font-size: 0.78rem; color: #6A6460; line-height: 1.6; }
+.merism-card.active .merism-question { color: #020301; }
+
+/* TOTALITY REVEAL */
+.totality-panel {
+  display: none; background: #020301; color: #FFFFFF;
+  padding: 2rem; margin-bottom: 2rem; border-radius: 2px;
+  animation: fadeUp 0.4s ease;
+}
+.totality-panel.visible { display: block; }
+.totality-label { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: #FFDB15; margin-bottom: 0.75rem; }
+.totality-statement { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; line-height: 1.4; }
+.totality-examples { font-size: 0.82rem; color: #B5A197; line-height: 1.7; }
+.totality-examples span { color: #FFFFFF; }
+.totality-insight { font-size: 0.85rem; color: #FFDB15; margin-top: 0.75rem; line-height: 1.65; font-style: italic; }
+
+/* NEXT BUTTON */
+.next-btn {
+  display: none; width: 100%; padding: 1rem; background: #020301;
+  color: #FFDB15; border: none; cursor: pointer; font-size: 0.7rem;
+  letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700;
+  margin-bottom: 3rem; transition: all 0.2s; font-family: inherit;
+}
+.next-btn:hover { background: #FFDB15; color: #020301; }
+.next-btn.visible { display: block; animation: fadeUp 0.4s ease 0.3s both; }
+
+/* PHASE 2 — Biblical merisms */
+.phase2-section { display: none; }
+.phase2-section.visible { display: block; animation: fadeUp 0.5s ease; }
+
+.bridge-box {
+  background: #FFDB15; padding: 1.5rem; margin-bottom: 2rem;
+  border-radius: 2px;
+}
+.bridge-box p { font-size: 0.95rem; line-height: 1.75; color: #020301; }
+.bridge-box strong { font-weight: 800; }
+
+.bible-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: #E0E0DC; margin-bottom: 2rem; }
+.bible-card {
+  background: #FFFFFF; padding: 1.5rem; cursor: pointer; transition: all 0.2s;
+}
+.bible-card:hover { background: #FFFDE6; }
+.bible-card.active { background: #FFDB15; }
+.bible-ref { font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: #B5A197; margin-bottom: 0.5rem; }
+.bible-card.active .bible-ref { color: #020301; opacity: 0.6; }
+.bible-poles { font-weight: 800; font-size: 1.2rem; margin-bottom: 0.4rem; line-height: 1.2; }
+.bible-verse { font-size: 0.78rem; color: #6A6460; line-height: 1.6; font-style: italic; }
+.bible-card.active .bible-verse { color: #020301; }
+
+.bible-totality {
+  display: none; background: #020301; color: #FFFFFF;
+  padding: 2rem; margin-bottom: 2rem; border-radius: 2px;
+  animation: fadeUp 0.4s ease;
+}
+.bible-totality.visible { display: block; }
+.bt-label { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: #FFDB15; margin-bottom: 0.75rem; }
+.bt-statement { font-weight: 700; font-size: 1.05rem; margin-bottom: 0.6rem; line-height: 1.5; }
+.bt-connection { font-size: 0.85rem; color: #B5A197; line-height: 1.7; }
+.bt-connection strong { color: #FFFFFF; }
+.bt-connection em { color: #FFDB15; font-style: normal; }
+
+/* PHASE 3 — The collapse */
+.phase3-section { display: none; }
+.phase3-section.visible { display: block; animation: fadeUp 0.5s ease; }
+
+.collapse-intro {
+  background: #FFFFFF; border: 1px solid #E0E0DC; border-left: 3px solid #020301;
+  padding: 1.5rem; margin-bottom: 2rem;
+}
+.collapse-intro p { font-size: 0.9rem; line-height: 1.8; color: #020301; }
+.collapse-intro strong { font-weight: 800; }
+
+/* TOGGLE */
+.mode-toggle {
+  display: flex; align-items: center; justify-content: center;
+  gap: 1.5rem; margin-bottom: 2rem; padding: 1.25rem;
+  background: #FFFFFF; border: 1px solid #E0E0DC;
+}
+.mode-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; }
+.mode-label.hebrew { color: #020301; }
+.mode-label.greek { color: #B5A197; }
+.mode-label.greek.active-mode { color: #020301; }
+.mode-label.hebrew.active-mode { color: #020301; }
+
+.toggle-track {
+  width: 140px; height: 36px; background: #020301;
+  border-radius: 2px; position: relative; cursor: pointer;
+  display: flex; align-items: center; padding: 3px; transition: all 0.3s;
+  flex-shrink: 0;
+}
+.toggle-thumb {
+  width: 65px; height: 28px; background: #FFDB15; border-radius: 1px;
+  transition: all 0.4s; display: flex; align-items: center; justify-content: center;
+  font-size: 0.58rem; color: #020301; font-weight: 800; letter-spacing: 0.08em;
+}
+.toggle-track.greek-mode .toggle-thumb { transform: translateX(68px); background: #B5A197; color: #FFFFFF; }
+
+/* SPECTRUM / COLLAPSE VIEW */
+.spectrum-view { margin-bottom: 2rem; }
+
+.hebrew-view { animation: fadeUp 0.4s ease; }
+.greek-view { display: none; animation: fadeUp 0.4s ease; }
+.greek-view.visible { display: block; }
+.hebrew-view.hidden { display: none; }
+
+/* Hebrew spectrum */
+.spectrum-poles { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.s-pole { font-weight: 800; font-size: 1.1rem; }
+.s-between { font-size: 0.6rem; color: #B5A197; text-transform: uppercase; letter-spacing: 0.1em; }
+.spectrum-bar { height: 10px; border-radius: 5px; margin-bottom: 1.25rem; background: linear-gradient(90deg, #FFDB15, #B5A197, #020301); }
+.spectrum-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1.25rem; background: #FFFFFF; border: 1px solid #E0E0DC; border-radius: 2px; }
+.chip {
+  padding: 5px 12px; border-radius: 2px; font-size: 0.65rem;
+  letter-spacing: 0.05em; border: 1px solid;
+  animation: chipIn 0.3s ease both;
+}
+.chip.left { background: rgba(255,219,21,0.2); border-color: rgba(255,219,21,0.5); color: #020301; }
+.chip.middle { background: #FFFFFF; border-color: #E0E0DC; color: #020301; }
+.chip.right { background: rgba(181,161,151,0.15); border-color: rgba(181,161,151,0.4); color: #6A6460; }
+.hebrew-note { font-size: 0.65rem; color: #B5A197; text-align: center; margin-top: 0.75rem; letter-spacing: 0.05em; }
+
+/* Greek collapse */
+.greek-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #E0E0DC; margin-bottom: 0.75rem; }
+.g-box { background: #FFFFFF; padding: 1.25rem; }
+.g-box h4 { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.6rem; font-weight: 700; }
+.g-box.superior h4 { color: #020301; }
+.g-box.inferior h4 { color: #B5A197; }
+.g-box-pole { font-weight: 800; font-size: 1rem; margin-bottom: 0.75rem; }
+.g-box.superior .g-box-pole { color: #020301; }
+.g-box.inferior .g-box-pole { color: #B5A197; }
+.g-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.g-chip { padding: 4px 9px; font-size: 0.62rem; border-radius: 2px; }
+.g-box.superior .g-chip { background: rgba(255,219,21,0.2); border: 1px solid rgba(255,219,21,0.5); color: #020301; }
+.g-box.inferior .g-chip { background: rgba(181,161,151,0.1); border: 1px solid rgba(181,161,151,0.3); color: #B5A197; text-decoration: line-through; }
+.collapse-warning {
+  background: #020301; color: #FFFFFF; padding: 1rem 1.25rem;
+  font-size: 0.82rem; line-height: 1.7;
+}
+.collapse-warning strong { color: #FFDB15; }
+
+/* PHASE 4 — YLH Payoff */
+.phase4-section { display: none; }
+.phase4-section.visible { display: block; animation: fadeUp 0.5s ease; }
+
+.payoff-box {
+  background: #020301; color: #FFFFFF; padding: 2rem;
+  margin-bottom: 1.5rem; border-radius: 2px;
+}
+.payoff-box .p-tag { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: #FFDB15; margin-bottom: 1rem; }
+.payoff-box p { font-size: 0.95rem; line-height: 1.85; margin-bottom: 0.75rem; color: rgba(255,255,255,0.85); }
+.payoff-box p:last-child { margin-bottom: 0; }
+.payoff-box strong { color: #FFFFFF; }
+.payoff-box em { color: #FFDB15; font-style: italic; }
+
+.question-box {
+  background: #FFDB15; padding: 2rem; border-radius: 2px; margin-bottom: 2rem;
+}
+.question-box .q-tag { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: #020301; opacity: 0.6; margin-bottom: 0.75rem; }
+.question-box p { font-weight: 700; font-size: 1.05rem; line-height: 1.7; color: #020301; margin-bottom: 0.6rem; }
+.question-box p:last-child { margin-bottom: 0; font-weight: 400; font-size: 0.88rem; opacity: 0.8; }
+
+.restart-btn {
+  width: 100%; padding: 1rem; background: transparent;
+  border: 2px solid #020301; color: #020301; cursor: pointer;
+  font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+  font-weight: 700; transition: all 0.2s; font-family: inherit;
+}
+.restart-btn:hover { background: #020301; color: #FFDB15; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes chipIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+
+footer { border-top: 1px solid #E0E0DC; padding: 1.5rem 2rem; text-align: center; font-size: 0.6rem; letter-spacing: 0.1em; color: #B5A197; text-transform: uppercase; }
+footer a { color: #6A6460; text-decoration: none; }
+footer a:hover { color: #020301; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="ylh-tools.html">YLH<span>.</span>Tools</a>
+  <a class="nav-back" href="ylh-tools.html">← All Tools</a>
+</nav>
+
+<div class="hero">
+  <p class="eyebrow">Tool 03 / 05 · Text Analysis</p>
+  <h1>Genesis is <em>Polemic</em></h1>
+  <p class="hero-sub">You already understand this. You just don't know you know it yet.</p>
+</div>
+
+<div class="main">
+
+  <!-- PHASES -->
+  <div class="phases">
+    <div class="phase active" id="ph1">01 · You Already Know This</div>
+    <div class="phase" id="ph2">02 · The Bible Does It Too</div>
+    <div class="phase" id="ph3">03 · Watch It Collapse</div>
+    <div class="phase" id="ph4">04 · What We Lost</div>
+  </div>
+
+  <!-- ── PHASE 1 ────────────────────────────────────────────────────── -->
+  <div id="phase1-section">
+    <div class="section-title">Phase 01</div>
+    <div class="section-heading">When we say "high and low" — how many places do we mean?</div>
+    <div class="section-sub">Click each phrase below. These are called <strong>merisms</strong> — a way of naming <em>everything</em> by citing just the two poles. You already use them every day.</div>
+
+    <div class="merism-grid" id="merism-grid"></div>
+    <div class="totality-panel" id="totality-panel"></div>
+    <button class="next-btn" id="next-to-phase2" onclick="goToPhase2()">I get it — show me where the Bible does this →</button>
+  </div>
+
+  <!-- ── PHASE 2 ────────────────────────────────────────────────────── -->
+  <div class="phase2-section" id="phase2-section">
+    <div class="bridge-box">
+      <p><strong>The Hebrew authors used merisms constantly.</strong> When Genesis says "the heavens and the earth" — it doesn't mean just sky and ground. It means <strong>everything that exists.</strong> Same move you just saw. Same logic. Different stakes.</p>
+    </div>
+
+    <div class="section-title">Phase 02</div>
+    <div class="section-heading">Now read these the same way.</div>
+    <div class="section-sub">Click each biblical merism. You already know how to read them.</div>
+
+    <div class="bible-cards" id="bible-cards"></div>
+    <div class="bible-totality" id="bible-totality"></div>
+    <button class="next-btn" id="next-to-phase3" onclick="goToPhase3()">Now watch what Greek thinking did to these →</button>
+  </div>
+
+  <!-- ── PHASE 3 ────────────────────────────────────────────────────── -->
+  <div class="phase3-section" id="phase3-section">
+    <div class="section-title">Phase 03</div>
+    <div class="section-heading">What happens when someone forgets it's a merism?</div>
+
+    <div class="collapse-intro">
+      <p>Greek philosophy sorted everything into <strong>hierarchies</strong> — one thing above, one thing below. When Greek thinkers read Hebrew merisms, they didn't hear "everything between." They heard <strong>two categories</strong>. And they immediately asked: which one is superior?</p>
+      <p style="margin-top:0.75rem">Pick a biblical merism below. See the full spectrum in Hebrew mode. Then flip the toggle — and watch it collapse.</p>
+    </div>
+
+    <!-- Bible selector for phase 3 -->
+    <div class="bible-cards" id="bible-cards-p3" style="margin-bottom:1.5rem;"></div>
+
+    <div class="mode-toggle">
+      <div class="mode-label hebrew" id="hebrew-label">Hebrew — Everything Between</div>
+      <div class="toggle-track" id="toggle-track" onclick="toggleMode()">
+        <div class="toggle-thumb" id="toggle-thumb">HEBREW</div>
+      </div>
+      <div class="mode-label greek" id="greek-label">Greek — Pick a Side</div>
+    </div>
+
+    <div class="collapse-warning" id="collapse-warning" style="display:none;">
+      <strong>The spectrum just collapsed into two boxes.</strong> Everyone who lived in the middle — every identity, every experience that didn't fit neatly into either pole — just disappeared. This is not ancient history.
+    </div>
+
+    <div class="spectrum-view" id="spectrum-view"></div>
+
+    <button class="next-btn visible" id="next-to-phase4" onclick="goToPhase4()" style="margin-top:1rem;">So what exactly did we lose? →</button>
+  </div>
+
+  <!-- ── PHASE 4 ────────────────────────────────────────────────────── -->
+  <div class="phase4-section" id="phase4-section">
+    <div class="section-title">Phase 04</div>
+    <div class="section-heading">Who disappeared from the image of God?</div>
+
+    <div class="payoff-box">
+      <div class="p-tag">YLH Analysis</div>
+      <p>Genesis 1:27 says God created humanity <strong>"male and female."</strong> For a Hebrew reader, that meant: <em>all of humanity — every person, in every expression, across the entire spectrum.</em> The poles name the whole. No one is outside the image of God.</p>
+      <p>When Greek binary thinking read that verse, it heard two categories. Male went in the superior box. Female went in the inferior box. And everyone who didn't fit either box <strong>ceased to exist in the theology.</strong></p>
+      <p>That single interpretive mistake — reading a merism as a binary — has been used for 1,600 years to exclude people from full humanity, from ordination, from marriage, from belonging. <em>Not because the text said so. Because someone forgot how Hebrew works.</em></p>
+    </div>
+
+    <div class="question-box">
+      <div class="q-tag">The Question This Tool Is Really Asking</div>
+      <p>If "male and female" means all of humanity — who told you it meant only two kinds of people? And what did they gain from that reading?</p>
+      <p>The Yahwist Liberation Hermeneutic reads every text by consequence: not just what it says, but what it does — who it includes, who it erases, and who benefits from the erasure.</p>
+    </div>
+
+    <button class="restart-btn" onclick="restart()">↺ Start Over</button>
+  </div>
+
+</div>
+
+<footer>
+  <p>YLH Tools · Yahwist Liberation Hermeneutic · Open Scholarship</p>
+  <p style="margin-top:0.4rem"><a href="ylh-tools.html">← Return to Atlas Home</a></p>
+</footer>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const EVERYDAY = [
+  {
+    id: 'high-low', poles: ['High', 'Low'],
+    question: 'When you searched "high and low" — how many places did you search?',
+    totality: 'You searched EVERYWHERE.',
+    examples: ['The attic', 'the basement', 'the car', 'under the couch', 'in your coat pocket', 'every drawer', 'the backyard'],
+    insight: '"High and low" doesn\'t mean two places. It means every place. The poles name the whole. That\'s a merism.',
+  },
+  {
+    id: 'night-day', poles: ['Night', 'Day'],
+    question: 'When something happens "night and day" — does it only happen at those two times?',
+    totality: 'It happens ALL THE TIME — without stopping.',
+    examples: ['Dawn', 'dusk', 'noon', 'midnight', 'twilight', 'the blue hour', 'golden hour', 'every moment between'],
+    insight: '"Night and day" means constantly — every moment, not just two of them. The poles name the whole span of time.',
+  },
+  {
+    id: 'young-old', poles: ['Young', 'Old'],
+    question: 'When an event is "for young and old" — who\'s invited?',
+    totality: 'EVERYONE is invited.',
+    examples: ['Toddlers', 'teenagers', 'young adults', 'middle-aged people', 'retirees', 'the elderly', 'every age in between'],
+    insight: '"Young and old" means people of every age — not just two age groups. The poles declare the totality of humanity.',
+  },
+  {
+    id: 'rich-poor', poles: ['Rich', 'Poor'],
+    question: 'A law that applies to "rich and poor alike" — who does it apply to?',
+    totality: 'It applies to EVERYONE.',
+    examples: ['The wealthy', 'the working class', 'the middle class', 'the struggling', 'the homeless', 'every economic condition between'],
+    insight: '"Rich and poor" names every economic condition — the entire spectrum of human financial reality, not just two categories.',
+  },
+  {
+    id: 'black-white', poles: ['Black', 'White'],
+    question: 'When something is presented in "black and white" — what are we really saying?',
+    totality: 'We mean the WHOLE picture — all of it.',
+    examples: ['Every shade of gray', 'every gradation', 'every nuance', 'every complexity', 'the full range of the issue'],
+    insight: 'We use "black and white" to mean the complete picture. Ironically, when we say something IS "black and white," we mean there\'s no middle — which is exactly the Greek mistake applied to Hebrew merisms.',
+  },
+  {
+    id: 'heaven-earth', poles: ['Heaven', 'Earth'],
+    question: 'When someone says "heaven and earth" — what do they mean?',
+    totality: 'They mean EVERYTHING that exists.',
+    examples: ['The sky', 'the ground', 'the ocean', 'outer space', 'underground', 'every living thing', 'every physical and spiritual reality'],
+    insight: '"Heaven and earth" means the entire cosmos — all of existence. This one bridges directly into Genesis 1:1.',
+  },
+];
+
+const BIBLICAL = [
+  {
+    id: 'gen1-1', ref: 'Genesis 1:1', poles: ['Heavens', 'Earth'],
+    verse: '"In the beginning God created the heavens and the earth."',
+    totality: 'God created EVERYTHING THAT EXISTS.',
+    connection: 'Same move as "heaven and earth" above. <strong>Not just sky and ground</strong> — all of creation, every particle of reality. <em>The poles name the whole cosmos.</em>',
+    spectrum: {
+      left: ['Open sky','Atmosphere','Stars','Outer space','Sun','Moon'],
+      middle: ['Mountains','Oceans','Forests','Deserts','Tidal zones','River deltas','Volcanic islands'],
+      right: ['Deep ocean','Underground caves','Earth\'s core','Root systems','Soil','Bedrock'],
+    },
+    greekSplit: {
+      superior: ['Open sky','Atmosphere','Stars','Outer space','Sun','Moon'],
+      inferior: ['Deep ocean','Underground caves','Earth\'s core','Root systems','Soil','Bedrock','Mountains','Oceans','Forests','Deserts','Tidal zones','River deltas'],
+    },
+    greekPoles: ['Spiritual / Heavenly', 'Material / Earthly'],
+    greekWarning: 'Greek dualism elevated the spiritual/heavenly over the material/earthly. Creation went from being wholly good (Genesis 1) to being suspect, fallen, lesser than the spiritual realm.',
+  },
+  {
+    id: 'gen1-27', ref: 'Genesis 1:27', poles: ['Male', 'Female'],
+    verse: '"So God created mankind in his own image; male and female he created them."',
+    totality: 'God created ALL OF HUMANITY — every person, in every expression.',
+    connection: 'Same move as "young and old." <strong>Not just two kinds of people</strong> — the full spectrum of human gender and embodiment. <em>Every person bears the divine image.</em>',
+    spectrum: {
+      left: ['Cisgender men','Trans men','Masculine-presenting people'],
+      middle: ['Nonbinary people','Intersex people','Two-Spirit people','Gender-fluid people','Agender people'],
+      right: ['Cisgender women','Trans women','Feminine-presenting people'],
+    },
+    greekSplit: {
+      superior: ['Cisgender men'],
+      inferior: ['Cisgender women','Trans men','Trans women','Nonbinary people','Intersex people','Two-Spirit people','Gender-fluid people','Agender people','Masculine-presenting people','Feminine-presenting people'],
+    },
+    greekPoles: ['Male — Universal Subject', 'Female — Deviation / Other'],
+    greekWarning: 'Greek philosophy made male the universal, rational, normative subject. Female became the deviation. Everyone outside both boxes ceased to exist in Western theology entirely.',
+  },
+  {
+    id: 'gen1-5', ref: 'Genesis 1:5', poles: ['Evening', 'Morning'],
+    verse: '"And there was evening, and there was morning — the first day."',
+    totality: 'The ENTIRE DAY — every moment from dusk to dawn and back again.',
+    connection: 'Same move as "night and day." <strong>Not just two moments</strong> — the whole continuous flow of time. <em>And notice: evening comes first in Hebrew. The day begins in darkness.</em>',
+    spectrum: {
+      left: ['Sunset','Dusk','Early evening','Late evening'],
+      middle: ['Midnight','The small hours','Pre-dawn','Blue hour'],
+      right: ['Dawn','Sunrise','Early morning','Morning'],
+    },
+    greekSplit: {
+      superior: ['Dawn','Sunrise','Early morning','Morning'],
+      inferior: ['Sunset','Dusk','Early evening','Late evening','Midnight','The small hours','Pre-dawn','Blue hour'],
+    },
+    greekPoles: ['Morning — Light / Rational / Good', 'Evening — Dark / Irrational / Suspect'],
+    greekWarning: 'Greek thinking elevated day/light/wakefulness as rational and good, demoting night/darkness/rest as lesser. The Hebrew text deliberately starts with evening — subverting this assumption entirely.',
+  },
+  {
+    id: 'gal3-28', ref: 'Galatians 3:28', poles: ['Jew / Free / Male', 'Greek / Enslaved / Female'],
+    verse: '"There is neither Jew nor Greek, neither slave nor free, nor is there male and female, for you are all one in Christ Jesus."',
+    totality: 'ALL PEOPLE without exception — Paul dissolves every social hierarchy at once.',
+    connection: 'Paul stacks <strong>three merisms in one verse</strong> — ethnicity, legal status, gender. Each pair names a totality. <em>This is the most radical inclusion statement in the ancient world.</em>',
+    spectrum: {
+      left: ['Jewish person','Roman citizen','Free person','Greek person'],
+      middle: ['Freedperson','Immigrant','Provincial','Mixed heritage','Samaritan'],
+      right: ['Enslaved person','Barbarian','Scythian','Non-citizen','Refugee'],
+    },
+    greekSplit: {
+      superior: ['Jewish person (for supersessionists)','Roman citizen','Free person','Greek person'],
+      inferior: ['Enslaved person','Barbarian','Scythian','Non-citizen','Refugee','Immigrant','Freedperson'],
+    },
+    greekPoles: ['Elevated — Citizen / Free / Male', 'Suppressed — Subject / Enslaved / Female'],
+    greekWarning: 'Empire Christianity turned each of Paul\'s merisms into the hierarchy Paul was dismantling. Gal 3:28 became the most suppressed verse in Christian history precisely because it threatened the entire imperial social order.',
+  },
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let activeEveryday = null;
+let activeBiblical = null;
+let activeBiblicalP3 = BIBLICAL[1]; // Default Gen 1:27
+let isGreekMode = false;
+let phase = 1;
+let everydaySeenCount = 0;
+
+// ── INIT ───────────────────────────────────────────────────────────────────────
+function init() {
+  renderMerismCards();
+  renderBibleCards();
+  renderBibleCardsP3();
+  renderSpectrumView();
+}
+
+// ── PHASE INDICATOR ────────────────────────────────────────────────────────────
+function setPhase(n) {
+  phase = n;
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('ph' + i);
+    el.className = 'phase' + (i === n ? ' active' : i < n ? ' done' : '');
+  }
+}
+
+// ── PHASE 1 ────────────────────────────────────────────────────────────────────
+function renderMerismCards() {
+  const grid = document.getElementById('merism-grid');
+  grid.innerHTML = EVERYDAY.map(m => `
+    <div class="merism-card${activeEveryday?.id === m.id ? ' active' : ''}" onclick="selectEveryday('${m.id}')">
+      <div class="merism-poles">${m.poles[0]} <span class="sep">&</span> ${m.poles[1]}</div>
+      <div class="merism-question">${m.question}</div>
+    </div>
+  `).join('');
+}
+
+function selectEveryday(id) {
+  activeEveryday = EVERYDAY.find(m => m.id === id);
+  everydaySeenCount++;
+  renderMerismCards();
+
+  const panel = document.getElementById('totality-panel');
+  panel.className = 'totality-panel visible';
+  panel.innerHTML = `
+    <div class="totality-label">The Answer</div>
+    <div class="totality-statement">${activeEveryday.totality}</div>
+    <div class="totality-examples">Everything between: <span>${activeEveryday.examples.join(' · ')}</span></div>
+    <div class="totality-insight">${activeEveryday.insight}</div>
+  `;
+
+  if (everydaySeenCount >= 2) {
+    document.getElementById('next-to-phase2').classList.add('visible');
+  }
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── PHASE 2 ────────────────────────────────────────────────────────────────────
+function goToPhase2() {
+  document.getElementById('phase2-section').classList.add('visible');
+  setPhase(2);
+  setTimeout(() => document.getElementById('phase2-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function renderBibleCards() {
+  document.getElementById('bible-cards').innerHTML = BIBLICAL.map(b => `
+    <div class="bible-card${activeBiblical?.id === b.id ? ' active' : ''}" onclick="selectBiblical('${b.id}')">
+      <div class="bible-ref">${b.ref}</div>
+      <div class="bible-poles">${b.poles[0]} <span style="color:#B5A197;font-weight:400">&</span> ${b.poles[1]}</div>
+      <div class="bible-verse">${b.verse}</div>
+    </div>
+  `).join('');
+}
+
+function selectBiblical(id) {
+  activeBiblical = BIBLICAL.find(b => b.id === id);
+  renderBibleCards();
+
+  const panel = document.getElementById('bible-totality');
+  panel.className = 'bible-totality visible';
+  panel.innerHTML = `
+    <div class="bt-label">${activeBiblical.ref} — Hebrew Reading</div>
+    <div class="bt-statement">${activeBiblical.totality}</div>
+    <div class="bt-connection">${activeBiblical.connection}</div>
+  `;
+
+  document.getElementById('next-to-phase3').classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── PHASE 3 ────────────────────────────────────────────────────────────────────
+function goToPhase3() {
+  document.getElementById('phase3-section').classList.add('visible');
+  setPhase(3);
+  setTimeout(() => document.getElementById('phase3-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function renderBibleCardsP3() {
+  document.getElementById('bible-cards-p3').innerHTML = BIBLICAL.map(b => `
+    <div class="bible-card${activeBiblicalP3?.id === b.id ? ' active' : ''}" onclick="selectBiblicalP3('${b.id}')">
+      <div class="bible-ref">${b.ref}</div>
+      <div class="bible-poles">${b.poles[0]} <span style="color:#B5A197;font-weight:400">&</span> ${b.poles[1]}</div>
+    </div>
+  `).join('');
+}
+
+function selectBiblicalP3(id) {
+  activeBiblicalP3 = BIBLICAL.find(b => b.id === id);
+  isGreekMode = false;
+  document.getElementById('toggle-track').classList.remove('greek-mode');
+  document.getElementById('toggle-thumb').textContent = 'HEBREW';
+  document.getElementById('collapse-warning').style.display = 'none';
+  renderBibleCardsP3();
+  renderSpectrumView();
+}
+
+function toggleMode() {
+  isGreekMode = !isGreekMode;
+  const track = document.getElementById('toggle-track');
+  const thumb = document.getElementById('toggle-thumb');
+  const warning = document.getElementById('collapse-warning');
+
+  if (isGreekMode) {
+    track.classList.add('greek-mode');
+    thumb.textContent = 'GREEK';
+    warning.style.display = 'block';
+  } else {
+    track.classList.remove('greek-mode');
+    thumb.textContent = 'HEBREW';
+    warning.style.display = 'none';
+  }
+  renderSpectrumView();
+}
+
+function renderSpectrumView() {
+  const container = document.getElementById('spectrum-view');
+  const b = activeBiblicalP3;
+  if (!b) { container.innerHTML = ''; return; }
+
+  if (!isGreekMode) {
+    const allChips = [
+      ...b.spectrum.left.map(t => `<span class="chip left" style="animation-delay:${Math.random()*0.3}s">${t}</span>`),
+      ...b.spectrum.middle.map(t => `<span class="chip middle" style="animation-delay:${Math.random()*0.3}s">${t}</span>`),
+      ...b.spectrum.right.map(t => `<span class="chip right" style="animation-delay:${Math.random()*0.3}s">${t}</span>`),
+    ];
+    container.innerHTML = `
+      <div class="hebrew-view">
+        <div class="spectrum-poles">
+          <span class="s-pole">${b.poles[0]}</span>
+          <span class="s-between">← everything between →</span>
+          <span class="s-pole">${b.poles[1]}</span>
+        </div>
+        <div class="spectrum-bar"></div>
+        <div class="spectrum-chips">${allChips.join('')}</div>
+        <div class="hebrew-note">All ${allChips.length} included — every one bears the image</div>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="greek-view visible">
+        <div class="greek-boxes">
+          <div class="g-box superior">
+            <h4>↑ Superior — Elevated</h4>
+            <div class="g-box-pole">${b.greekPoles[0]}</div>
+            <div class="g-chips">${b.greekSplit.superior.map(t => `<span class="g-chip">${t}</span>`).join('')}</div>
+          </div>
+          <div class="g-box inferior">
+            <h4>↓ Inferior — Suppressed</h4>
+            <div class="g-box-pole">${b.greekPoles[1]}</div>
+            <div class="g-chips">${b.greekSplit.inferior.map(t => `<span class="g-chip">${t}</span>`).join('')}</div>
+          </div>
+        </div>
+        <div style="font-size:0.75rem;color:#B5A197;padding:0.75rem 0;font-style:italic;">${b.greekWarning}</div>
+      </div>
+    `;
+  }
+}
+
+// ── PHASE 4 ────────────────────────────────────────────────────────────────────
+function goToPhase4() {
+  document.getElementById('phase4-section').classList.add('visible');
+  setPhase(4);
+  setTimeout(() => document.getElementById('phase4-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function restart() {
+  activeEveryday = null;
+  activeBiblical = null;
+  activeBiblicalP3 = BIBLICAL[1];
+  isGreekMode = false;
+  everydaySeenCount = 0;
+
+  document.getElementById('totality-panel').className = 'totality-panel';
+  document.getElementById('next-to-phase2').classList.remove('visible');
+  document.getElementById('bible-totality').className = 'bible-totality';
+  document.getElementById('next-to-phase3').classList.remove('visible');
+  document.getElementById('phase2-section').classList.remove('visible');
+  document.getElementById('phase3-section').classList.remove('visible');
+  document.getElementById('phase4-section').classList.remove('visible');
+  document.getElementById('collapse-warning').style.display = 'none';
+  document.getElementById('toggle-track').classList.remove('greek-mode');
+  document.getElementById('toggle-thumb').textContent = 'HEBREW';
+
+  setPhase(1);
+  renderMerismCards();
+  renderBibleCards();
+  renderBibleCardsP3();
+  renderSpectrumView();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+init();
+</script>
+</body>
+</html>
