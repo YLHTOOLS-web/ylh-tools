@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Policy Analysis: OpenAI Industrial Policy</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0f0f; color: #F3F5F9; font-family: 'Georgia', serif; padding: 20px; line-height: 1.7; }
+
+  h1 { color: #FFDB15; font-size: 1.25rem; margin-bottom: 4px; }
+  .subtitle { color: #B5A197; font-size: 0.82rem; margin-bottom: 24px; }
+
+  .scores-row { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+  .score-card { background: #181818; border: 1px solid #2a2a2a; border-radius: 8px; padding: 14px; flex: 1; min-width: 120px; text-align: center; }
+  .score-card .axis { font-size: 0.68rem; color: #B5A197; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .val { font-size: 1.9rem; font-weight: bold; }
+  .val.red { color: #e05555; }
+  .val.yellow { color: #FFDB15; }
+  .val.green { color: #5ec97a; }
+  .score-card .label { font-size: 0.68rem; color: #B5A197; margin-top: 4px; }
+
+  .bar-wrap { background: #181818; border-radius: 8px; padding: 16px; margin-bottom: 28px; }
+  .bar-row { margin-bottom: 12px; }
+  .bar-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: #B5A197; margin-bottom: 4px; }
+  .bar { height: 9px; border-radius: 5px; background: #2a2a2a; overflow: hidden; }
+  .fill { height: 100%; border-radius: 5px; }
+  .fill.green { background: #5ec97a; }
+  .fill.red { background: #e05555; }
+  .bar-note { font-size: 0.78rem; color: #777; margin-top: 10px; }
+
+  .tab-row { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+  .tab { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 4px; padding: 7px 13px; font-size: 0.77rem; color: #B5A197; cursor: pointer; transition: all 0.15s; }
+  .tab.active { background: #FFDB15; color: #020301; border-color: #FFDB15; font-weight: bold; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .section-title { color: #FFDB15; font-size: 0.9rem; font-weight: bold; border-bottom: 1px solid #2a2a2a; padding-bottom: 6px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.07em; }
+
+  .block { background: #181818; border-left: 3px solid #FFDB15; border-radius: 0 6px 6px 0; padding: 14px 16px; margin-bottom: 14px; }
+  .block-title { font-size: 0.73rem; color: #FFDB15; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 7px; }
+  .block p { font-size: 0.86rem; color: #F3F5F9; margin-bottom: 6px; }
+  .block em { color: #B5A197; font-style: normal; }
+
+  .warn { background: #1a1008; border-left: 3px solid #e07a20; border-radius: 0 6px 6px 0; padding: 14px 16px; margin-bottom: 14px; }
+  .warn-label { font-size: 0.7rem; color: #e07a20; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 7px; }
+  .warn p { font-size: 0.86rem; }
+
+  .verdict { background: #0d1a10; border: 1px solid #3a6b45; border-radius: 8px; padding: 20px; margin-top: 8px; }
+  .verdict-title { color: #5ec97a; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+  .verdict p { font-size: 0.87rem; margin-bottom: 10px; }
+  .verdict .key { color: #FFDB15; font-style: italic; margin-top: 8px; }
+
+  p { font-size: 0.87rem; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Policy Analysis: Industrial Policy for the Intelligence Age</h1>
+<p class="subtitle">OpenAI — April 2026 | Consequence-Based Policy Framework | Analyst: Brandy Mitchell</p>
+
+<div class="scores-row">
+  <div class="score-card">
+    <div class="axis">Internal Consistency</div>
+    <div class="val yellow">2/5</div>
+    <div class="label">Proposals contradict substrate</div>
+  </div>
+  <div class="score-card">
+    <div class="axis">Enforcement Architecture</div>
+    <div class="val red">1/5</div>
+    <div class="label">Voluntary throughout</div>
+  </div>
+  <div class="score-card">
+    <div class="axis">Distributional Reach</div>
+    <div class="val yellow">2/5</div>
+    <div class="label">US-centric, market-bounded</div>
+  </div>
+  <div class="score-card">
+    <div class="axis">Democratic Accountability</div>
+    <div class="val red">1/5</div>
+    <div class="label">Author governs itself</div>
+  </div>
+  <div class="score-card">
+    <div class="axis">Conflict of Interest</div>
+    <div class="val red">5/5</div>
+    <div class="label">Maximal — structural</div>
+  </div>
+</div>
+
+<div class="bar-wrap">
+  <div class="section-title">Distributional Index</div>
+  <div class="bar-row">
+    <div class="bar-meta"><span>Pro-Distribution Signals</span><span>34 / 100</span></div>
+    <div class="bar"><div class="fill green" style="width:34%"></div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-meta"><span>Concentration-Preserving Architecture</span><span>71 / 100</span></div>
+    <div class="bar"><div class="fill red" style="width:71%"></div></div>
+  </div>
+  <p class="bar-note">Distribution signals are real. They are structurally subordinated to mechanisms that preserve existing power. The document cannot close this gap from within its own framework.</p>
+</div>
+
+<div class="tab-row">
+  <div class="tab active" onclick="showTab('consequence', this)">Consequence Test</div>
+  <div class="tab" onclick="showTab('mechanism', this)">Mechanism Audit</div>
+  <div class="tab" onclick="showTab('assumptions', this)">Hidden Assumptions</div>
+  <div class="tab" onclick="showTab('silenced', this)">What's Excluded</div>
+  <div class="tab" onclick="showTab('alternative', this)">Alternative Specs</div>
+</div>
+
+<!-- TAB 1 -->
+<div id="consequence" class="tab-content active">
+  <div class="section-title">Consequence Test: What Does This Actually Produce?</div>
+  <p>Policy analysis reads by outcome, not intent. The question is not what OpenAI wants — it is what these mechanisms produce if enacted exactly as written.</p>
+
+  <div class="block">
+    <div class="block-title">Public Wealth Fund — Who Seeds It?</div>
+    <p>The document proposes AI companies "work with policymakers" to seed the fund but specifies no mandatory contribution amounts, no governance structure, and no democratic oversight mechanism.</p>
+    <p><em>Consequence: A fund designed in corporate boardrooms, seeded at corporate discretion, governed by whoever controls the enabling legislation. This is corporate philanthropy rebranded as universal dividend.</em></p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Tax Reform — No Rates Specified</div>
+    <p>The document explicitly declines to propose corporate tax rates, noting only that Trump lowered them to 21%. It proposes the direction of reform without the instrument of reform.</p>
+    <p><em>Consequence: The framing shifts public debate while enforcement power stays with whoever controls Congress. The document names the problem and removes its own teeth.</em></p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Adaptive Safety Net — Who Defines the Triggers?</div>
+    <p>The auto-trigger mechanism activates when "displacement metrics exceed pre-defined thresholds." The document does not specify who defines the metrics, who sets the thresholds, or who controls the measurement infrastructure.</p>
+    <p><em>Consequence: A safety net that can be permanently set below activation by whoever controls the data. The mechanism exists; the accountability over the mechanism does not.</em></p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">4-Day Workweek — Pilot, Not Right</div>
+    <p>The efficiency dividend frames the 4-day workweek as an employer incentive to run time-bound pilots — not a labor right, not a legal standard, not a negotiated floor.</p>
+    <p><em>Consequence: The 4-day workweek remains conditional on corporate participation. Economic power announced by those holding it is not the same as economic power transferred. This is the structural distinction between a press release and a policy.</em></p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Containment Playbooks — Who Responds?</div>
+    <p>The document acknowledges dangerous AI systems may be unrecallable once released, then proposes "coordinated playbooks" involving government. It does not propose independent government authority to act without corporate cooperation.</p>
+    <p><em>Consequence: OpenAI becomes a necessary partner in any containment effort it helped create the need for. The company that generates the emergency helps design the emergency response. This is regulatory capture embedded in the crisis protocol.</em></p>
+  </div>
+</div>
+
+<!-- TAB 2 -->
+<div id="mechanism" class="tab-content">
+  <div class="section-title">Mechanism Audit: How Does the Logic Actually Run?</div>
+  <p>Every policy document encodes a decision logic. Tracing that logic reveals what the document structurally permits and prohibits.</p>
+
+  <div class="block">
+    <div class="block-title">Primary Logic Chain</div>
+    <p>1. AI will create enormous wealth concentration<br>
+    2. That concentration requires redistribution<br>
+    3. Redistribution proposals should come from AI companies<br>
+    4. Governments implement proposals acceptable to companies<br>
+    5. Workers and communities give feedback through designated channels</p>
+    <p><em>This is supply-side redistribution. Capital remains at the top of the decision hierarchy. The beneficiaries of policy are consulted, not empowered.</em></p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Authority-by-Proximity Logic</div>
+    <p>The document repeatedly positions OpenAI as most qualified to propose solutions because it is closest to the technology. Proximity to the system being governed becomes the basis for governance authority.</p>
+    <p><em>Applied consistently: defense contractors should write procurement law. Pharmaceutical companies should set drug pricing policy. The banking industry should design financial regulation. This is not expertise — it is monopoly on definition.</em></p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Liberation Language as Structural Cover</div>
+    <p>Terms like "people first," "democratize access," "right to AI," and "share prosperity broadly" are not false. They describe real values. But the mechanisms proposed cannot produce those outcomes from within the framework's own constraints.</p>
+    <p><em>This pattern is identifiable across history: reform documents that correctly name the harm, propose insufficient remedies, and foreclose stronger alternatives by occupying the policy space first. The sincerity of the authors is irrelevant to this structural analysis.</em></p>
+  </div>
+</div>
+
+<!-- TAB 3 -->
+<div id="assumptions" class="tab-content">
+  <div class="section-title">Hidden Assumptions: What Must Be True for This to Work?</div>
+  <p>Every policy document rests on foundational commitments it cannot examine without collapsing. These are the load-bearing walls.</p>
+
+  <div class="warn">
+    <div class="warn-label">Assumption 1: Capitalism Is the Correct Container</div>
+    <p>The document states directly: "Capitalism, imperfect as it is, remains an effective system for translating human ingenuity into shared prosperity." This is a cosmological commitment, not a policy claim. It forecloses mechanisms requiring structural redistribution of ownership — not just distribution of returns. <em>The document cannot propose worker ownership of AI infrastructure because its foundational assumption prohibits it.</em></p>
+  </div>
+
+  <div class="warn">
+    <div class="warn-label">Assumption 2: US Competitiveness Is the Organizing Value</div>
+    <p>The document invokes competition with China repeatedly to justify speed, infrastructure concentration, and reduced regulatory friction. This converts a justice question — who benefits from AI? — into a security question — how does America win? These are not the same question and do not produce the same answers.</p>
+  </div>
+
+  <div class="warn">
+    <div class="warn-label">Assumption 3: Technological Development Pace Is Not Democratically Controllable</div>
+    <p>The document treats superintelligence as inevitable and imminent — "not a distant possibility." This forecloses the question of whether the pace of development should be subject to democratic authorization. The only permitted question is how to manage what is already coming. Whether to build it is structurally absent.</p>
+  </div>
+
+  <div class="warn">
+    <div class="warn-label">Assumption 4: OpenAI Is a Legitimate Governance Co-Author</div>
+    <p>The document assumes a private corporation with fiduciary duties to shareholders is an appropriate co-designer of the regulatory architecture that governs it. This assumption is invisible until named. When named, it fails the most basic conflict-of-interest standard applied in every other governance domain.</p>
+  </div>
+</div>
+
+<!-- TAB 4 -->
+<div id="silenced" class="tab-content">
+  <div class="section-title">What's Excluded: Perspectives the Document Cannot Hold</div>
+  <p>A document's exclusions are as analytically significant as its inclusions. What questions cannot be asked within this framework?</p>
+
+  <div class="block">
+    <div class="block-title">Labor Sovereignty</div>
+    <p>A framework in which workers hold inherent authority over the conditions of their labor — not as a policy concession, but as a pre-political right. The document offers workers a "voice" and a "formal way to collaborate with management." In a labor sovereignty framework, workers do not collaborate with management decisions. They make them. The document cannot hold this position without dismantling its own logic.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">The Global South as Stakeholder, Not Recipient</div>
+    <p>AI systems are trained on data extracted from communities across the globe who will not own or govern the systems built on their data. The document mentions deploying benefits "globally" once. The entire policy architecture is organized around US competitiveness and US workers. The majority world appears as a future market, not a present co-authority.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Non-Market Definitions of a Good Life</div>
+    <p>The document's entire value framework is organized around economic participation, output, productivity, and labor market attachment. A framework organized around relationship, community, land, rest, or care as primary goods — not as workforce pipeline categories — cannot be expressed within this document's language. "Pathways into human-centered work" still means labor market integration. The alternative — that a good life may not require market participation at all — is structurally unaskable.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Permanent Dignity Floor vs. Triggered Safety Net</div>
+    <p>The document proposes safety net expansion that activates when displacement crosses thresholds and phases out as conditions stabilize. This is structurally different from a permanent guaranteed floor — income, healthcare, housing — that does not require proving harm to receive. The latter position, argued by King, Friedman, and others across the political spectrum, cannot be held within a framework committed to means-testing and market normalization as baseline conditions.</p>
+  </div>
+</div>
+
+<!-- TAB 5 -->
+<div id="alternative" class="tab-content">
+  <div class="section-title">Alternative Specifications: What Would Actually Work?</div>
+  <p>Not what OpenAI should have said — what a liberation-aligned industrial policy requires structurally.</p>
+
+  <div class="block">
+    <div class="block-title">Mandatory Ownership, Not Voluntary Distribution</div>
+    <p>Require worker and community equity stakes in AI infrastructure as a condition of operating license — not a dividend from a fund companies help design. The difference between owning the means and receiving a check from those who do is not semantic. It is the difference between power and dependency.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Democratic Authorization of Development Pace</div>
+    <p>Subject the pace of AI development to democratic authorization processes — not just democratic management of consequences. Communities most vulnerable to displacement should hold meaningful veto power over deployment timelines in their sectors, not advisory input after decisions are made.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Global Governance Parity</div>
+    <p>Give the Global South, Indigenous nations, and majority-world communities equal standing in AI governance architecture — not as recipients of access programs, but as co-authorities over systems built on their data and deployed in their contexts.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Permanent Dignity Floor</div>
+    <p>Replace the auto-trigger safety net with a permanent guaranteed floor — income, healthcare, housing — that does not require proving displacement to receive. The test of a just society is not whether it responds to suffering. It is whether suffering is required to qualify for support.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Conflict of Interest Prohibition</div>
+    <p>Prohibit AI companies from co-authoring the regulatory frameworks that govern them — the same standard applied to defense contractors, pharmaceutical companies, and financial institutions in other regulatory domains. OpenAI should be a subject of industrial policy. It should not be its author.</p>
+  </div>
+</div>
+
+<div class="verdict">
+  <div class="verdict-title">Analytical Verdict</div>
+  <p>This document correctly diagnoses the problem: AI will concentrate wealth, erode the tax base, and displace workers at speed and scale unprecedented in modern economic history. Its proposed remedies are structurally insufficient because they are designed within the system generating the harm.</p>
+  <p>It is not disinformation. It is something analytically more significant: <strong>a sincere proposal that cannot work, authored by actors who benefit from its failure to work, timed to occupy the policy space before external democratic pressure can force a structurally stronger alternative.</strong></p>
+  <p>The document names the disruption it is causing, proposes to manage that disruption on its own terms, and positions itself as a necessary partner in any governance response. That is not accountability. That is agenda-setting by the entity that should be the subject of the agenda.</p>
+  <p class="key">The consequence test: if enacted exactly as written, who holds concentrated power in 20 years? The answer is the same entities that hold it now. That is the verdict.</p>
+</div>
+
+<script>
+function showTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
