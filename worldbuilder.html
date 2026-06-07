@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorldBuilder: An Anthropology of Human Reality Systems</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap');
+
+:root {
+  --void: #080504;
+  --ash: #111009;
+  --ember: #c8602a;
+  --gold: #d4a843;
+  --pale: #e8d5a0;
+  --iron: #2a1e0f;
+  --clay: #5a3a10;
+  --smoke: rgba(232,213,160,0.06);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html,body{
+  background:var(--void);
+  color:var(--pale);
+  font-family:'IM Fell English',Georgia,serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── STARFIELD ── */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0.1}50%{opacity:var(--o,0.7)}}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:10;
+  text-align:center;
+  padding:48px 24px 32px;
+  border-bottom:1px solid rgba(212,168,67,0.15);
+}
+.prog-title{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(16px,3.5vw,28px);
+  color:var(--gold);
+  letter-spacing:4px;
+  text-shadow:0 0 40px rgba(212,168,67,0.4);
+  animation:glow 4s ease-in-out infinite alternate;
+}
+@keyframes glow{from{text-shadow:0 0 20px rgba(212,168,67,0.3)}to{text-shadow:0 0 60px rgba(212,168,67,0.7),0 0 100px rgba(200,96,42,0.3)}}
+.prog-sub{
+  font-family:'IM Fell English',serif;
+  font-style:italic;
+  font-size:clamp(11px,1.8vw,15px);
+  color:var(--pale);
+  opacity:0.55;
+  margin-top:8px;
+  letter-spacing:2px;
+}
+
+/* ── OPERATING QUESTIONS ── */
+.questions-bar{
+  position:relative;z-index:10;
+  display:flex;flex-wrap:wrap;
+  justify-content:center;gap:10px;
+  padding:20px 24px;
+  border-bottom:1px solid rgba(212,168,67,0.1);
+  background:linear-gradient(to right,transparent,rgba(212,168,67,0.04),transparent);
+}
+.q-pill{
+  font-family:'Cinzel',serif;
+  font-size:clamp(7px,1.2vw,9px);
+  letter-spacing:1.5px;
+  color:var(--gold);
+  opacity:0.65;
+  border:1px solid rgba(212,168,67,0.2);
+  padding:5px 10px;
+  border-radius:1px;
+  background:rgba(212,168,67,0.04);
+}
+
+/* ── TIMELINE RAIL ── */
+#timeline{
+  position:relative;z-index:10;
+  padding:40px 0 80px;
+  max-width:1100px;
+  margin:0 auto;
+}
+
+/* Vertical spine */
+#timeline::before{
+  content:'';
+  position:absolute;
+  left:50%;
+  top:0;bottom:0;
+  width:1px;
+  background:linear-gradient(to bottom,
+    transparent 0%,
+    rgba(212,168,67,0.15) 5%,
+    rgba(212,168,67,0.4) 20%,
+    rgba(212,168,67,0.4) 80%,
+    rgba(212,168,67,0.15) 95%,
+    transparent 100%
+  );
+  transform:translateX(-50%);
+}
+
+/* ── ERA CARDS ── */
+.era{
+  position:relative;
+  display:flex;
+  align-items:flex-start;
+  gap:0;
+  padding:0 24px;
+  margin-bottom:8px;
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity 0.7s ease, transform 0.7s ease;
+}
+.era.visible{opacity:1;transform:none;}
+.era:nth-child(odd){flex-direction:row;}
+.era:nth-child(even){flex-direction:row-reverse;}
+
+/* Spine node */
+.era-node{
+  position:absolute;
+  left:50%;
+  top:32px;
+  transform:translateX(-50%);
+  width:14px;height:14px;
+  border-radius:50%;
+  border:2px solid var(--gold);
+  background:var(--ash);
+  z-index:5;
+  transition:box-shadow 0.3s;
+}
+.era.active .era-node{
+  box-shadow:0 0 20px rgba(212,168,67,0.8),0 0 40px rgba(212,168,67,0.4);
+  background:var(--gold);
+}
+
+/* Card itself */
+.era-card{
+  width:calc(50% - 40px);
+  background:linear-gradient(135deg,rgba(30,18,8,0.95),rgba(17,10,9,0.98));
+  border:1px solid rgba(212,168,67,0.18);
+  padding:24px 22px 20px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  transition:border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+}
+.era-card::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 30%,rgba(212,168,67,0.06),transparent 60%);
+  opacity:0;transition:opacity 0.3s;
+}
+.era-card:hover::before,.era-card.open::before{opacity:1;}
+.era-card:hover{
+  border-color:rgba(212,168,67,0.45);
+  box-shadow:0 0 30px rgba(212,168,67,0.1);
+  transform:translateY(-2px);
+}
+.era-card.open{
+  border-color:rgba(212,168,67,0.6);
+  box-shadow:0 0 40px rgba(212,168,67,0.15),inset 0 0 30px rgba(212,168,67,0.03);
+}
+
+/* Era number + connector line */
+.era:nth-child(odd) .era-card{margin-right:40px;}
+.era:nth-child(even) .era-card{margin-left:40px;}
+
+/* Connector tick */
+.era:nth-child(odd) .era-card::after{
+  content:'';
+  position:absolute;
+  right:-42px;top:38px;
+  width:42px;height:1px;
+  background:rgba(212,168,67,0.3);
+}
+.era:nth-child(even) .era-card::after{
+  content:'';
+  position:absolute;
+  left:-42px;top:38px;
+  width:42px;height:1px;
+  background:rgba(212,168,67,0.3);
+}
+
+/* Era header */
+.era-num{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:3px;
+  color:var(--ember);
+  opacity:0.8;
+  margin-bottom:4px;
+}
+.era-title{
+  font-family:'Cinzel',serif;
+  font-size:clamp(13px,2vw,17px);
+  font-weight:600;
+  color:var(--gold);
+  letter-spacing:1px;
+  margin-bottom:6px;
+  line-height:1.3;
+}
+.era-hook{
+  font-family:'IM Fell English',serif;
+  font-style:italic;
+  font-size:clamp(11px,1.4vw,13px);
+  color:var(--pale);
+  opacity:0.65;
+  line-height:1.5;
+}
+
+/* Sigil in card */
+.era-sigil{
+  position:absolute;
+  right:16px;top:16px;
+  opacity:0.18;
+  transition:opacity 0.3s;
+}
+.era-card:hover .era-sigil,.era-card.open .era-sigil{opacity:0.4;}
+
+/* ── EXPANDED CONTENT ── */
+.era-body{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.era-card.open .era-body{max-height:600px;}
+
+.era-divider{
+  width:100%;
+  height:1px;
+  background:linear-gradient(to right,transparent,rgba(212,168,67,0.3),transparent);
+  margin:16px 0;
+}
+
+.features{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:14px;
+}
+.feature{
+  font-size:clamp(10px,1.3vw,12px);
+  color:var(--pale);
+  opacity:0.75;
+  line-height:1.5;
+}
+.feature strong{
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  letter-spacing:2px;
+  color:var(--ember);
+  opacity:0.9;
+  display:block;
+  margin-bottom:3px;
+}
+
+/* Schema grid */
+.schema{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.schema-item{
+  background:rgba(212,168,67,0.04);
+  border:1px solid rgba(212,168,67,0.12);
+  padding:8px 10px;
+  border-radius:1px;
+}
+.schema-q{
+  font-family:'Cinzel',serif;
+  font-size:7px;
+  letter-spacing:2px;
+  color:var(--ember);
+  opacity:0.8;
+  margin-bottom:4px;
+  text-transform:uppercase;
+}
+.schema-a{
+  font-size:clamp(10px,1.3vw,12px);
+  color:var(--pale);
+  opacity:0.8;
+  line-height:1.4;
+  font-style:italic;
+}
+
+/* ── BOTTOM INSCRIPTION ── */
+footer{
+  position:relative;z-index:10;
+  text-align:center;
+  padding:32px 24px 48px;
+  border-top:1px solid rgba(212,168,67,0.12);
+}
+.footer-text{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:4px;
+  color:var(--gold);
+  opacity:0.4;
+}
+
+/* MOBILE */
+@media(max-width:700px){
+  #timeline::before{left:24px;}
+  .era{flex-direction:column!important;padding:0 16px 0 52px;}
+  .era-node{left:24px;top:28px;}
+  .era-card{width:100%!important;margin:0!important;}
+  .era-card::after{display:none;}
+  .features,.schema{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<header>
+  <div class="prog-title">WorldBuilder</div>
+  <div class="prog-sub">An Anthropology of Human Reality Systems</div>
+</header>
+
+<div class="questions-bar">
+  <span class="q-pill">Who built this world?</span>
+  <span class="q-pill">What rules govern it?</span>
+  <span class="q-pill">Who has admin privileges?</span>
+  <span class="q-pill">What counts as truth?</span>
+  <span class="q-pill">What gets rewarded?</span>
+  <span class="q-pill">What gets punished?</span>
+  <span class="q-pill">Who benefits?</span>
+  <span class="q-pill">What kind of human does this world produce?</span>
+</div>
+
+<div id="timeline"></div>
+
+<footer>
+  <div class="footer-text">Every world has rules · Every world has admins · Every world can be debugged</div>
+</footer>
+
+<script>
+// ── STARFIELD ──
+const starsEl = document.getElementById('stars');
+for(let i=0;i<120;i++){
+  const s=document.createElement('div');
+  s.className='star';
+  s.style.cssText=`
+    left:${Math.random()*100}%;
+    top:${Math.random()*100}%;
+    width:${Math.random()*2+0.5}px;
+    height:${Math.random()*2+0.5}px;
+    --d:${Math.random()*5+2}s;
+    --o:${Math.random()*0.6+0.2};
+    animation-delay:${Math.random()*5}s;
+  `;
+  starsEl.appendChild(s);
+}
+
+// ── SIGIL SVGs ──
+const sigils = {
+  fire: `<svg width="48" height="48" viewBox="-24 -24 48 48"><path d="M0 -20 Q 8 -10 4 0 Q 12 -5 8 8 Q 4 18 0 20 Q -4 18 -8 8 Q -12 -5 -4 0 Q -8 -10 0 -20Z" fill="#d4a843" stroke="none"/><path d="M0 0 Q 4 5 2 12 Q 0 16 0 20 Q -2 16 -2 12 Q -4 5 0 0Z" fill="#c8602a"/></svg>`,
+  spiral: `<svg width="48" height="48" viewBox="-24 -24 48 48"><path d="M0 -18 Q18 -18 18 0 Q18 18 0 18 Q-12 18 -12 6 Q-12 -6 0 -6 Q8 -6 8 2 Q8 8 2 10" fill="none" stroke="#d4a843" stroke-width="2.5" stroke-linecap="round"/><circle cx="2" cy="10" r="3" fill="#d4a843"/></svg>`,
+  mountain: `<svg width="48" height="48" viewBox="-24 -24 48 48"><polygon points="0,-20 -18,12 18,12" fill="none" stroke="#d4a843" stroke-width="1.5"/><polygon points="0,-8 -9,8 9,8" fill="rgba(212,168,67,0.2)" stroke="#d4a843" stroke-width="1"/><line x1="-18" y1="12" x2="18" y2="12" stroke="#d4a843" stroke-width="1.5"/></svg>`,
+  ziggurat: `<svg width="48" height="48" viewBox="-24 -24 48 48"><g fill="none" stroke="#d4a843" stroke-width="1.4"><polygon points="0,-18 -4,-10 4,-10"/><rect x="-9" y="-10" width="18" height="6"/><rect x="-14" y="-4" width="28" height="6"/><rect x="-19" y="2" width="38" height="6"/></g></svg>`,
+  tablet: `<svg width="48" height="48" viewBox="-24 -24 48 48"><rect x="-14" y="-20" width="28" height="38" rx="3" fill="none" stroke="#d4a843" stroke-width="1.4"/><g stroke="#d4a843" stroke-width="0.8" opacity="0.7"><line x1="-9" y1="-13" x2="9" y2="-13"/><line x1="-9" y1="-7" x2="9" y2="-7"/><line x1="-9" y1="-1" x2="9" y2="-1"/><line x1="-9" y1="5" x2="9" y2="5"/><line x1="-9" y1="11" x2="2" y2="11"/></g></svg>`,
+  eagle: `<svg width="48" height="48" viewBox="-24 -24 48 48"><path d="M0 -6 Q-20 -14 -22 -4 Q-14 -2 0 -6Z" fill="#d4a843" opacity="0.6"/><path d="M0 -6 Q20 -14 22 -4 Q14 -2 0 -6Z" fill="#d4a843" opacity="0.6"/><circle cx="0" cy="-4" r="5" fill="none" stroke="#d4a843" stroke-width="1.5"/><path d="M-3 -8 L-5 -14 M3 -8 L5 -14" stroke="#d4a843" stroke-width="1"/><line x1="0" y1="-1" x2="0" y2="14" stroke="#d4a843" stroke-width="1.5"/><path d="M-6 14 L0 10 L6 14" stroke="#d4a843" stroke-width="1" fill="none"/></svg>`,
+  scroll: `<svg width="48" height="48" viewBox="-24 -24 48 48"><path d="M-14 -16 Q-20 -16 -20 -10 L-20 10 Q-20 16 -14 16 L14 16 Q20 16 20 10 L20 -10 Q20 -16 14 -16 Z" fill="none" stroke="#d4a843" stroke-width="1.4"/><g stroke="#d4a843" stroke-width="0.8" opacity="0.6"><line x1="-10" y1="-8" x2="10" y2="-8"/><line x1="-10" y1="-2" x2="10" y2="-2"/><line x1="-10" y1="4" x2="6" y2="4"/></g><path d="M-20 -10 Q-26 -10 -26 -4 Q-26 2 -20 2" fill="none" stroke="#d4a843" stroke-width="1.2"/><path d="M20 -10 Q26 -10 26 -4 Q26 2 20 2" fill="none" stroke="#d4a843" stroke-width="1.2"/></svg>`,
+  dome: `<svg width="48" height="48" viewBox="-24 -24 48 48"><path d="M-18 6 Q-18 -18 0 -18 Q18 -18 18 6Z" fill="none" stroke="#d4a843" stroke-width="1.4"/><line x1="-20" y1="6" x2="20" y2="6" stroke="#d4a843" stroke-width="1.4"/><line x1="-8" y1="6" x2="-8" y2="16" stroke="#d4a843" stroke-width="1.2"/><line x1="8" y1="6" x2="8" y2="16" stroke="#d4a843" stroke-width="1.2"/><line x1="-12" y1="16" x2="12" y2="16" stroke="#d4a843" stroke-width="1.4"/><circle cx="0" cy="-8" r="3" fill="none" stroke="#d4a843" stroke-width="0.8" opacity="0.6"/></svg>`,
+  flag: `<svg width="48" height="48" viewBox="-24 -24 48 48"><line x1="-14" y1="-20" x2="-14" y2="20" stroke="#d4a843" stroke-width="1.8"/><path d="M-14 -20 L14 -12 L-14 -4Z" fill="rgba(212,168,67,0.3)" stroke="#d4a843" stroke-width="1"/><circle cx="4" cy="-12" r="3" fill="none" stroke="#d4a843" stroke-width="0.8"/></svg>`,
+  circuit: `<svg width="48" height="48" viewBox="-24 -24 48 48"><rect x="-16" y="-16" width="32" height="32" rx="2" fill="none" stroke="#d4a843" stroke-width="1"/><g stroke="#d4a843" stroke-width="0.8" opacity="0.7"><line x1="-16" y1="0" x2="-22" y2="0"/><line x1="16" y1="0" x2="22" y2="0"/><line x1="0" y1="-16" x2="0" y2="-22"/><line x1="0" y1="16" x2="0" y2="22"/></g><circle cx="0" cy="0" r="6" fill="none" stroke="#d4a843" stroke-width="1.2"/><circle cx="0" cy="0" r="2" fill="#d4a843" opacity="0.8"/><g fill="#d4a843" opacity="0.4"><rect x="-10" y="-10" width="4" height="4"/><rect x="6" y="-10" width="4" height="4"/><rect x="-10" y="6" width="4" height="4"/><rect x="6" y="6" width="4" height="4"/></g></svg>`,
+  echad: `<svg width="48" height="48" viewBox="-24 -24 48 48"><circle cx="0" cy="0" r="20" fill="none" stroke="#d4a843" stroke-width="3.5" opacity="0.7"/><circle cx="0" cy="0" r="14" fill="none" stroke="#d4a843" stroke-width="1"/><line x1="-11" y1="0" x2="11" y2="0" stroke="#d4a843" stroke-width="0.8" opacity="0.6"/><line x1="0" y1="-11" x2="0" y2="11" stroke="#d4a843" stroke-width="0.8" opacity="0.6"/><circle cx="0" cy="-10" r="2" fill="#d4a843" opacity="0.7"/><circle cx="10" cy="0" r="2" fill="#d4a843" opacity="0.6"/><circle cx="-10" cy="0" r="2" fill="#d4a843" opacity="0.6"/><circle cx="0" cy="10" r="2" fill="#d4a843" opacity="0.6"/><circle cx="0" cy="0" r="4" fill="#d4a843" opacity="0.9"/><circle cx="0" cy="0" r="1.5" fill="#1a0f05"/></svg>`,
+};
+
+// ── ERA DATA ──
+const eras = [
+  {
+    num:"ERA 01",
+    title:"Ice Age World",
+    hook:"Humans build meaning from survival.",
+    sigil: sigils.fire,
+    timeframe:"~300,000 – 12,000 BCE",
+    features:[
+      {label:"WORLD MATERIAL",text:"Sky, fire, animals, death, seasons"},
+      {label:"KNOWLEDGE SOURCE",text:"Elders, hunters, memory, signs in nature"},
+      {label:"TECHNOLOGY",text:"Cave art, ritual, burial, kin groups"},
+      {label:"COSMOLOGY TYPE",text:"Animist — all things carry spirit"},
+    ],
+    schema:{
+      builder:"No one. Emerged from shared survival.",
+      rules:"Follow the seasons. Honor the kill. Bury the dead.",
+      admin:"Elders, spirit-speakers, skilled hunters",
+      truth:"What keeps us alive. What the signs say.",
+      rewarded:"Courage, generosity, memory, accuracy",
+      punished:"Betrayal, waste, breaking taboo",
+      benefits:"The band survives together or not at all",
+      produces:"The embedded human — self as kin-node"
+    }
+  },
+  {
+    num:"ERA 02",
+    title:"Forager / Clan Worlds",
+    hook:"Humans build social maps.",
+    sigil: sigils.spiral,
+    timeframe:"~50,000 – 5,000 BCE",
+    features:[
+      {label:"WORLD MATERIAL",text:"Kinship, ancestor memory, taboos, land spirits"},
+      {label:"KNOWLEDGE SOURCE",text:"Oral tradition, embodied practice"},
+      {label:"TECHNOLOGY",text:"Story, song, ritual, seasonal movement"},
+      {label:"COSMOLOGY TYPE",text:"Relational — cosmos is a web of obligations"},
+    ],
+    schema:{
+      builder:"Ancestors. The land itself. The tradition.",
+      rules:"Kinship rules. Taboo structures. Gift economies.",
+      admin:"Age, ritual status, embodied experience",
+      truth:"What the elders remember. What worked before.",
+      rewarded:"Generosity, reciprocity, ritual competence",
+      punished:"Hoarding, breaking taboo, disrupting kin web",
+      benefits:"The lineage, the band, the collective memory",
+      produces:"The relational human — self as story-carrier"
+    }
+  },
+  {
+    num:"ERA 03",
+    title:"Agricultural Worlds",
+    hook:"Humans build settled reality.",
+    sigil: sigils.mountain,
+    timeframe:"~10,000 – 3,500 BCE",
+    features:[
+      {label:"WORLD MATERIAL",text:"Land, fertility, rain, harvest, storage"},
+      {label:"KNOWLEDGE SOURCE",text:"Seasonal observation, priestly calendar"},
+      {label:"TECHNOLOGY",text:"Planting, irrigation, granaries, domestication"},
+      {label:"COSMOLOGY TYPE",text:"Cyclical — cosmos moves in seasons and floods"},
+    ],
+    schema:{
+      builder:"The first farmers. The river gods. The calendar-keepers.",
+      rules:"Plant when the star rises. Pay the priest. Appease the rain.",
+      admin:"Priest, chieftain, calendar-keeper, granary holder",
+      truth:"The harvest. The flood. The fertility cycle.",
+      rewarded:"Surplus, obedience to ritual schedule, proper sacrifice",
+      punished:"Drought, famine read as divine displeasure",
+      benefits:"Those who control the surplus and the seed",
+      produces:"The settled human — self as productive body"
+    }
+  },
+  {
+    num:"ERA 04",
+    title:"City-State Worlds",
+    hook:"Humans build institutions.",
+    sigil: sigils.ziggurat,
+    timeframe:"~3,500 – 500 BCE",
+    features:[
+      {label:"WORLD MATERIAL",text:"Temples, armies, law codes, writing, taxation"},
+      {label:"KNOWLEDGE SOURCE",text:"Scribes, priests, recorded archives"},
+      {label:"TECHNOLOGY",text:"Cuneiform, cylinder seals, monumental architecture"},
+      {label:"COSMOLOGY TYPE",text:"Hierarchical — cosmos mirrors the city"},
+    ],
+    schema:{
+      builder:"The king. The temple. The scribe class.",
+      rules:"Hammurabi's code. Temple tax. Labor conscription.",
+      admin:"Scribes, priests, kings, military commanders",
+      truth:"What is written. What the god-king decrees.",
+      rewarded:"Loyalty, tribute, building the king's legacy",
+      punished:"Debt, rebellion, impurity, disobedience to cosmic order",
+      benefits:"The palace and temple complex",
+      produces:"The administered human — self as taxable unit"
+    }
+  },
+  {
+    num:"ERA 05",
+    title:"Imperial Worlds",
+    hook:"Humans build totalizing systems.",
+    sigil: sigils.eagle,
+    timeframe:"~800 BCE – 500 CE",
+    features:[
+      {label:"WORLD MATERIAL",text:"Empire, conquest, official religion, propaganda"},
+      {label:"KNOWLEDGE SOURCE",text:"Imperial archive, state priests, court historians"},
+      {label:"TECHNOLOGY",text:"Roads, legions, coinage, controlled grain supply"},
+      {label:"COSMOLOGY TYPE",text:"Political — cosmos authorizes empire"},
+    ],
+    schema:{
+      builder:"Rome. Persia. Assyria. Han. The conquering army.",
+      rules:"Pay Caesar. Accept the pantheon. Submit or be erased.",
+      admin:"Emperor, proconsul, legionary, imperial priesthood",
+      truth:"What serves the empire's story of itself.",
+      rewarded:"Assimilation, collaboration, tribute payment",
+      punished:"Revolt, heresy, ethnic solidarity, memory of prior world",
+      benefits:"The metropolitan center. The colonizing class.",
+      produces:"The subject human — self as imperial category"
+    }
+  },
+  {
+    num:"ERA 06",
+    title:"Axial / Prophetic Worlds",
+    hook:"Humans critique empire from inside it.",
+    sigil: sigils.fire,
+    timeframe:"~800 – 200 BCE",
+    features:[
+      {label:"WORLD MATERIAL",text:"Justice, wisdom, ethics, covenant, liberation"},
+      {label:"KNOWLEDGE SOURCE",text:"Prophetic tradition, conscience, communal memory"},
+      {label:"TECHNOLOGY",text:"Counter-narrative, parable, protest, lament"},
+      {label:"COSMOLOGY TYPE",text:"Ethical — cosmos demands consequence, not compliance"},
+    ],
+    schema:{
+      builder:"Prophets, sages, dissenters. Amos. Isaiah. Confucius. Buddha. Socrates.",
+      rules:"Do justice. Love mercy. Walk humbly. The poor are the measure.",
+      admin:"Moral consequence. Communal memory. The oppressed as witness.",
+      truth:"What the powerful deny. What the poor experience.",
+      rewarded:"Integrity, solidarity, truth-telling",
+      punished:"Prophets get killed. Counter-worlds get suppressed.",
+      benefits:"Eventually — the oppressed. Often posthumously.",
+      produces:"The ethical human — self as conscience-bearer"
+    }
+  },
+  {
+    num:"ERA 07",
+    title:"Textual Worlds",
+    hook:"Humans preserve reality in books.",
+    sigil: sigils.tablet,
+    timeframe:"~200 BCE – 700 CE",
+    features:[
+      {label:"WORLD MATERIAL",text:"Scripture, canon, commentary, doctrine"},
+      {label:"KNOWLEDGE SOURCE",text:"The text. The interpreter. The institution behind both."},
+      {label:"TECHNOLOGY",text:"Codex, commentary, canon councils, literacy gatekeeping"},
+      {label:"COSMOLOGY TYPE",text:"Textual — the book becomes the world"},
+    ],
+    schema:{
+      builder:"Canon councils. Rabbinic academies. Church fathers. Hadith collectors.",
+      rules:"What the text says — as interpreted by the authorized interpreter.",
+      admin:"Text + interpreter + institution. The triple lock.",
+      truth:"What is written. What the tradition reads in what is written.",
+      rewarded:"Orthodoxy, textual fluency, institutional belonging",
+      punished:"Heresy, apostasy, unauthorized reading",
+      benefits:"Those who control interpretation",
+      produces:"The textual human — self as reader/believer"
+    }
+  },
+  {
+    num:"ERA 08",
+    title:"Church / Mosque / Academy Worlds",
+    hook:"Humans formalize knowledge.",
+    sigil: sigils.dome,
+    timeframe:"~500 – 1800 CE",
+    features:[
+      {label:"WORLD MATERIAL",text:"Theology, philosophy, law, universities, guilds"},
+      {label:"KNOWLEDGE SOURCE",text:"Credentialed institutions and their approved texts"},
+      {label:"TECHNOLOGY",text:"Scholasticism, fatwa, university, printing press"},
+      {label:"COSMOLOGY TYPE",text:"Hierarchical-rational — truth is certified"},
+    ],
+    schema:{
+      builder:"Pope. Caliph. University rector. The credentialing apparatus.",
+      rules:"Degree. Ordination. Certification. Peer review.",
+      admin:"Authority becomes credentialed. Trust requires institution.",
+      truth:"What the authorized institution certifies.",
+      rewarded:"Conformity to approved frameworks. Institutional loyalty.",
+      punished:"Unauthorized knowledge. Vernacular theology. Women scholars.",
+      benefits:"The institutionally trained. The credentialed class.",
+      produces:"The certified human — self as licensed knower"
+    }
+  },
+  {
+    num:"ERA 09",
+    title:"Nation-State Worlds",
+    hook:"Humans build civic reality.",
+    sigil: sigils.flag,
+    timeframe:"~1648 – 2000 CE",
+    features:[
+      {label:"WORLD MATERIAL",text:"Race, borders, citizenship, capitalism, public school"},
+      {label:"KNOWLEDGE SOURCE",text:"State curriculum, science, media, law"},
+      {label:"TECHNOLOGY",text:"Print, telegraph, radio, TV, census, passport"},
+      {label:"COSMOLOGY TYPE",text:"National — the state is the sacred frame"},
+    ],
+    schema:{
+      builder:"Colonial powers. Founding fathers. Constitutional conventions. Race-scientists.",
+      rules:"Citizenship. Property law. Border control. Public education.",
+      admin:"State, science, media, law — the four pillars",
+      truth:"What the curriculum teaches. What the news verifies.",
+      rewarded:"Productivity, patriotism, assimilation, consumption",
+      punished:"Dissent, non-compliance, poverty, wrong citizenship",
+      benefits:"Capital-holders. The citizened class. The national majority.",
+      produces:"The national subject — self as citizen-consumer"
+    }
+  },
+  {
+    num:"ERA 10",
+    title:"Digital / Algorithmic Worlds",
+    hook:"Humans build programmable reality.",
+    sigil: sigils.circuit,
+    timeframe:"~1990 – Present",
+    features:[
+      {label:"WORLD MATERIAL",text:"Feeds, avatars, platforms, AI, metaverse"},
+      {label:"KNOWLEDGE SOURCE",text:"Algorithm, influencer, data model, trend"},
+      {label:"TECHNOLOGY",text:"Social media, recommendation engine, LLM, surveillance capitalism"},
+      {label:"COSMOLOGY TYPE",text:"Algorithmic — visibility is ontology"},
+    ],
+    schema:{
+      builder:"Platform engineers. VC-backed founders. Ad-revenue models.",
+      rules:"Engagement maximization. Content policy. Terms of service.",
+      admin:"Algorithm + influencer + data model. No human in the loop.",
+      truth:"What goes viral. What gets amplified. What the model was trained on.",
+      rewarded:"Outrage, performance, virality, brand alignment",
+      punished:"Nuance, slowness, offline-ness, wrong politics",
+      benefits:"Platform owners. Data brokers. Attention merchants.",
+      produces:"The performative human — self as content"
+    }
+  },
+  {
+    num:"ERA 11",
+    title:"Programmable Cosmology",
+    hook:"Humans now build worlds on purpose.",
+    sigil: sigils.echad,
+    timeframe:"Now → ?",
+    features:[
+      {label:"WORLD MATERIAL",text:"Roblox, Minecraft, TikTok, AI, VR, synthetic biology"},
+      {label:"KNOWLEDGE SOURCE",text:"Whoever holds the repo. Whoever trains the model."},
+      {label:"TECHNOLOGY",text:"World-engines, AI world-builders, reality APIs"},
+      {label:"COSMOLOGY TYPE",text:"Meta — the world is a design choice"},
+    ],
+    schema:{
+      builder:"We are. Every system has rules, lore, incentives, admins, banned knowledge.",
+      rules:"Whatever the designer encodes. Explicit or not.",
+      admin:"Platform admins. Model trainers. Whoever controls the server.",
+      truth:"Whatever the system rewards believing.",
+      rewarded:"Depends entirely on world design. This is the question.",
+      punished:"Depends entirely on world design. This is the warning.",
+      benefits:"This is the political question of the century.",
+      produces:"The world-maker — or the world's raw material. Your choice."
+    }
+  },
+];
+
+// ── RENDER TIMELINE ──
+const timeline = document.getElementById('timeline');
+
+eras.forEach((era,i)=>{
+  const div = document.createElement('div');
+  div.className='era';
+  div.innerHTML=`
+    <div class="era-node"></div>
+    <div class="era-card" onclick="toggleEra(this)">
+      <div class="era-sigil">${era.sigil}</div>
+      <div class="era-num">${era.num} · ${era.timeframe}</div>
+      <div class="era-title">${era.title}</div>
+      <div class="era-hook">${era.hook}</div>
+      <div class="era-body">
+        <div class="era-divider"></div>
+        <div class="features">
+          ${era.features.map(f=>`
+            <div class="feature">
+              <strong>${f.label}</strong>
+              ${f.text}
+            </div>
+          `).join('')}
+        </div>
+        <div class="era-divider"></div>
+        <div class="schema">
+          <div class="schema-item"><div class="schema-q">Who Built This?</div><div class="schema-a">${era.schema.builder}</div></div>
+          <div class="schema-item"><div class="schema-q">What Rules?</div><div class="schema-a">${era.schema.rules}</div></div>
+          <div class="schema-item"><div class="schema-q">Admin Privileges</div><div class="schema-a">${era.schema.admin}</div></div>
+          <div class="schema-item"><div class="schema-q">What Is Truth?</div><div class="schema-a">${era.schema.truth}</div></div>
+          <div class="schema-item"><div class="schema-q">What Gets Rewarded?</div><div class="schema-a">${era.schema.rewarded}</div></div>
+          <div class="schema-item"><div class="schema-q">What Gets Punished?</div><div class="schema-a">${era.schema.punished}</div></div>
+          <div class="schema-item"><div class="schema-q">Who Benefits?</div><div class="schema-a">${era.schema.benefits}</div></div>
+          <div class="schema-item"><div class="schema-q">Human Produced</div><div class="schema-a">${era.schema.produces}</div></div>
+        </div>
+      </div>
+    </div>
+  `;
+  timeline.appendChild(div);
+});
+
+function toggleEra(card){
+  const wasOpen = card.classList.contains('open');
+  document.querySelectorAll('.era-card.open').forEach(c=>c.classList.remove('open'));
+  document.querySelectorAll('.era.active').forEach(e=>e.classList.remove('active'));
+  if(!wasOpen){
+    card.classList.add('open');
+    card.closest('.era').classList.add('active');
+  }
+}
+
+// ── INTERSECTION OBSERVER for reveal ──
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+},{threshold:0.1});
+document.querySelectorAll('.era').forEach(e=>observer.observe(e));
+</script>
+</body>
+</html>
