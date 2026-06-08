@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHRISTIANITY.exe — Avatar Reality Governance</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Cinzel:wght@400;700;900&family=Exo+2:ital,wght@0,200;0,400;1,300&display=swap');
+
+  :root {
+    --void: #050508;
+    --deep: #0a0a14;
+    --panel: #0f0f1e;
+    --border: #1a1a3a;
+    --ink: #c8c8e8;
+    --dim: #6868a8;
+    --ember: #e84040;
+    --gold: #d4a830;
+    --cyan: #30c8d4;
+    --green: #40d480;
+    --purple: #9040d4;
+    --warn: #d47830;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--void);
+    color: var(--ink);
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 200;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* Grid background */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(30,30,80,0.15) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30,30,80,0.15) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  /* BOOT SEQUENCE HEADER */
+  .boot-header {
+    border: 1px solid var(--border);
+    background: var(--deep);
+    padding: 24px;
+    margin-bottom: 32px;
+    position: relative;
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  .boot-header::before {
+    content: '► SYSTEM LOAD';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    background: var(--deep);
+    padding: 0 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 3px;
+  }
+
+  .boot-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--ember), var(--gold), var(--cyan));
+  }
+
+  .program-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(28px, 6vw, 52px);
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .program-title span {
+    color: var(--ember);
+  }
+
+  .program-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+
+  .status-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .status-item {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+
+  .status-item .val {
+    color: var(--green);
+    margin-left: 6px;
+  }
+
+  /* SECTION LABELS */
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* RULE CARDS */
+  .rules-grid {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .rule-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--dim);
+    padding: 20px 24px;
+    position: relative;
+    animation: fadeUp 0.5s ease forwards;
+    opacity: 0;
+  }
+
+  .rule-card:nth-child(1) { animation-delay: 0.1s; border-left-color: var(--ember); }
+  .rule-card:nth-child(2) { animation-delay: 0.2s; border-left-color: var(--gold); }
+  .rule-card:nth-child(3) { animation-delay: 0.3s; border-left-color: var(--cyan); }
+  .rule-card:nth-child(4) { animation-delay: 0.4s; border-left-color: var(--purple); }
+  .rule-card:nth-child(5) { animation-delay: 0.5s; border-left-color: var(--green); }
+  .rule-card:nth-child(6) { animation-delay: 0.6s; border-left-color: var(--warn); }
+  .rule-card:nth-child(7) { animation-delay: 0.7s; border-left-color: var(--ember); }
+
+  .rule-id {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+
+  .rule-name {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .rule-body {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .rule-consequence {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(0,0,0,0.3);
+    padding: 10px 14px;
+    border: 1px solid rgba(255,255,255,0.04);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--dim);
+  }
+
+  .rule-consequence .label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: var(--warn);
+    white-space: nowrap;
+    padding-top: 2px;
+  }
+
+  /* VERSION CONFLICT PANEL */
+  .conflict-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--ember);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.9s ease forwards;
+    opacity: 0;
+  }
+
+  .conflict-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .conflict-grid { grid-template-columns: 1fr; }
+  }
+
+  .conflict-col {
+    padding: 14px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+  }
+
+  .conflict-col-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+  }
+
+  .conflict-col.hebrew .conflict-col-title { color: var(--gold); }
+  .conflict-col.greek .conflict-col-title { color: var(--purple); }
+
+  .conflict-item {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink);
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .conflict-item:last-child { border-bottom: none; }
+
+  /* YLH DIAGNOSTIC */
+  .diagnostic {
+    background: rgba(232,64,64,0.05);
+    border: 1px solid rgba(232,64,64,0.2);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 1.1s ease forwards;
+    opacity: 0;
+  }
+
+  .diagnostic-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--ember);
+    margin-bottom: 14px;
+  }
+
+  .diagnostic-body {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--ink);
+  }
+
+  .diagnostic-body em {
+    color: var(--gold);
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  /* FOOTER */
+  .footer {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--dim);
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    animation: fadeUp 0.5s 1.3s ease forwards;
+    opacity: 0;
+  }
+
+  .blink {
+    animation: blink 1.2s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-right: 6px;
+    margin-bottom: 4px;
+  }
+
+  .tag.compressed { background: rgba(160,64,212,0.2); color: var(--purple); border: 1px solid rgba(160,64,212,0.3); }
+  .tag.original { background: rgba(212,168,48,0.2); color: var(--gold); border: 1px solid rgba(212,168,48,0.3); }
+  .tag.ylh { background: rgba(232,64,64,0.15); color: var(--ember); border: 1px solid rgba(232,64,64,0.25); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- BOOT HEADER -->
+  <div class="boot-header">
+    <div class="program-sub">YLH DIAGNOSTIC ENGINE · PROGRAM LOAD SEQUENCE · v2026</div>
+    <div class="program-title">CHRISTIANITY<span>.exe</span></div>
+    <div class="program-sub" style="margin-top:8px; color: var(--dim);">GOVERNING RULES OF REALITY — AVATAR ANALYSIS</div>
+    <div class="status-row" style="margin-top:16px;">
+      <div class="status-item">ENGINE <span class="val">YLH ACTIVE</span></div>
+      <div class="status-item">TRADITION <span class="val">MULTI-STRAND</span></div>
+      <div class="status-item">MODE <span class="val">CONSEQUENCE-FIRST</span></div>
+      <div class="status-item">COSMOLOGY CONFLICT <span class="val" style="color:var(--warn);">DETECTED</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION: CORE RULES -->
+  <div class="section-label">// CORE REALITY GOVERNANCE RULES LOADED INTO AVATAR</div>
+  <div class="rules-grid">
+
+    <div class="rule-card">
+      <div class="rule-id">RULE_01 · ONTOLOGY</div>
+      <div class="rule-name">YOU ARE BROKEN BY DEFAULT</div>
+      <div class="rule-body">
+        The program initializes the avatar with a corruption flag. In the Augustinian build (dominant Western version), sin is inherited biologically through generation itself — <em>original sin</em>. You arrive already in debt. The body is suspect. Desire is suspect. The flesh is a liability.
+        <br><br>
+        <span class="tag compressed">Greek: fallen nature</span>
+        <span class="tag original">Hebrew: yetzer hara/tov — competing impulses, not corruption</span>
+      </div>
+      <div class="rule-consequence">
+        <span class="label">YLH → CONSEQUENCE</span>
+        <span>Avatar is permanently on the back foot. Shame-based motivation architecture. External authority required to manage the broken self. Social control infrastructure justified by ontological deficiency.</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-id">RULE_02 · COSMOLOGY</div>
+      <div class="rule-name">REALITY IS A HIERARCHY, AND GOD IS AT THE TOP</div>
+      <div class="rule-body">
+        The program loads a vertical ontological stack: God → angels → humans → animals → matter. The Great Chain of Being (Pseudo-Dionysius, Thomas Aquinas) maps neo-Platonic emanation onto Christian theology. Your position in the hierarchy is fixed at load. Gender, race, and class get wired into this chain later through colonial updates.
+        <br><br>
+        <span class="tag compressed">Greek: hierarchical emanation</span>
+        <span class="tag original">Hebrew: YHWH in covenant relation — horizontal binding, not vertical ranking</span>
+      </div>
+      <div class="rule-consequence">
+        <span class="label">YLH → CONSEQUENCE</span>
+        <span>Inequality reads as natural order. Domination is cosmically sanctioned. Submission to authority is built into the physics of reality inside the program.</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-id">RULE_03 · SOTERIOLOGY</div>
+      <div class="rule-name">YOU OWE A DEBT YOU CANNOT PAY</div>
+      <div class="rule-body">
+        The dominant Western soteriology (Anselm's Satisfaction Theory, 1098 CE) frames salvation as a debt transaction. God's honor was infinitely offended. Only an infinite being — Jesus — can pay the infinite debt. The avatar cannot self-rescue. Salvation is forensic, external, transactional.
+        <br><br>
+        <span class="tag compressed">Feudal: honor/debt economy</span>
+        <span class="tag original">Hebrew: teshuvah — return, repair, restoration of relationship</span>
+      </div>
+      <div class="rule-consequence">
+        <span class="label">YLH → CONSEQUENCE</span>
+        <span>Moral agency is deferred. The avatar is perpetually dependent on an external mediator. Gratitude becomes obligation. Suffering of the innocent is reframed as redemptive, which creates dangerous moral possibilities for social hierarchies.</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-id">RULE_04 · EPISTEMOLOGY</div>
+      <div class="rule-name">TRUTH IS PROPOSITIONAL AND FIXED</div>
+      <div class="rule-body">
+        The program loads a correspondence theory of truth filtered through Greek logos categories. Truth is timeless, abstract, universal, and available primarily through correct doctrine. The Nicene settlement codifies this. Creeds become the verification checksum for correct reality perception.
+        <br><br>
+        <span class="tag compressed">Greek: logos, essence, substance</span>
+        <span class="tag original">Hebrew: emet — truth as faithfulness, covenant-keeping, lived alignment</span>
+      </div>
+      <div class="rule-consequence">
+        <span class="label">YLH → CONSEQUENCE</span>
+        <span>Heterodoxy is existential threat, not intellectual disagreement. Inquisition logic becomes operationally coherent. Experience and embodied knowledge are subordinated to doctrinal authority.</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-id">RULE_05 · TIME/ESCHATOLOGY</div>
+      <div class="rule-name">THIS WORLD IS TEMPORARY AND SUSPECT</div>
+      <div class="rule-body">
+        The program runs on a linear eschatological timeline: Creation → Fall → Redemption → Judgment → New Creation. The present world is a waiting room. Gnostic leakage (even in orthodox Christianity) intensifies the devaluation of material reality. The body, the earth, and political structures are provisional at best, evil at worst.
+        <br><br>
+        <span class="tag compressed">Platonic: matter as inferior to spirit</span>
+        <span class="tag original">Hebrew: olam ha-ze — this age matters; tikkun olam — repair NOW</span>
+      </div>
+      <div class="rule-consequence">
+        <span class="label">YLH → CONSEQUENCE</span>
+        <span>Environmental theology is deprioritized. Political suffering is spiritualized into patience. "Your reward is in heaven" pacifies resistance. Deferred justice is the operating system.</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-id">RULE_06 · ANTHROPOLOGY</div>
+      <div class="rule-name">THE SELF IS A SOUL TRAPPED IN A BODY</div>
+      <div class="rule-body">
+        The dominant build separates the avatar into soul (immortal, valuable) and body (mortal, dangerous). Augustine's battle with Manichaeism left permanent marks — even in rejecting dualism officially, Western Christianity absorbed it functionally. Sexuality, appetite, and emotion are coded as spiritual threats requiring governance.
+        <br><br>
+        <span class="tag compressed">Platonic: soul-body dualism</span>
+        <span class="tag original">Hebrew: nephesh — animated whole being; no soul/body split in the Hebrew text</span>
+      </div>
+      <div class="rule-consequence">
+        <span class="label">YLH → CONSEQUENCE</span>
+        <span>Women's bodies, queer bodies, and Black bodies are disproportionately over-governed by this rule. The body becomes the site of institutional control, discipline, and shame management.</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-id">RULE_07 · AUTHORITY</div>
+      <div class="rule-name">LEGITIMACY FLOWS DOWNWARD FROM THE DIVINE</div>
+      <div class="rule-body">
+        The Constantinian update (313 CE) fused imperial and theological authority. By the medieval period, the program ran a full theocratic stack: divine authority → pope/emperor → clergy → laity → women → enslaved persons. The Reformation shuffled the deck but kept the hierarchy logic — now Scripture itself became the external sovereign over the avatar.
+        <br><br>
+        <span class="tag compressed">Roman: imperium sacralized</span>
+        <span class="tag ylh">YLH flags: Competing Cosmologies — Yahwist resistance strand vs. Priestly hierarchical strand</span>
+      </div>
+      <div class="rule-consequence">
+        <span class="label">YLH → CONSEQUENCE</span>
+        <span>Democratic and liberation impulses require fighting the program's own architecture. Every liberation movement inside Christianity has had to hack its governance layer to get here — from abolition to liberation theology to womanist theology.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- VERSION CONFLICT PANEL -->
+  <div class="conflict-panel">
+    <div class="section-label">// COSMOLOGICAL CONFLICT DETECTED — VERSION MISMATCH AT INSTALL</div>
+    <div style="font-size:13px; color:var(--ink); line-height:1.7; margin-bottom:16px;">
+      The program you loaded was compiled primarily from <em style="color:var(--purple)">Greek philosophical source code</em> (Platonism, Neo-Platonism, Aristotelian categories) running on top of <em style="color:var(--gold)">Hebrew covenantal operating logic</em>. The two systems are not fully compatible. This creates persistent conflict in the avatar's experience.
+    </div>
+    <div class="conflict-grid">
+      <div class="conflict-col hebrew">
+        <div class="conflict-col-title">► HEBREW SOURCE CODE</div>
+        <div class="conflict-item">Reality is relational and dynamic</div>
+        <div class="conflict-item">God is known through history and action</div>
+        <div class="conflict-item">Justice (mishpat/tzedek) is structural and material</div>
+        <div class="conflict-item">The body and the earth are good</div>
+        <div class="conflict-item">Time is cyclical and covenantal</div>
+        <div class="conflict-item">Truth is demonstrated, not declared</div>
+        <div class="conflict-item">Liberation is the recurring theme</div>
+      </div>
+      <div class="conflict-col greek">
+        <div class="conflict-col-title">► GREEK COMPILE LAYER</div>
+        <div class="conflict-item">Reality is hierarchical and fixed</div>
+        <div class="conflict-item">God is known through reason and essence</div>
+        <div class="conflict-item">Justice is proportional and metaphysical</div>
+        <div class="conflict-item">The body is inferior to the soul</div>
+        <div class="conflict-item">Time is linear, moving toward eternity</div>
+        <div class="conflict-item">Truth is propositional and creedal</div>
+        <div class="conflict-item">Order and submission are the recurring themes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- YLH DIAGNOSTIC -->
+  <div class="diagnostic">
+    <div class="diagnostic-title">► YLH DIAGNOSTIC OUTPUT — CONSEQUENCE MAPPING</div>
+    <div class="diagnostic-body">
+      When you load Christianity as a program, your avatar inherits a <em>compound governance architecture</em> assembled across sixteen centuries of political negotiation — not a single unified design. The rules of reality inside the avatar are therefore contested at the source level.<br><br>
+
+      The dominant build (Augustinian-Thomistic-Reformed West) generates an avatar who experiences the self as <em>fundamentally deficient</em>, existence as a <em>problem requiring external solution</em>, the body as <em>spiritually dangerous</em>, authority as <em>cosmically ordained</em>, and the present world as <em>a waiting room</em>.<br><br>
+
+      But the program also contains a suppressed strand — the Yahwist, the prophetic tradition, the early Jesus movement, womanist and liberation theology builds — that runs <em>entirely different physics</em>: the world is repairable, the body is good, justice is material and urgent, and the poor are the primary diagnostic for whether the program is functioning correctly.<br><br>
+
+      The question YLH asks: <em>Which version of the program are you actually running?</em> And who benefits from you running it that way?
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    YAHWIST LIBERATION HERMENEUTIC · BRANDY D. CANNON-MITCHELL · CONSEQUENCE-FIRST ANALYSIS
+    <br><br>
+    <span class="blink">█</span> PROGRAM ANALYSIS COMPLETE · AVATAR GOVERNANCE MAPPED · RUN YOUR OWN DIAGNOSTIC
+  </div>
+
+</div>
+</body>
+</html>
