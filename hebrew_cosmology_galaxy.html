@@ -8,32 +8,27 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; font-family: 'Space Mono', monospace; }
+html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; }
 #canvas { display: block; width: 100%; height: 100vh; cursor: grab; }
 #canvas:active { cursor: grabbing; }
-
-/* Sidebar Layout to prevent covering the network lines */
-#sidebar {
-  position: fixed; top: 0; right: 0; width: 380px; height: 100vh;
-  background: rgba(14, 14, 14, 0.98); border-left: 1px solid rgba(201,162,39,0.3);
-  padding: 30px 24px; display: none; flex-direction: column;
-  color: #f5f0e8; overflow-y: auto; z-index: 10;
-  box-shadow: -5px 0 25px rgba(0,0,0,0.5);
+#info-panel {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(18,18,18,0.97); border: 1px solid #c9a227;
+  border-radius: 8px; padding: 14px 20px; max-width: 420px; width: 92%;
+  display: none; font-family: 'IM Fell English', serif;
+  color: #f5f0e8; text-align: center; pointer-events: none;
 }
-#sidebar .node-title {
-  font-family: 'Cinzel', serif; font-size: 18px; color: #c9a227;
-  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px;
-  line-height: 1.3;
+#info-panel .node-title {
+  font-family: 'Cinzel', serif; font-size: 12px; color: #c9a227;
+  letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 5px;
 }
-#sidebar .node-cat {
-  font-family: 'Space Mono', monospace; font-size: 9px;
-  letter-spacing: 0.12em; margin-bottom: 20px; text-transform: uppercase;
-  border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;
+#info-panel .node-cat {
+  font-family: 'Space Mono', monospace; font-size: 8px;
+  letter-spacing: 0.1em; margin-bottom: 7px; text-transform: uppercase;
 }
-#sidebar .node-desc { font-family: 'IM Fell English', serif; font-size: 14px; line-height: 1.6; color: #dddddd; }
-
+#info-panel .node-desc { font-size: 11.5px; line-height: 1.6; color: #ddd; }
 #legend {
-  position: fixed; bottom: 14px; left: 14px;
+  position: fixed; top: 14px; right: 14px;
   font-family: 'Space Mono', monospace; font-size: 8px; color: #999;
   line-height: 2.1; background: rgba(18,18,18,0.9);
   padding: 10px 14px; border-radius: 6px;
@@ -41,7 +36,6 @@ html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; f
 }
 #legend div { display: flex; align-items: center; gap: 7px; }
 #legend span { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
 #title-block {
   position: fixed; top: 14px; left: 14px;
   font-family: 'Cinzel', serif; color: #c9a227;
@@ -51,20 +45,11 @@ html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; f
 }
 #title-block h1 { font-size: 12px; letter-spacing: 0.14em; font-weight: 600; }
 #title-block p { font-family: 'Space Mono', monospace; font-size: 7.5px; color: #777; margin-top: 3px; }
-
-#hint { 
-  position: fixed; bottom: 14px; right: 400px; 
-  font-family: 'Space Mono', monospace; font-size: 8px; color: #aaa;
-  background: rgba(18,18,18,0.9); padding: 6px 12px; border-radius: 4px;
-  border: 0.5px solid rgba(255,255,255,0.1);
-  transition: right 0.2s ease;
-}
-#hint.sidebar-closed { right: 14px; }
-
+#hint { position: fixed; bottom: 14px; right: 14px; font-family: 'Space Mono', monospace; font-size: 7.5px; color: #555; }
 #filter-bar {
   position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
   display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
-  pointer-events: all; max-width: 500px; z-index: 5;
+  pointer-events: all; max-width: 500px;
 }
 .fbtn {
   font-family: 'Space Mono', monospace; font-size: 7.5px; letter-spacing: 0.08em;
@@ -74,59 +59,50 @@ html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; f
 }
 .fbtn.active { color: #1a1a1a; }
 
-/* Visual Zoom Controls Panel */
+/* Clickable UI Controls Pad Overlay */
 #zoom-controls {
-  position: fixed; bottom: 200px; left: 14px;
+  position: fixed; bottom: 20px; left: 20px;
   display: flex; flex-direction: column; gap: 6px; z-index: 5;
 }
 .zbtn {
-  width: 36px; height: 36px; background: rgba(18, 18, 18, 0.95);
-  border: 1px solid rgba(201, 162, 39, 0.35); color: #f5f0e8;
-  border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 16px;
+  width: 34px; height: 34px; background: rgba(18, 18, 18, 0.95);
+  border: 1px solid rgba(201, 162, 39, 0.3); color: #f5f0e8;
+  border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 15px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: all 0.1s ease;
 }
-.zbtn:hover { border-color: #c9a227; background: #c9a227; color: #1a1a1a; }
+.zbtn:hover { border-color: #c9a227; background: rgba(201,162,39,0.1); }
 .zbtn:active { transform: scale(0.95); }
-
 #zoom-display {
-  width: 52px; background: rgba(18, 18, 18, 0.95);
-  border: 1px solid rgba(201, 162, 39, 0.2); border-radius: 6px;
-  padding: 6px 4px; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; color: #aaa; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  width: 34px; background: rgba(18, 18, 18, 0.95);
+  border: 1px solid rgba(201, 162, 39, 0.15); border-radius: 6px;
+  padding: 5px 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; font-family: 'Space Mono', monospace; color: #c9a227; font-size: 8px; font-weight: bold;
 }
-#zoom-display .zlbl { font-size: 7px; letter-spacing: 0.08em; color: #666; text-transform: uppercase; margin-bottom: 2px; }
-#zoom-display .zval { font-size: 10px; font-weight: bold; color: #c9a227; }
 </style>
 </head>
 <body>
-
 <canvas id="canvas"></canvas>
 
 <div id="zoom-controls">
   <button class="zbtn" id="z-in" title="Zoom In">+</button>
   <button class="zbtn" id="z-out" title="Zoom Out">−</button>
-  <button class="zbtn" id="z-reset" title="Reset View" style="font-size:12px;">⟲</button>
-  <div id="zoom-display">
-    <div class="zlbl">Zoom</div>
-    <div class="zval" id="z-percent">100%</div>
-  </div>
+  <button class="zbtn" id="z-reset" title="Reset View" style="font-size:11px;">⟲</button>
+  <div id="zoom-display" id="z-percent">88%</div>
 </div>
 
-<div id="sidebar">
+<div id="info-panel">
   <div class="node-title" id="ip-title"></div>
   <div class="node-cat" id="ip-cat"></div>
   <div class="node-desc" id="ip-desc"></div>
 </div>
-
 <div id="title-block">
   <h1>HEBREW COSMOLOGY GALAXY</h1>
-  <p>YLH TOOLS · BRANDY MITCHELL · CC BY 4.0</p>
+  <p>YLH TOOLS · BRANDY Mitchell · CC BY 4.0</p>
 </div>
-
 <div id="filter-bar"></div>
 <div id="legend"></div>
-<div id="hint">DRAG TO PAN &nbsp;|&nbsp; HOVER OR CLICK NODES TO EXPLORE SUBSTRATES</div>
+<div id="hint">DRAG · CLICK BUTTONS TO ZOOM · HOVER TO READ</div>
 
 <script>
 const canvas = document.getElementById('canvas');
@@ -284,7 +260,7 @@ const nodes = [
   {id:'angelology', tier:'secondtemple', label:'Angelology',     sub:'Hierarchical divine beings', x:300, y:130, r:11,
    desc:'Second Temple period develops an elaborate angelology — named angels (Michael, Gabriel, Raphael, Uriel), angelic hierarchies, divine mediators. This imports Persian/Zoroastrian heavenly hierarchy into Jewish cosmology while maintaining YHWH\'s supremacy. The divine council becomes ordered, bureaucratized, and militarized. Angels become the infrastructure of cosmic governance.'},
   {id:'satan_fig',  tier:'secondtemple', label:'Satan Figure',   sub:'Adversary becomes cosmic evil', x:355, y:30, r:11,
-   desc:'The evolution from ha-satan (prosecuting attorney in divine council, Job 1-2) to Satan (cosmic adversary, 1 Chronicles 21, Zechariah 3, and full development in 1 Enoch) tracks directly with Persian Zoroastrian influence post-exile. By the time of the New Testament, Satan is a cosmic adversary who rules "the present evil age." This is Angra Mainyu with Hebrew vocabulary. The shift has enormous consequence for theodicy.'},
+   desc:'The evolution from ha-satan (proseciting attorney in divine council, Job 1-2) to Satan (cosmic adversary, 1 Chronicles 21, Zechariah 3, and full development in 1 Enoch) tracks directly with Persian Zoroastrian influence post-exile. By the time of the New Testament, Satan is a cosmic adversary who rules "the present evil age." This is Angra Mainyu with Hebrew vocabulary. The shift has enormous consequence for theodicy.'},
   {id:'merkabah',   tier:'secondtemple', label:'Merkabah Mysticism', sub:'Throne/chariot visions', x:240, y:290, r:10,
    desc:"Merkabah (chariot) mysticism — Second Temple and early rabbinic tradition of ascending through heavenly palaces to the divine throne. Rooted in Ezekiel's chariot vision (Ezek 1). Developed into full mystical practice by 1st–6th c. CE. Where the divine council becomes a throne room, and the mystic seeks direct encounter with the divine presence. Influenced by Babylonian astronomical cosmology and Persian heavenly geography."},
   {id:'enoch_trad', tier:'secondtemple', label:'Enoch Tradition', sub:'Fallen angels/cosmic secrets', x:160, y:390, r:10,
@@ -394,21 +370,20 @@ function toWorld(pos) {
   };
 }
 
-// UI Zoom Trigger Handlers
-const percentDisplay = document.getElementById('z-percent');
+// Interactive Zoom Panel Trigger Bindings
+const percentDisplay = document.getElementById('zoom-display');
 function updateZoomDisplay() {
   percentDisplay.innerText = Math.round(zoom * 100) + '%';
 }
-updateZoomDisplay();
 
 document.getElementById('z-in').addEventListener('click', () => {
-  zoom *= 1.25;
+  zoom *= 1.2;
   if (zoom > 4) zoom = 4;
   updateZoomDisplay();
 });
 
 document.getElementById('z-out').addEventListener('click', () => {
-  zoom /= 1.25;
+  zoom /= 1.2;
   if (zoom < 0.15) zoom = 0.15;
   updateZoomDisplay();
 });
@@ -469,16 +444,29 @@ canvas.addEventListener('click', e => {
   selectNode(found);
 });
 
-// Lock traditional wheel zooming mechanics out completely
-canvas.addEventListener('wheel', e => e.preventDefault(), { passive: false });
+// Leave canvas-wheel listening active as requested
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const mouse = getMousePos(e);
+  const before = toWorld(mouse);
+  
+  if (e.deltaY < 0) zoom *= 1.05;
+  else zoom /= 1.05;
+  
+  zoom = Math.min(Math.max(0.15, zoom), 4);
+  updateZoomDisplay();
+  
+  const after = toWorld(mouse);
+  pan.x += (after.x - before.x) * zoom;
+  pan.y += (after.y - before.y) * zoom;
+}, { passive: false });
 
 function selectNode(node) {
   selectedNode = node;
   updateSidebar(node || hoveredNode);
 }
 
-const sidebar = document.getElementById('sidebar');
-const hintText = document.getElementById('hint');
+const sidebar = document.getElementById('info-panel');
 const ipTitle = document.getElementById('ip-title');
 const ipCat = document.getElementById('ip-cat');
 const ipDesc = document.getElementById('ip-desc');
@@ -486,11 +474,9 @@ const ipDesc = document.getElementById('ip-desc');
 function updateSidebar(node) {
   if (!node) {
     sidebar.style.display = 'none';
-    hintText.classList.add('sidebar-closed');
     return;
   }
-  sidebar.style.display = 'flex';
-  hintText.classList.remove('sidebar-closed');
+  sidebar.style.display = 'block';
   ipTitle.innerText = node.label + (node.sub ? ` (${node.sub})` : '');
   ipCat.innerText = TIERS[node.tier].label;
   ipCat.style.color = TIERS[node.tier].color;
