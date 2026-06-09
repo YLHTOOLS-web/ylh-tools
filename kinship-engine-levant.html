@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinship Engine · The Circle of Obligation · YLH Tools</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&family=Space+Mono:wght@400;700&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f5f0e8;font-family:'IM Fell English',serif;color:#1a1a1a;min-height:100vh;padding:2rem 1rem}
+.ke{max-width:720px;margin:0 auto}
+.ke-header{border-bottom:1px solid #1a1a1a;padding-bottom:0.75rem;margin-bottom:0.75rem}
+.ke-title{font-family:'Cinzel',serif;font-size:24px;font-weight:600;color:#1a1a1a;letter-spacing:0.04em;margin-bottom:2px}
+.ke-sub{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#888;margin-bottom:6px}
+.ke-q{font-family:'IM Fell English',serif;font-size:14px;color:#444;font-style:italic}
+.era-buttons{display:flex;gap:0;margin-bottom:0.75rem;border:1px solid #1a1a1a;overflow:hidden}
+.era-btn{flex:1;padding:9px 4px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.06em;text-transform:uppercase;background:transparent;border:none;border-right:1px solid #1a1a1a;cursor:pointer;color:#888;transition:all 0.15s;line-height:1.4}
+.era-btn:last-child{border-right:none}
+.era-btn:hover{background:#e8e0d0;color:#1a1a1a}
+.era-btn.active{background:#1a1a1a;color:#f5f0e8}
+.era-btn.active .era-date{color:#c9a227}
+.era-date{display:block;font-size:7px;color:#aaa;margin-top:2px}
+.era-btn.active:hover{background:#1a1a1a}
+.toggle-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:0.75rem}
+.ctrl-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#888;white-space:nowrap;min-width:36px}
+.tog{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.05em;text-transform:uppercase;padding:4px 10px;border:1px solid;cursor:pointer;transition:all 0.15s;background:transparent}
+.tog:hover{opacity:0.8}
+.tog.on{color:#f5f0e8}
+.tog-a{border-color:#BA7517;color:#BA7517}.tog-a.on{background:#BA7517}
+.tog-b{border-color:#993C1D;color:#993C1D}.tog-b.on{background:#993C1D}
+.tog-c{border-color:#0F6E56;color:#0F6E56}.tog-c.on{background:#0F6E56}
+.tog-d{border-color:#185FA5;color:#185FA5}.tog-d.on{background:#185FA5}
+.map-wrap{border:1px solid #1a1a1a;background:#c8d8e8}
+.map-svg{display:block;width:100%}
+.detail{border:1px solid #1a1a1a;border-top:none;background:#f5f0e8;padding:1.25rem 1.5rem;min-height:180px}
+.dp-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:5px}
+.dp-name{font-family:'Cinzel',serif;font-size:18px;font-weight:600;color:#1a1a1a;margin-bottom:2px}
+.dp-era-txt{font-family:'Space Mono',monospace;font-size:9px;color:#888;margin-bottom:10px}
+.dp-body{font-family:'IM Fell English',serif;font-size:15px;line-height:1.75;color:#2a2a2a;margin-bottom:10px}
+.dp-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.dp-chip{font-family:'Space Mono',monospace;font-size:9px;padding:3px 9px;border:1px solid;letter-spacing:0.05em;text-transform:uppercase}
+.chip-c{border-color:#1a5e8a;color:#1a5e8a}
+.chip-b{border-color:#a03030;color:#a03030}
+.chip-o{border-color:#555;color:#555}
+.dp-tension{font-family:'IM Fell English',serif;font-size:13px;font-style:italic;color:#888;border-left:2px solid #c9a227;padding-left:10px;margin-top:8px;line-height:1.65}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:0.75rem}
+.leg-item{display:flex;align-items:center;gap:5px;font-family:'Space Mono',monospace;font-size:8px;color:#666;letter-spacing:0.05em;text-transform:uppercase}
+.ke-footer{margin-top:1rem;display:flex;justify-content:space-between;align-items:center;padding-top:0.75rem;border-top:1px solid #1a1a1a;flex-wrap:wrap;gap:6px}
+.footer-credit{font-family:'Space Mono',monospace;font-size:9px;color:#888;letter-spacing:0.06em}
+.footer-note{font-family:'IM Fell English',serif;font-size:12px;font-style:italic;color:#888}
+@media(max-width:600px){
+  .era-btn{font-size:7px;padding:6px 2px}
+  .era-date{font-size:6px}
+  .ke-title{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div class="ke">
+  <div class="ke-header">
+    <div class="ke-sub">Kinship Engine · Levant Map · Bronze–Iron Age</div>
+    <div class="ke-title">The Circle of Obligation</div>
+    <div class="ke-q">Three systems. Same territory. Incompatible cosmologies.</div>
+  </div>
+
+  <div class="era-buttons">
+    <button class="era-btn" onclick="setEra(0)">Early Bronze<span class="era-date">c. 3000–2000</span></button>
+    <button class="era-btn" onclick="setEra(1)">Middle Bronze<span class="era-date">c. 2000–1550</span></button>
+    <button class="era-btn" onclick="setEra(2)">Late Bronze I<span class="era-date">c. 1550–1350</span></button>
+    <button class="era-btn" onclick="setEra(3)">Late Bronze II<span class="era-date">c. 1350–1200</span></button>
+    <button class="era-btn" onclick="setEra(4)">Early Iron<span class="era-date">c. 1200–900</span></button>
+    <button class="era-btn" onclick="setEra(5)">Iron Age II<span class="era-date">c. 900–600</span></button>
+  </div>
+
+  <div class="toggle-row">
+    <span class="ctrl-label">Show</span>
+    <button class="tog tog-a on" id="togA" onclick="toggleTrace('a')">Canaanite</button>
+    <button class="tog tog-b on" id="togB" onclick="toggleTrace('b')">Imperial</button>
+    <button class="tog tog-c on" id="togC" onclick="toggleTrace('c')">Israelite</button>
+    <button class="tog tog-d on" id="togD" onclick="toggleTrace('d')">Egyptian</button>
+  </div>
+
+  <div class="map-wrap">
+    <svg class="map-svg" id="mapSvg" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="detail">
+    <div class="dp-label" style="color:#888" id="dpLabel">Select a site</div>
+    <div class="dp-name" id="dpName">—</div>
+    <div class="dp-era-txt" id="dpEra"></div>
+    <div class="dp-body" id="dpBody">Click any cosmological sigil on the map to explore its kinship logic.</div>
+    <div class="dp-chips" id="dpChips"></div>
+    <div class="dp-tension" id="dpTension"></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><svg width="16" height="16" viewBox="0 0 16 16"><polygon points="8,2 14,14 2,14" fill="none" stroke="#BA7517" stroke-width="1.5"/><circle cx="8" cy="9" r="2.5" fill="#BA7517"/></svg>El's council — Canaanite</div>
+    <div class="leg-item"><svg width="16" height="16" viewBox="0 0 16 16"><rect x="4" y="10" width="8" height="4" fill="#993C1D"/><rect x="5.5" y="6" width="5" height="4" fill="#993C1D" opacity="0.85"/><rect x="6.5" y="3" width="3" height="3" fill="#993C1D" opacity="0.7"/></svg>Ziggurat — Mesopotamian</div>
+    <div class="leg-item"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="3" fill="#185FA5"/><line x1="8" y1="1" x2="8" y2="4" stroke="#185FA5" stroke-width="1.5"/><line x1="8" y1="12" x2="8" y2="15" stroke="#185FA5" stroke-width="1.5"/><line x1="1" y1="8" x2="4" y2="8" stroke="#185FA5" stroke-width="1.5"/><line x1="12" y1="8" x2="15" y2="8" stroke="#185FA5" stroke-width="1.5"/><line x1="3" y1="3" x2="5" y2="5" stroke="#185FA5" stroke-width="1"/><line x1="11" y1="3" x2="13" y2="5" stroke="#185FA5" stroke-width="1"/></svg>Solar disk — Egyptian</div>
+    <div class="leg-item"><svg width="16" height="16" viewBox="0 0 16 16"><rect x="3" y="9" width="10" height="5" fill="none" stroke="#0F6E56" stroke-width="1.2"/><path d="M3 9 L8 4 L13 9" fill="none" stroke="#0F6E56" stroke-width="1.2"/><rect x="6.5" y="5" width="3" height="4" fill="#0F6E56" opacity="0.5"/></svg>Open altar — Proto-Israelite</div>
+    <div class="leg-item"><svg width="16" height="16" viewBox="0 0 16 16"><rect x="3" y="8" width="10" height="6" fill="none" stroke="#0F6E56" stroke-width="1.2"/><path d="M3 8 Q8 2 13 8" fill="none" stroke="#0F6E56" stroke-width="1.2" stroke-dasharray="2 1.5"/><circle cx="8" cy="3" r="2" fill="#0F6E56" opacity="0.7"/></svg>Tabernacle — Confederation</div>
+    <div class="leg-item"><svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="12" width="12" height="3" fill="#0F6E56" opacity="0.7"/><rect x="3.5" y="7" width="9" height="5" fill="none" stroke="#0F6E56" stroke-width="1.2"/><rect x="6" y="3" width="4" height="4" fill="none" stroke="#0F6E56" stroke-width="1.2"/><rect x="4.5" y="7" width="1.5" height="5" fill="#0F6E56" opacity="0.5"/><rect x="10" y="7" width="1.5" height="5" fill="#0F6E56" opacity="0.5"/></svg>Temple — Monarchy</div>
+  </div>
+
+  <div class="ke-footer">
+    <div class="footer-credit">Brandy Mitchell · YLH · CC BY 4.0</div>
+    <div class="footer-note">Anthropology births epistemology</div>
+  </div>
+</div>
+
+<script>
+const COLORS={
+  a:{fill:"#BA7517",stroke:"#633806",label:"Canaanite substrate"},
+  b:{fill:"#993C1D",stroke:"#4A1B0C",label:"Mesopotamian empire"},
+  c:{fill:"#0F6E56",stroke:"#04342C",label:"Israelite"},
+  d:{fill:"#185FA5",stroke:"#042C53",label:"Egyptian empire"}
+};
+
+const SITES=[
+  {id:"ugarit",trace:"a",sigil:"council",x:185,y:62,eras:[0,1,2,3],name:"Ugarit",eraLabel:"Middle–Late Bronze Age · c. 2000–1185 BCE",body:"Ugarit is the primary textual source for Canaanite cosmology. The Baal Cycle recovered from its archives gives us El enthroned on his cosmic mountain, the divine assembly deliberating, Baal as the storm deity contending for authority within the council. The city-state's kinship logic is inseparable from this cosmology: El's household is the model for the city's household. The king rules because El authorizes it.",center:"El enthroned — divine council",boundary:"City wall + patron deity territory",outside:"Outside El's household — stranger or enemy",tension:"Ugarit was destroyed around 1185 BCE — possibly by the Sea Peoples. Its archive was never recovered by its scribes. What survived did so by accident."},
+  {id:"hazor",trace:"a",sigil:"council",x:272,y:148,eras:[0,1,2,3,4],name:"Hazor",eraLabel:"Bronze Age city-state · c. 2700–1200 BCE",body:"Hazor was the largest city-state in Canaan — described in Joshua 11 as 'the head of all those kingdoms.' Its patron deity structure followed the El-council model. Hazor controlled the northern trade routes and maintained diplomatic relations with Egypt and Mesopotamia simultaneously. It was destroyed around 1200 BCE — possibly by the Israelite confederation, possibly by internal revolt, possibly by the general Bronze Age collapse.",center:"Patron deity + urban residence",boundary:"Administrative territory — taxed",outside:"Rural population — dependent, no legal standing",tension:"Hazor appears in both Egyptian diplomatic archives (the Amarna letters) and Israelite conquest narratives. Its destruction marks the transition from Bronze Age city-state kinship to Iron Age highland kinship."},
+  {id:"megiddo",trace:"a",sigil:"council",x:248,y:198,eras:[0,1,2,3,4,5],name:"Megiddo",eraLabel:"Bronze–Iron Age · c. 3000–600 BCE",body:"Megiddo controlled the Jezreel Valley pass — the most strategically important point in the Levant. Every empire that entered Canaan had to deal with Megiddo. Its patron deity cosmology survived multiple conquests by adapting: the city kept functioning under Egyptian suzerainty, absorbed Israelite administrative control under Solomon, and persisted into the Assyrian period. Megiddo is the city-state that refused to disappear.",center:"Patron deity — adapted to each overlord",boundary:"Valley pass control — military and economic",outside:"Travelers without city authorization",tension:"Megiddo's survival across eras reveals how city-state kinship logic persists by adapting its cosmological vocabulary to whoever is in power, while maintaining local obligation structures beneath the surface."},
+  {id:"jerusalem-canaan",trace:"a",sigil:"council",x:258,y:295,eras:[0,1,2,3],name:"Jerusalem (Jebus)",eraLabel:"Bronze Age Canaanite city · pre-1000 BCE",body:"Before it was David's capital, Jerusalem was a Jebusite city-state — likely with a patron deity cosmology in the El-council tradition. The Melchizedek episode in Genesis 14 preserves a memory of Jerusalem's pre-Israelite sacred character: Melchizedek is 'priest of El Elyon' — El Most High — and blesses Abraham. The city's sacred geography precedes its Israelite identity.",center:"El Elyon — Jebusite patron",boundary:"Hilltop city — defensible terrain",outside:"Surrounding clans — negotiated relationship",tension:"When David captures Jerusalem and makes it his capital, he is not building on empty ground. He is building on a pre-existing sacred site with its own cosmological claim. The Jerusalem temple inherits this layered geography."},
+  {id:"lachish",trace:"a",sigil:"council",x:238,y:320,eras:[1,2,3,4,5],name:"Lachish",eraLabel:"Bronze–Iron Age · c. 2000–701 BCE",body:"Lachish was the second most important city in Judah. Its Canaanite origins placed it in the El-council kinship tradition, later absorbed into the Israelite monarchy's administrative system. The Assyrian siege of Lachish in 701 BCE under Sennacherib is depicted in detail on the palace reliefs at Nineveh — one of the most documented military events of the ancient world.",center:"Patron deity → Israelite administrative center",boundary:"Fortified city — military garrison",outside:"Rural Shephelah population",tension:"Lachish's destruction by Assyria in 701 BCE concentrates the surviving Judean population in Jerusalem — creating the conditions for the final editing of the Torah."},
+  {id:"akkad",trace:"b",sigil:"ziggurat",x:600,y:155,eras:[0,1],name:"Akkad / Ur III",eraLabel:"Early–Middle Bronze Age · c. 2334–2004 BCE",body:"Sargon of Akkad creates the first model of imperial kinship: the king as son of the god, the empire as the god's household extended across territory. Ur III follows with an elaborate bureaucratic theology — the ziggurat at Ur is the cosmic mountain connecting earth to Nanna the moon god. Every city the empire absorbs has its local patron deity subordinated to the imperial deity. Local kinship structures are reorganized under imperial administration.",center:"King as divine son — imperial deity",boundary:"Military reach — administrative province",outside:"Ungoverned peoples — available for conquest",tension:"Imperial kinship creates a new category: the loyal subject who is not kin. The empire demands obligation without the reciprocal bonds that kinship normally carries. This tension generates resistance."},
+  {id:"babylon",trace:"b",sigil:"ziggurat",x:590,y:200,eras:[2,3,4,5],name:"Babylon",eraLabel:"Middle Bronze – Iron Age · c. 1894–539 BCE",body:"Babylon's cosmology is imperial kinship theology made architectural. The ziggurat Etemenanki — 'house of the foundation of heaven and earth' — is the axis mundi of Babylonian cosmology. The king ascends it to receive authority from Marduk. The Enuma Elish narrates how Marduk defeated Tiamat and organized the cosmos — which is also a narrative about why Babylon should rule it. Every people Babylon absorbs has their deity subordinated to Marduk in the divine hierarchy.",center:"Marduk — cosmic sovereign",boundary:"Cosmological — Marduk's order extends everywhere",outside:"Chaos — theologically identical with non-Babylonian",tension:"Babylon's imperial cosmology is the direct pressure that produces Israelite counter-cosmology. Deutero-Isaiah's 'I am YHWH and there is no other' is written in direct response to the Enuma Elish. The exile is a cosmological crisis."},
+  {id:"assyria",trace:"b",sigil:"ziggurat",x:575,y:130,eras:[4,5],name:"Nineveh / Assyria",eraLabel:"Iron Age · c. 934–609 BCE",body:"Assyrian imperial cosmology centers on Ashur — a deity who is essentially the empire personified. Ashur's will is identical with the king's military expansion. This cosmology has no room for legitimate alternative kinship structures. Resistance is not just political rebellion — it is cosmic disorder.",center:"Ashur — empire as deity",boundary:"Deportation line — enforced by displacement",outside:"Deported peoples — kinship memory severed",tension:"Assyria's deportation of the northern kingdom in 722 BCE makes the written Torah urgent. If kinship memory can be destroyed by displacement, it must be encoded in portable text. The scroll becomes the replacement for the land."},
+  {id:"egypt-delta",trace:"d",sigil:"solar",x:90,y:435,eras:[1,2,3],name:"Egyptian empire (Nile Delta)",eraLabel:"Middle–Late Bronze Age · c. 1550–1150 BCE",body:"Egyptian imperial cosmology places Pharaoh as the son of Ra — the solar deity — and therefore as the cosmic mediator between heaven and earth. All legitimate authority flows from the sun. Egyptian hegemony over Canaan was administered through a network of garrison cities and vassal city-states who paid tribute. The Amarna letters are the diplomatic correspondence of this system — Canaanite city-state kings writing to Pharaoh as 'my sun, my god.'",center:"Pharaoh as solar son — Ra's household",boundary:"Tribute network — enforced by garrison",outside:"Non-tribute peoples — available for labor",tension:"Egyptian imperial kinship is the cosmological context for the Exodus narrative. 'Let my people go' is a kinship claim: Israel belongs to YHWH's household, not Pharaoh's. The plagues are a cosmological argument — YHWH demonstrating sovereignty over each domain of Egyptian cosmic order."},
+  {id:"egypt-canaan",trace:"d",sigil:"solar",x:160,y:355,eras:[2,3],name:"Egyptian garrison — southern Canaan",eraLabel:"Late Bronze Age · c. 1350–1200 BCE",body:"At the height of Egyptian power in Canaan, garrisons were stationed at key sites throughout the southern Levant. Egyptian administrative presence meant Egyptian cosmological claims: Pharaoh's solar authority extended over these territories. The local population supplied corvée labor.",center:"Pharaoh's solar authority — garrison enforcement",boundary:"Administrative zone — taxed and conscripted",outside:"Highland peoples — outside direct control",tension:"The highland zones where proto-Israelite bands were forming were largely outside Egyptian direct administration — too remote, too poor, too mobile to garrison. This is the geographic condition that made the confederation possible."},
+  {id:"negev-band",trace:"c",sigil:"altar",x:220,y:392,eras:[0,1,2,3],name:"Negev — proto-Israelite bands",eraLabel:"Early–Middle Bronze Age · c. 2000–1550 BCE",body:"The patriarchal narratives locate Abraham, Isaac, and Jacob moving through the Negev and Sinai — semi-arid land too marginal for city-state control. The deity encountered here has no temple, no mountain court, no divine assembly — only a name called at an open-air altar, a pillar of stone, a tree. YHWH as a band deity appears in the open, moves with the people, and makes kinship promises rather than cosmological claims.",center:"Traveling deity — no fixed house",boundary:"Genealogical — sons of Abraham",outside:"City-state populations — potential threat or host",tension:"The Negev band cosmology — YHWH encountered in the open, moving, making promises — is the oldest recoverable layer of Israelite religion. Every subsequent theological development is in some sense a response to what to do with a deity who refused to stay in one place."},
+  {id:"sinai",trace:"c",sigil:"altar",x:140,y:458,eras:[2,3,4],name:"Sinai — covenant formation",eraLabel:"Late Bronze Age · c. 1300–1200 BCE",body:"The Sinai tradition preserves memory of the moment when band kinship became confederation kinship. The covenant at Sinai is a formal kinship document: YHWH is the patron, Israel is the household, the Torah is the household rules. The cosmology is still open-sky altar — no temple, no city — but the scale has changed. This is no longer a single band's deity. This is the claim that YHWH is the patron of a confederation of formerly scattered groups.",center:"YHWH as covenant patron — mobile presence",boundary:"Covenant membership — law and circumcision",outside:"Egypt behind, Canaan ahead",tension:"The Sinai covenant is a counter-claim to both Egypt and Canaan. Against Egypt: Pharaoh is not the cosmic mediator, YHWH is. Against Canaan: El's council is not the governing structure, YHWH's covenant is. Both claims are made without a temple, without a city, without a king."},
+  {id:"highlands",trace:"c",sigil:"tabernacle",x:255,y:252,eras:[3,4],name:"Central highlands — confederation",eraLabel:"Late Bronze – Early Iron Age · c. 1200–1000 BCE",body:"The central highlands of Canaan — the hill country of Ephraim and Judah — were the zone of Israelite confederation formation. The tabernacle tradition — YHWH's mobile tent-sanctuary — is the cosmological signature of this period. The divine presence moves with the confederation, not anchored to a city. Shiloh becomes the early central sanctuary but remains a tent, not a temple.",center:"YHWH in the tabernacle — mobile",boundary:"Tribal territory — twelve portions",outside:"Canaanite city-states in the valleys",tension:"The highland confederation's cosmology is in direct geographic tension with the valley city-states. The highlands are too rugged for chariot warfare — which is why the confederation can survive against technologically superior city-states. Judges 5 celebrates a battle won in the mud, where chariots were useless."},
+  {id:"shiloh",trace:"c",sigil:"tabernacle",x:272,y:232,eras:[4],name:"Shiloh — central sanctuary",eraLabel:"Early Iron Age · c. 1200–1050 BCE",body:"Shiloh was the location of the ark of the covenant during the confederation period. It functioned as a pilgrimage center where the tribes gathered. The cosmology is still tabernacle cosmology: YHWH's throne is portable, not housed in stone. Shiloh was destroyed — probably by the Philistines around 1050 BCE. The loss of the ark and the destruction of Shiloh creates the crisis that leads to the demand for a king.",center:"Ark of the covenant — YHWH's mobile throne",boundary:"Pilgrimage obligation — tribal calendar",outside:"Philistines — military and cosmological threat",tension:"The destruction of Shiloh is a cosmological crisis: if YHWH's house can be destroyed, what does that mean about YHWH's power? The demand for a king in 1 Samuel is in part an attempt to solve this cosmological problem through political means."},
+  {id:"jerusalem-temple",trace:"c",sigil:"temple",x:258,y:295,eras:[5],name:"Jerusalem — Solomon's temple",eraLabel:"Iron Age II · c. 960–586 BCE",body:"Solomon's temple is the cosmological rupture in Israelite kinship history. YHWH now has a house — a permanent, stone-built cosmic mountain in Jerusalem. The cherubim throne, the holy of holies, the bronze sea representing the cosmic waters — the temple is a full cosmological statement that YHWH is now a territorial deity in the ANE tradition. The band deity who moved through the Negev has been given an address.",center:"YHWH enthroned in the temple — Jerusalem",boundary:"Administrative kingdom — taxed, conscripted",outside:"Foreign nations — cosmologically subordinate",tension:"The temple cosmology adopts the same architectural grammar as the Babylonian ziggurat and the Egyptian solar temple. YHWH is now housed like every other ANE deity. The prophetic tradition's discomfort with this is not aesthetic — it is a kinship argument."}
+];
+
+let currentEra=2;
+let selectedId=null;
+let vis={a:true,b:true,c:true,d:true};
+
+function setEra(i){
+  currentEra=i;
+  document.querySelectorAll('.era-btn').forEach((b,idx)=>b.classList.toggle('active',idx===i));
+  if(selectedId){
+    const n=SITES.find(s=>s.id===selectedId);
+    if(n&&(!n.eras.includes(i)||!vis[n.trace])){selectedId=null;resetDetail();}
+  }
+  renderMap();
+}
+
+function toggleTrace(t){
+  vis[t]=!vis[t];
+  document.getElementById("tog"+t.toUpperCase()).classList.toggle("on",vis[t]);
+  if(selectedId){
+    const n=SITES.find(s=>s.id===selectedId);
+    if(n&&n.trace===t&&!vis[t]){selectedId=null;resetDetail();}
+  }
+  renderMap();
+}
+
+function resetDetail(){
+  document.getElementById("dpLabel").textContent="Select a site";
+  document.getElementById("dpLabel").style.color="#888";
+  document.getElementById("dpName").textContent="—";
+  document.getElementById("dpEra").textContent="";
+  document.getElementById("dpBody").textContent="Click any cosmological sigil on the map to explore its kinship logic.";
+  document.getElementById("dpChips").innerHTML="";
+  document.getElementById("dpTension").textContent="";
+}
+
+function drawSigil(parent,type,x,y,col,sz){
+  const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+  g.setAttribute("pointer-events","none");
+  const s=sz||14;const f=col.fill;const sk=col.stroke;
+  if(type==="council"){
+    const tri=document.createElementNS("http://www.w3.org/2000/svg","polygon");
+    tri.setAttribute("points",`${x},${y-s} ${x+s*0.88},${y+s*0.55} ${x-s*0.88},${y+s*0.55}`);
+    tri.setAttribute("fill","none");tri.setAttribute("stroke",sk);tri.setAttribute("stroke-width","1.5");
+    g.appendChild(tri);
+    [-s*0.38,0,s*0.38].forEach(dx=>{
+      const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      c.setAttribute("cx",x+dx);c.setAttribute("cy",y+s*0.1);c.setAttribute("r",s*0.13);
+      c.setAttribute("fill",f);g.appendChild(c);
+    });
+    const cc=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    cc.setAttribute("cx",x);cc.setAttribute("cy",y-s*0.25);cc.setAttribute("r",s*0.16);
+    cc.setAttribute("fill",sk);g.appendChild(cc);
+  } else if(type==="ziggurat"){
+    [[s*1.6,s*0.3],[s*1.1,s*0.3],[s*0.65,s*0.28],[s*0.3,s*0.28]].forEach(([w,h],i)=>{
+      const r=document.createElementNS("http://www.w3.org/2000/svg","rect");
+      r.setAttribute("x",x-w/2);r.setAttribute("y",y+s*0.55-h*(i+1));
+      r.setAttribute("width",w);r.setAttribute("height",h);
+      r.setAttribute("fill",f);r.setAttribute("stroke",sk);r.setAttribute("stroke-width","0.8");
+      r.setAttribute("opacity",(0.6+i*0.1).toString());g.appendChild(r);
+    });
+  } else if(type==="solar"){
+    const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",x);c.setAttribute("cy",y);c.setAttribute("r",s*0.32);
+    c.setAttribute("fill",f);c.setAttribute("stroke",sk);c.setAttribute("stroke-width","1.2");
+    g.appendChild(c);
+    for(let i=0;i<8;i++){
+      const a=(i/8)*Math.PI*2;
+      const ln=document.createElementNS("http://www.w3.org/2000/svg","line");
+      ln.setAttribute("x1",x+Math.cos(a)*s*0.4);ln.setAttribute("y1",y+Math.sin(a)*s*0.4);
+      ln.setAttribute("x2",x+Math.cos(a)*s*0.82);ln.setAttribute("y2",y+Math.sin(a)*s*0.82);
+      ln.setAttribute("stroke",sk);ln.setAttribute("stroke-width","1.5");g.appendChild(ln);
+    }
+  } else if(type==="altar"){
+    const base=document.createElementNS("http://www.w3.org/2000/svg","rect");
+    base.setAttribute("x",x-s*0.5);base.setAttribute("y",y+s*0.1);
+    base.setAttribute("width",s*1.0);base.setAttribute("height",s*0.45);
+    base.setAttribute("fill","none");base.setAttribute("stroke",sk);base.setAttribute("stroke-width","1.4");
+    g.appendChild(base);
+    const roof=document.createElementNS("http://www.w3.org/2000/svg","polyline");
+    roof.setAttribute("points",`${x-s*0.5},${y+s*0.1} ${x},${y-s*0.45} ${x+s*0.5},${y+s*0.1}`);
+    roof.setAttribute("fill","none");roof.setAttribute("stroke",sk);roof.setAttribute("stroke-width","1.4");
+    g.appendChild(roof);
+    const stone=document.createElementNS("http://www.w3.org/2000/svg","rect");
+    stone.setAttribute("x",x-s*0.15);stone.setAttribute("y",y-s*0.55);
+    stone.setAttribute("width",s*0.3);stone.setAttribute("height",s*0.42);
+    stone.setAttribute("fill",f);g.appendChild(stone);
+  } else if(type==="tabernacle"){
+    const body=document.createElementNS("http://www.w3.org/2000/svg","rect");
+    body.setAttribute("x",x-s*0.55);body.setAttribute("y",y+s*0.05);
+    body.setAttribute("width",s*1.1);body.setAttribute("height",s*0.5);
+    body.setAttribute("fill","none");body.setAttribute("stroke",sk);body.setAttribute("stroke-width","1.4");
+    g.appendChild(body);
+    const tent=document.createElementNS("http://www.w3.org/2000/svg","path");
+    tent.setAttribute("d",`M${x-s*0.55},${y+s*0.05} Q${x},${y-s*0.65} ${x+s*0.55},${y+s*0.05}`);
+    tent.setAttribute("fill","none");tent.setAttribute("stroke",sk);
+    tent.setAttribute("stroke-width","1.4");tent.setAttribute("stroke-dasharray","3 2");
+    g.appendChild(tent);
+    const cloud=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    cloud.setAttribute("cx",x);cloud.setAttribute("cy",y-s*0.75);cloud.setAttribute("r",s*0.2);
+    cloud.setAttribute("fill",f);cloud.setAttribute("opacity","0.85");g.appendChild(cloud);
+  } else if(type==="temple"){
+    const plat=document.createElementNS("http://www.w3.org/2000/svg","rect");
+    plat.setAttribute("x",x-s*0.65);plat.setAttribute("y",y+s*0.25);
+    plat.setAttribute("width",s*1.3);plat.setAttribute("height",s*0.35);
+    plat.setAttribute("fill",f);plat.setAttribute("stroke",sk);plat.setAttribute("stroke-width","1");
+    g.appendChild(plat);
+    const wall=document.createElementNS("http://www.w3.org/2000/svg","rect");
+    wall.setAttribute("x",x-s*0.5);wall.setAttribute("y",y-s*0.2);
+    wall.setAttribute("width",s*1.0);wall.setAttribute("height",s*0.45);
+    wall.setAttribute("fill","none");wall.setAttribute("stroke",sk);wall.setAttribute("stroke-width","1.4");
+    g.appendChild(wall);
+    const inner=document.createElementNS("http://www.w3.org/2000/svg","rect");
+    inner.setAttribute("x",x-s*0.2);inner.setAttribute("y",y-s*0.62);
+    inner.setAttribute("width",s*0.4);inner.setAttribute("height",s*0.42);
+    inner.setAttribute("fill","none");inner.setAttribute("stroke",sk);inner.setAttribute("stroke-width","1.2");
+    g.appendChild(inner);
+    [x-s*0.42,x+s*0.26].forEach(cx2=>{
+      const col2=document.createElementNS("http://www.w3.org/2000/svg","rect");
+      col2.setAttribute("x",cx2);col2.setAttribute("y",y-s*0.2);
+      col2.setAttribute("width",s*0.14);col2.setAttribute("height",s*0.45);
+      col2.setAttribute("fill",f);col2.setAttribute("stroke",sk);col2.setAttribute("stroke-width","0.8");
+      g.appendChild(col2);
+    });
+  }
+  parent.appendChild(g);
+}
+
+function renderMap(){
+  const svg=document.getElementById("mapSvg");
+  svg.innerHTML="";
+  const sea=document.createElementNS("http://www.w3.org/2000/svg","rect");
+  sea.setAttribute("x","0");sea.setAttribute("y","0");sea.setAttribute("width","680");sea.setAttribute("height","520");
+  sea.setAttribute("fill","#b8cfe0");svg.appendChild(sea);
+  const land=document.createElementNS("http://www.w3.org/2000/svg","path");
+  land.setAttribute("d","M142,0 L680,0 L680,520 L142,520 Q160,492 174,462 Q184,438 170,412 Q156,386 164,355 Q174,325 160,300 Q146,272 154,242 Q164,212 150,182 Q138,156 144,126 Q150,96 142,62 Z");
+  land.setAttribute("fill","#d4c49a");svg.appendChild(land);
+  const jezreel=document.createElementNS("http://www.w3.org/2000/svg","path");
+  jezreel.setAttribute("d","M200,188 Q240,180 280,185 Q320,192 350,202 Q330,215 295,210 Q255,205 215,210 Z");
+  jezreel.setAttribute("fill","#c8b880");jezreel.setAttribute("opacity","0.5");svg.appendChild(jezreel);
+  const jordan=document.createElementNS("http://www.w3.org/2000/svg","path");
+  jordan.setAttribute("d","M296,122 Q302,158 299,200 Q297,240 302,280 Q306,318 303,358 Q299,388 296,418");
+  jordan.setAttribute("fill","none");jordan.setAttribute("stroke","#8aaec4");jordan.setAttribute("stroke-width","2.5");jordan.setAttribute("opacity","0.6");svg.appendChild(jordan);
+  const galilee=document.createElementNS("http://www.w3.org/2000/svg","ellipse");
+  galilee.setAttribute("cx","298");galilee.setAttribute("cy","158");galilee.setAttribute("rx","9");galilee.setAttribute("ry","13");
+  galilee.setAttribute("fill","#8baec4");galilee.setAttribute("opacity","0.75");svg.appendChild(galilee);
+  const dead=document.createElementNS("http://www.w3.org/2000/svg","ellipse");
+  dead.setAttribute("cx","308");dead.setAttribute("cy","348");dead.setAttribute("rx","11");dead.setAttribute("ry","26");
+  dead.setAttribute("fill","#8baec4");dead.setAttribute("opacity","0.75");svg.appendChild(dead);
+  const negev=document.createElementNS("http://www.w3.org/2000/svg","path");
+  negev.setAttribute("d","M158,378 Q185,392 215,408 Q235,425 238,452 Q208,468 175,463 Q150,455 142,438 Q140,415 158,378 Z");
+  negev.setAttribute("fill","#e2d0a0");negev.setAttribute("opacity","0.65");svg.appendChild(negev);
+  const sinai=document.createElementNS("http://www.w3.org/2000/svg","path");
+  sinai.setAttribute("d","M95,432 Q118,450 142,468 Q128,492 108,508 Q82,520 60,508 Q40,490 50,465 Q66,446 95,432 Z");
+  sinai.setAttribute("fill","#e2d0a0");sinai.setAttribute("opacity","0.78");svg.appendChild(sinai);
+  const nile=document.createElementNS("http://www.w3.org/2000/svg","path");
+  nile.setAttribute("d","M38,378 Q65,388 92,394 Q82,414 60,418 Q38,412 28,398 Z");
+  nile.setAttribute("fill","#b8c8a0");nile.setAttribute("opacity","0.6");svg.appendChild(nile);
+  const hills=document.createElementNS("http://www.w3.org/2000/svg","path");
+  hills.setAttribute("d","M218,172 Q244,158 270,162 Q296,172 306,202 Q310,232 300,260 Q288,290 268,302 Q244,310 220,297 Q200,282 194,252 Q190,220 200,196 Z");
+  hills.setAttribute("fill","#c4b07a");hills.setAttribute("opacity","0.4");svg.appendChild(hills);
+  const mesoZone=document.createElementNS("http://www.w3.org/2000/svg","path");
+  mesoZone.setAttribute("d","M545,0 L680,0 L680,285 Q648,262 618,242 Q582,212 558,182 Q534,152 545,105 Z");
+  mesoZone.setAttribute("fill","#c8aa70");mesoZone.setAttribute("opacity","0.38");svg.appendChild(mesoZone);
+  if(vis.d&&[1,2,3].includes(currentEra)){
+    const horus=document.createElementNS("http://www.w3.org/2000/svg","path");
+    horus.setAttribute("d","M95,415 Q118,395 145,372 Q162,352 168,325 Q172,302 168,278");
+    horus.setAttribute("fill","none");horus.setAttribute("stroke","#185FA5");
+    horus.setAttribute("stroke-width","1.5");horus.setAttribute("stroke-dasharray","4 3");horus.setAttribute("opacity","0.45");
+    svg.appendChild(horus);
+    const rt=document.createElementNS("http://www.w3.org/2000/svg","text");
+    rt.setAttribute("x","118");rt.setAttribute("y","345");
+    rt.setAttribute("font-family","'Space Mono',monospace");rt.setAttribute("font-size","7");
+    rt.setAttribute("fill","#042C53");rt.setAttribute("opacity","0.55");rt.setAttribute("transform","rotate(-55,118,345)");
+    rt.textContent="Way of Horus";svg.appendChild(rt);
+  }
+  [
+    {t:"Mediterranean Sea",x:86,y:230,size:8,color:"#5a7a9a",italic:true},
+    {t:"Jezreel Valley",x:264,y:195,size:7,color:"#7a6a40",italic:true},
+    {t:"Central Highlands",x:222,y:248,size:7,color:"#5a4a22",italic:true},
+    {t:"Negev",x:196,y:420,size:7,color:"#7a6a40",italic:true},
+    {t:"Sinai",x:112,y:474,size:7,color:"#7a6a40",italic:true},
+    {t:"Nile Delta",x:52,y:396,size:7,color:"#5a7a50",italic:true},
+    {t:"Transjordan",x:360,y:275,size:7,color:"#7a6a40",italic:true},
+    {t:"Mesopotamia",x:606,y:82,size:7,color:"#7a5a30",italic:true},
+    {t:"Dead Sea",x:336,y:352,size:7,color:"#5a7a8a",italic:true},
+  ].forEach(l=>{
+    const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x",l.x);t.setAttribute("y",l.y);t.setAttribute("text-anchor","middle");
+    t.setAttribute("font-family",l.italic?"'IM Fell English',serif":"'Space Mono',monospace");
+    if(l.italic)t.setAttribute("font-style","italic");
+    t.setAttribute("font-size",l.size);t.setAttribute("fill",l.color);t.setAttribute("opacity","0.82");
+    t.textContent=l.t;svg.appendChild(t);
+  });
+  [{name:"Ugarit",x:185,y:62},{name:"Hazor",x:272,y:148},{name:"Megiddo",x:248,y:198},
+   {name:"Jerusalem",x:258,y:295},{name:"Lachish",x:238,y:320},{name:"Jericho",x:310,y:285},
+   {name:"Shiloh",x:272,y:235},{name:"Beersheba",x:228,y:365},{name:"Gaza",x:174,y:308},
+   {name:"Beth Shean",x:300,y:200}
+  ].forEach(c=>{
+    const dot=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    dot.setAttribute("cx",c.x);dot.setAttribute("cy",c.y);dot.setAttribute("r","2");
+    dot.setAttribute("fill","#3a2a10");dot.setAttribute("opacity","0.35");svg.appendChild(dot);
+    const lbl=document.createElementNS("http://www.w3.org/2000/svg","text");
+    lbl.setAttribute("x",c.x+4);lbl.setAttribute("y",c.y+3);
+    lbl.setAttribute("font-family","'Space Mono',monospace");lbl.setAttribute("font-size","6.5");
+    lbl.setAttribute("fill","#3a2a10");lbl.setAttribute("opacity","0.38");lbl.textContent=c.name;
+    svg.appendChild(lbl);
+  });
+  if(vis.b&&[2,3,4,5].includes(currentEra)){
+    const arr=document.createElementNS("http://www.w3.org/2000/svg","text");
+    arr.setAttribute("x","548");arr.setAttribute("y","170");
+    arr.setAttribute("font-family","'Space Mono',monospace");arr.setAttribute("font-size","7.5");
+    arr.setAttribute("fill","#4A1B0C");arr.setAttribute("opacity","0.65");arr.setAttribute("text-anchor","middle");
+    arr.textContent="← IMPERIAL PRESSURE";svg.appendChild(arr);
+  }
+  if(vis.d&&[1,2,3].includes(currentEra)){
+    const arr2=document.createElementNS("http://www.w3.org/2000/svg","text");
+    arr2.setAttribute("x","88");arr2.setAttribute("y","370");
+    arr2.setAttribute("font-family","'Space Mono',monospace");arr2.setAttribute("font-size","7.5");
+    arr2.setAttribute("fill","#042C53");arr2.setAttribute("opacity","0.65");arr2.setAttribute("text-anchor","middle");
+    arr2.textContent="↑ EGYPTIAN PRESSURE";svg.appendChild(arr2);
+  }
+  SITES.filter(n=>n.eras.includes(currentEra)&&vis[n.trace]).forEach(n=>{
+    const col=COLORS[n.trace];
+    const isSel=selectedId===n.id;
+    const grp=document.createElementNS("http://www.w3.org/2000/svg","g");
+    grp.style.cursor="pointer";
+    if(isSel){
+      const ring=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      ring.setAttribute("cx",n.x);ring.setAttribute("cy",n.y);ring.setAttribute("r","25");
+      ring.setAttribute("fill","none");ring.setAttribute("stroke","#c9a227");ring.setAttribute("stroke-width","1.5");
+      grp.appendChild(ring);
+    }
+    const disc=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    disc.setAttribute("cx",n.x);disc.setAttribute("cy",n.y);disc.setAttribute("r","19");
+    disc.setAttribute("fill","#f5f0e8");disc.setAttribute("opacity",isSel?"0.95":"0.78");
+    disc.setAttribute("stroke",col.stroke);disc.setAttribute("stroke-width",isSel?"1.8":"0.8");
+    grp.appendChild(disc);
+    drawSigil(grp,n.sigil,n.x,n.y,col,13);
+    const lbl=document.createElementNS("http://www.w3.org/2000/svg","text");
+    lbl.setAttribute("x",n.x);lbl.setAttribute("y",n.y+27);
+    lbl.setAttribute("text-anchor","middle");
+    lbl.setAttribute("font-family","'Space Mono',monospace");
+    lbl.setAttribute("font-size","7");lbl.setAttribute("fill",col.stroke);lbl.setAttribute("letter-spacing","0.05em");
+    lbl.textContent=n.name.toUpperCase();grp.appendChild(lbl);
+    grp.addEventListener("click",()=>selectNode(n.id));
+    svg.appendChild(grp);
+  });
+}
+
+function selectNode(id){
+  const n=SITES.find(x=>x.id===id);
+  if(!n)return;
+  selectedId=id;renderMap();
+  const col=COLORS[n.trace];
+  document.getElementById("dpLabel").textContent=col.label;
+  document.getElementById("dpLabel").style.color=col.stroke;
+  document.getElementById("dpName").textContent=n.name;
+  document.getElementById("dpEra").textContent=n.eraLabel;
+  document.getElementById("dpBody").textContent=n.body;
+  document.getElementById("dpChips").innerHTML=`
+    <span class="dp-chip chip-c">Center: ${n.center}</span>
+    <span class="dp-chip chip-b">Boundary: ${n.boundary}</span>
+    <span class="dp-chip chip-o">Outside: ${n.outside}</span>
+  `;
+  document.getElementById("dpTension").textContent=n.tension;
+}
+
+setEra(2);
+</script>
+</body>
+</html>
