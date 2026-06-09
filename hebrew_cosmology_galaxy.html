@@ -3,374 +3,499 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hebrew Cosmology Galaxy | YLH Tools</title>
+<title>Hebrew Cosmology Galaxy v2 | YLH Tools</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 100%; height: 100%; background: #2a2a2a; overflow: hidden; }
-  #canvas { display: block; width: 100%; height: 100vh; cursor: grab; }
-  #canvas:active { cursor: grabbing; }
-
-  #info-panel {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: rgba(26,26,26,0.97); border: 1px solid #c9a227;
-    border-radius: 8px; padding: 14px 20px; max-width: 400px; width: 90%;
-    display: none; font-family: 'IM Fell English', serif;
-    color: #f5f0e8; text-align: center; pointer-events: none;
-    box-shadow: 0 0 24px rgba(201,162,39,0.15);
-  }
-  #info-panel .node-title {
-    font-family: 'Cinzel', serif; font-size: 13px; color: #c9a227;
-    letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 6px;
-  }
-  #info-panel .node-desc {
-    font-size: 12px; line-height: 1.6; color: #e8e8e8;
-  }
-
-  #legend {
-    position: fixed; top: 14px; right: 14px;
-    font-family: 'Space Mono', monospace; font-size: 9px; color: #999;
-    line-height: 2; background: rgba(26,26,26,0.85);
-    padding: 10px 14px; border-radius: 6px;
-    border: 0.5px solid rgba(201,162,39,0.2);
-  }
-  #legend span {
-    display: inline-block; width: 8px; height: 8px;
-    border-radius: 50%; margin-right: 6px; vertical-align: middle;
-  }
-  #title-block {
-    position: fixed; top: 14px; left: 14px;
-    font-family: 'Cinzel', serif; color: #c9a227;
-    background: rgba(26,26,26,0.85);
-    padding: 10px 16px; border-radius: 6px;
-    border: 0.5px solid rgba(201,162,39,0.2);
-  }
-  #title-block h1 { font-size: 13px; letter-spacing: 0.14em; font-weight: 600; }
-  #title-block p {
-    font-family: 'Space Mono', monospace; font-size: 8px;
-    color: #888; margin-top: 3px; letter-spacing: 0.08em;
-  }
-  #hint {
-    position: fixed; bottom: 14px; right: 14px;
-    font-family: 'Space Mono', monospace; font-size: 8px; color: #555;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; }
+#canvas { display: block; width: 100%; height: 100vh; cursor: grab; }
+#canvas:active { cursor: grabbing; }
+#info-panel {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(18,18,18,0.97); border: 1px solid #c9a227;
+  border-radius: 8px; padding: 14px 20px; max-width: 420px; width: 92%;
+  display: none; font-family: 'IM Fell English', serif;
+  color: #f5f0e8; text-align: center; pointer-events: none;
+}
+#info-panel .node-title {
+  font-family: 'Cinzel', serif; font-size: 12px; color: #c9a227;
+  letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 5px;
+}
+#info-panel .node-cat {
+  font-family: 'Space Mono', monospace; font-size: 8px;
+  letter-spacing: 0.1em; margin-bottom: 7px; text-transform: uppercase;
+}
+#info-panel .node-desc { font-size: 11.5px; line-height: 1.6; color: #ddd; }
+#legend {
+  position: fixed; top: 14px; right: 14px;
+  font-family: 'Space Mono', monospace; font-size: 8px; color: #999;
+  line-height: 2.1; background: rgba(18,18,18,0.9);
+  padding: 10px 14px; border-radius: 6px;
+  border: 0.5px solid rgba(201,162,39,0.25);
+}
+#legend div { display: flex; align-items: center; gap: 7px; }
+#legend span { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+#title-block {
+  position: fixed; top: 14px; left: 14px;
+  font-family: 'Cinzel', serif; color: #c9a227;
+  background: rgba(18,18,18,0.9);
+  padding: 10px 16px; border-radius: 6px;
+  border: 0.5px solid rgba(201,162,39,0.25);
+}
+#title-block h1 { font-size: 12px; letter-spacing: 0.14em; font-weight: 600; }
+#title-block p { font-family: 'Space Mono', monospace; font-size: 7.5px; color: #777; margin-top: 3px; }
+#hint { position: fixed; bottom: 14px; right: 14px; font-family: 'Space Mono', monospace; font-size: 7.5px; color: #555; }
+#filter-bar {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+  pointer-events: all; max-width: 500px;
+}
+.fbtn {
+  font-family: 'Space Mono', monospace; font-size: 7.5px; letter-spacing: 0.08em;
+  padding: 4px 9px; border-radius: 12px; border: 0.5px solid;
+  cursor: pointer; background: rgba(18,18,18,0.9); color: #aaa;
+  transition: all 0.15s; text-transform: uppercase; white-space: nowrap;
+}
+.fbtn.active { color: #1a1a1a; }
 </style>
 </head>
 <body>
 <canvas id="canvas"></canvas>
-
 <div id="info-panel">
   <div class="node-title" id="ip-title"></div>
+  <div class="node-cat" id="ip-cat"></div>
   <div class="node-desc" id="ip-desc"></div>
 </div>
-
 <div id="title-block">
   <h1>HEBREW COSMOLOGY GALAXY</h1>
   <p>YLH TOOLS · BRANDY MITCHELL · CC BY 4.0</p>
 </div>
-
-<div id="legend">
-  <div><span style="background:#c9a227"></span>CORE COSMOLOGY</div>
-  <div><span style="background:#7a5abf"></span>TEXTUAL SOURCE</div>
-  <div><span style="background:#4a9e8e"></span>THEOLOGICAL BURST</div>
-  <div><span style="background:#c0674a"></span>IMPERIAL OVERLAY</div>
-  <div><span style="background:#5a8a5a"></span>LIBERATION THREAD</div>
-  <div><span style="background:#888888"></span>NEIGHBOR COSMOLOGY</div>
-</div>
-
+<div id="filter-bar"></div>
+<div id="legend"></div>
 <div id="hint">DRAG · SCROLL TO ZOOM · HOVER TO READ</div>
 
 <script>
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 let W, H;
-
 function resize() {
-  W = window.innerWidth;
-  H = window.innerHeight;
-  canvas.width = W;
-  canvas.height = H;
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W; canvas.height = H;
 }
 resize();
 window.addEventListener('resize', resize);
 
-let pan = { x: 0, y: 0 };
-let zoom = 1;
-let dragging = false, lastMouse = null;
+let pan = {x:0,y:0}, zoom = 0.88, dragging = false, lastMouse = null;
 
-const COLORS = {
-  core: '#c9a227',
-  source: '#7a5abf',
-  theo: '#4a9e8e',
-  imperial: '#c0674a',
-  liberation: '#5a8a5a',
-  neighbor: '#888888'
+const TIERS = {
+  core:      { label: 'Core Hebrew Cosmology',         color: '#c9a227' },
+  absorbed:  { label: 'Absorbed/Contested Divinity',   color: '#d4845a' },
+  source:    { label: 'Documentary Sources (JEDP)',     color: '#7a5abf' },
+  theo:      { label: 'Theological Burst',              color: '#4a9e8e' },
+  imperial:  { label: 'Imperial Overlay',               color: '#c0674a' },
+  liberation:{ label: 'Liberation Thread',              color: '#5a8a5a' },
+  levant:    { label: 'Levant/Ugaritic Substrate',      color: '#7a8eaa' },
+  sumerian:  { label: 'Sumerian/Akkadian Substrate',    color: '#6a7a5a' },
+  egyptian:  { label: 'Egyptian Substrate',             color: '#a07840' },
+  persian:   { label: 'Persian/Zoroastrian Substrate',  color: '#7a5a7a' },
+  secondtemple:{ label: 'Second Temple Explosion',      color: '#5a7a9e' },
 };
 
 const nodes = [
-  // CENTER
-  { id: 'yhwh', label: 'YHWH', sublabel: 'Ehyeh asher ehyeh', x: 0, y: 0, r: 26, color: COLORS.core, glow: true,
-    desc: 'The divine name — verb-form, not noun. "I AM WHO I AM" / "I WILL BE WHAT I WILL BE." YHWH as living becoming, not static being. The cosmological center from which all else bursts.' },
+  // ── CORE ──────────────────────────────────────────────────────────────
+  {id:'yhwh',      tier:'core', label:'YHWH',           sub:'Ehyeh asher ehyeh', x:0,    y:0,    r:28, glow:true,
+   desc:'The divine name as verb-form, not noun. "I AM WHO I AM / I WILL BE WHAT I WILL BE." YHWH as living becoming — not static being. The cosmological center from which all else bursts. Name disclosed to Moses at the burning bush; archaeologically traceable to Midianite/Kenite origins before Israelite adoption.'},
+  {id:'tohu',      tier:'core', label:'Tohu wa-Bohu',   sub:'Formless void',      x:-170, y:-80,  r:15,
+   desc:'Pre-creation state — formless, void, darkness over tehom. Not nothingness but chaotic potentiality. ANE parallel: Tiamat before Marduk orders her. Genesis 1 (P) is direct polemic against chaos theology — YHWH does not fight the deep, YHWH speaks into it.'},
+  {id:'ruach',     tier:'core', label:'Ruach Elohim',   sub:'Wind/Spirit/Breath', x:-50,  y:-170, r:15,
+   desc:'Hovering (merachefet) over the primordial waters before light. Ruach is polysemous — breath, wind, spirit, animating force. Not yet a trinitarian person; a divine vitality present before creation. Cognate with Akkadian "breath of life" traditions.'},
+  {id:'dabar',     tier:'core', label:'Dabar',          sub:'Word/Event/Thing',   x:130,  y:-150, r:15,
+   desc:'YHWH speaks and it is. Dabar is simultaneously word, event, and the thing produced. Language has ontological weight in Hebrew cosmology — speaking is doing. This is radically different from Greek logos (rational principle). The John 1 swap is the rupture.'},
+  {id:'shalom',    tier:'core', label:'Shalom',         sub:'Wholeness/Right-ordering', x:175, y:55,  r:15,
+   desc:'Not "peace" as absence of conflict — shalom is right-ordering of all relationships: human, ecological, cosmic. The telos of covenantal life. To measure any theology: does it produce shalom for the materially poor, the stranger, the land?'},
+  {id:'hesed',     tier:'core', label:'Hesed',          sub:'Covenant fidelity',  x:155,  y:-35,  r:14,
+   desc:'Covenantal loving-kindness — the relational architecture of the cosmos. YHWH\'s hesed endures forever (Psalm 136). Not sentiment but structural commitment. Hesed is what holds the covenant when law fails.'},
+  {id:'tzedek',    tier:'core', label:'Tzedek/Mishpat', sub:'Justice/Right-judgment', x:-150, y:75, r:14,
+   desc:'Tzedek = restorative rightness. Mishpat = legal judgment oriented toward widow, orphan, stranger. These are YHWH\'s primary attributes (Psalm 89:14). Hebrew justice is consequence-measured — not abstract but social-structural.'},
+  {id:'tehom',     tier:'core', label:'Tehom',          sub:'The Deep',           x:40,   y:185,  r:12,
+   desc:'Cognate with Tiamat (Akkadian). The primordial waters. YHWH divides tehom — does not destroy it. The deep remains, held at bay, occasionally threatening (Flood, Red Sea). Creative-destructive force underlying the cosmos.'},
 
-  // TIER 1 — Core cosmological
-  { id: 'tohu', label: 'Tohu wa-Bohu', sublabel: 'Formless void', x: -180, y: -90, r: 16, color: COLORS.core,
-    desc: 'The pre-creation state — formless, void, darkness over the deep (tehom). Not nothingness but potentiality. ANE parallel: Tiamat, primordial waters. Genesis 1 is polemic AGAINST chaos theology, not a neutral description.' },
-  { id: 'ruach', label: 'Ruach Elohim', sublabel: 'Wind / Spirit / Breath', x: -60, y: -180, r: 16, color: COLORS.core,
-    desc: 'Hovering over the waters. Ruach is breath, wind, spirit — polysemous. The animating force present before light. Not a third person of a Trinity but a divine breath that calls life into being.' },
-  { id: 'dabar', label: 'Dabar', sublabel: 'Word / Event / Thing', x: 140, y: -160, r: 16, color: COLORS.core,
-    desc: 'YHWH speaks — and it is. Dabar is simultaneously word, event, and thing. The spoken word is the act. Hebrew cosmology: language has ontological weight. Contrast with Greek logos which shifts this toward static essence.' },
-  { id: 'shalom', label: 'Shalom', sublabel: 'Wholeness / Right-ordering', x: 180, y: 60, r: 16, color: COLORS.core,
-    desc: 'Not merely "peace" — shalom is the right ordering of all relationships: human, ecological, divine. The telos of Hebrew covenantal cosmology. Absence of shalom = injustice, not just conflict.' },
-  { id: 'hesed', label: 'Hesed', sublabel: 'Covenant fidelity', x: 160, y: -40, r: 15, color: COLORS.core,
-    desc: 'Covenantal loving-kindness. The relational glue of the cosmos. YHWH\'s hesed endures — it is not sentiment but structural commitment. The cosmos runs on hesed, not law alone.' },
-  { id: 'tzedek', label: 'Tzedek / Mishpat', sublabel: 'Justice / Right-judgment', x: -160, y: 80, r: 15, color: COLORS.core,
-    desc: 'Tzedek = restorative rightness. Mishpat = legal judgment oriented toward the widow, orphan, stranger. Hebrew justice is not abstract but consequence-measured. These are YHWH\'s primary attributes.' },
-  { id: 'tehom', label: 'Tehom', sublabel: 'The Deep', x: 40, y: 190, r: 13, color: COLORS.core,
-    desc: 'Cognate with Tiamat. The primordial deep waters. In Genesis 1, Elohim does not destroy tehom — divides it. The cosmos is structured out of the deep, not against it. Water = creative-destructive force.' },
+  // ── ABSORBED / CONTESTED DIVINITY ──────────────────────────────────────
+  {id:'el',        tier:'absorbed', label:'El',         sub:'Patriarchal deity absorbed', x:-270, y:-180, r:16,
+   desc:'Head of the Canaanite pantheon. Ancient, patriarchal, dwelling at the source of the rivers. His titles — El Shaddai, El Elyon, El Olam, El Roi — all appear in the patriarchal narratives. Exodus 6:3 is P admitting the merger: "I appeared as El Shaddai; by YHWH I was not known." YHWH absorbed El\'s identity, titles, and divine council role. Frank Moore Cross: the identification was nearly total.'},
+  {id:'asherah',   tier:'absorbed', label:'Asherah',    sub:'YHWH\'s consort, suppressed', x:-310, y:-80, r:13,
+   desc:'El\'s consort in Ugaritic texts; possibly YHWH\'s consort in early Israelite practice. Kuntillet Ajrud inscriptions (8th c. BCE): "YHWH of Samaria and his Asherah." Asherah poles condemned repeatedly in Deuteronomistic history — meaning they existed and were venerated. The Josianic reform (621 BCE) is partly an anti-Asherah campaign. She was not an aberration; she was the old cosmology persisting.'},
+  {id:'council',   tier:'absorbed', label:'Divine Council', sub:'Bene Elohim',    x:-310, y:30,   r:13,
+   desc:'\'Adat El — the assembly of divine beings. Psalm 82: YHWH stands in the divine council and judges the elohim. Job 1-2: the bene elohim present themselves before YHWH, including the Adversary. Genesis 6:1-4: bene elohim take human wives. This is not monotheism — it is monolatry consolidating toward monotheism. The council is real; its members are being demoted.'},
+  {id:'angel_yhwh',tier:'absorbed', label:'Angel of YHWH', sub:'Hypostasis/early theophany', x:-200, y:-280, r:12,
+   desc:'In early texts, the Angel of YHWH is functionally indistinguishable from YHWH (Genesis 16, 22, Exodus 3). Moses speaks to the Angel at the burning bush but the text says YHWH spoke. This is a remnant of an older hypostasis tradition — YHWH having a divine alter-ego or messenger-self. Later texts tame this by clearly separating messenger from sender.'},
+  {id:'hokmah',    tier:'absorbed', label:'Wisdom/Hokmah', sub:'Feminine divine presence', x:-130, y:-290, r:12,
+   desc:'Proverbs 8: Wisdom (Hokmah) was present at creation, a craftsman beside YHWH, delighting in the inhabited world. Feminine, personified, possibly a divine figure before being demoted to an attribute. Ben Sira identifies her with Torah. The Wisdom tradition is a major competing cosmology within Hebrew scripture — and the seedbed for later Logos theology.'},
+  {id:'nachash',   tier:'absorbed', label:'Nachash',     sub:'Serpent/divine challenger', x:-50, y:-290, r:11,
+   desc:'The serpent (nachash) in Genesis 3 is not yet Satan — it is a divine creature who tells the truth ("you will not die; you will know good and evil"). Later tradition (2nd c. BCE onward) identifies the nachash with the Satan figure. But in the J source, the serpent is a member of the divine council who challenges YHWH\'s information management. A destabilizing divine figure, not a cosmic evil.'},
 
-  // TIER 2 — Documentary sources
-  { id: 'J', label: 'Yahwist (J)', sublabel: '~10th c. BCE · Judah', x: -270, y: -60, r: 13, color: COLORS.source,
-    desc: 'The Yahwist source — earthy, anthropomorphic deity who walks in gardens, smells offerings, gets angry. Deeply covenantal. Origin stories from Judahite perspective. Polysemy: YHWH is close, embodied, relational.' },
-  { id: 'E', label: 'Elohist (E)', sublabel: '~9th c. BCE · Northern', x: -270, y: 40, r: 13, color: COLORS.source,
-    desc: 'Northern kingdom source. Elohim is more distant — speaks in dreams, through angels. Emphasis on fear of God and moral testing. Preserves northern prophetic tradition. Blended with J post-722 BCE.' },
-  { id: 'D', label: 'Deuteronomist (D)', sublabel: '~7th c. BCE · Reform', x: -270, y: 140, r: 13, color: COLORS.source,
-    desc: 'Josiah reform corpus. Covenant renewal, centralization of worship. YHWH is exclusive — Deuteronomic monotheism. Strong social justice provisions (Deut 15: debt cancellation). Also includes conquest theology.' },
-  { id: 'P', label: 'Priestly (P)', sublabel: '~6th c. BCE · Exile', x: -180, y: 200, r: 13, color: COLORS.source,
-    desc: 'Exile-era priestly school. Cosmic, ordered, liturgical. Genesis 1 is P\'s creation — structured, measured, Sabbath-oriented. P preserves identity through ritual when temple is gone. Systematizing force.' },
+  // ── DOCUMENTARY SOURCES ────────────────────────────────────────────────
+  {id:'J',         tier:'source', label:'Yahwist (J)',  sub:'~10th c. BCE · Judah', x:-270, y:-50, r:13,
+   desc:'Yahwist source — earthy, anthropomorphic deity who walks in gardens, smells offerings, gets angry, makes clothes. Deeply relational. Origin stories from Judahite perspective. Uses YHWH from the beginning. Polysemous, narrative, consequence-driven. The source most amenable to YLH reading.'},
+  {id:'E',         tier:'source', label:'Elohist (E)',  sub:'~9th c. BCE · Northern', x:-280, y:50,  r:13,
+   desc:'Northern kingdom source. Uses Elohim until Sinai. God speaks in dreams, through angels. Emphasis on fear of God and moral testing. Preserves northern prophetic tradition (Elijah connections). Blended with J after 722 BCE fall of Northern Kingdom.'},
+  {id:'D',         tier:'source', label:'Deuteronomist (D)', sub:'~7th c. BCE · Reform', x:-270, y:145, r:13,
+   desc:'Josiah reform corpus (621 BCE). Covenant renewal, cult centralization in Jerusalem, exclusive YHWH worship. Strong social justice provisions: debt cancellation (Deut 15), protection of resident aliens. Also includes conquest theology. The most politically ambivalent source — liberation logic and imperial logic in the same document.'},
+  {id:'P',         tier:'source', label:'Priestly (P)', sub:'~6th c. BCE · Exile',  x:-170, y:195,  r:13,
+   desc:'Exile-era priestly school. Genesis 1 is P\'s creation — structured, cosmic, liturgical, Sabbath-oriented. P preserves Israelite identity through ritual when temple is gone. Systematizing, ordering. Writes in direct contestation with Babylonian cosmology (Enuma Elish). P is polemic disguised as liturgy.'},
 
-  // TIER 3 — Theological bursts
-  { id: 'brit', label: 'Brit / Covenant', sublabel: 'Structural bond', x: 290, y: -120, r: 12, color: COLORS.theo,
-    desc: 'Covenant is the governance structure of Hebrew cosmology — not a contract but a binding mutual obligation. Noahic (all creation), Abrahamic (promise), Sinaitic (law), Davidic (kingship). Covenant is YLH\'s analytical core.' },
-  { id: 'sabbath', label: 'Shabbat', sublabel: 'Embedded liberation', x: 290, y: -20, r: 12, color: COLORS.theo,
-    desc: 'The seventh day is not just rest — it is YHWH\'s governance code built into time. Slaves rest. Debt is cancelled (Sabbath year). Land rests (Jubilee). Shabbat is a weekly anti-empire algorithm.' },
-  { id: 'ebyonim', label: 'Ebyonim', sublabel: 'The poor / the bent-down', x: 290, y: 80, r: 12, color: COLORS.theo,
-    desc: 'The anawim, the ebyonim — the materially poor are the theological center of Hebrew cosmology. YHWH hears the cry (shavah) of the oppressed. Poverty is not spiritualized — it is a structural condition YHWH addresses.' },
-  { id: 'torah', label: 'Torah', sublabel: 'Instruction / Way', x: 80, y: 290, r: 12, color: COLORS.theo,
-    desc: 'Not "law" in the Greek-Roman sense but instruction, way, path. Torah is how shalom is maintained. The misreading of Torah as punitive law is a Greek philosophical overlay. Torah\'s goal: flourishing, not compliance.' },
-  { id: 'nabi', label: 'Nabi / Prophecy', sublabel: 'Consequence-speaker', x: -80, y: 280, r: 12, color: COLORS.theo,
-    desc: 'Prophets (nabi) are consequence-speakers, not future-tellers. They name what is happening now in light of covenantal logic. Amos, Isaiah, Jeremiah — all structural critics of economic injustice.' },
-  { id: 'exile', label: 'Golah / Exile', sublabel: 'Crucible of theology', x: -270, y: 220, r: 12, color: COLORS.theo,
-    desc: 'Babylonian exile (597–539 BCE) is the theological forge. Loss of land, temple, kingship forced re-articulation of YHWH outside territorial logic. Exile produces the most generative Hebrew theology.' },
+  // ── THEOLOGICAL BURSTS ─────────────────────────────────────────────────
+  {id:'brit',      tier:'theo', label:'Brit/Covenant',  sub:'Governance structure', x:285, y:-115, r:12,
+   desc:'Covenant is the governance architecture of Hebrew cosmology — not a legal contract but a binding mutual obligation defining the shape of reality. Noahic (all creation), Abrahamic (promise + land), Sinaitic (law + social order), Davidic (kingship). YLH\'s analytical core: what does this covenant obligate, and who does it protect?'},
+  {id:'sabbath',   tier:'theo', label:'Shabbat',        sub:'Anti-empire algorithm', x:285, y:-20,  r:12,
+   desc:'The seventh day is YHWH\'s governance code built into time itself. Slaves rest. Debt is cancelled (Sabbath year). Land rests (Jubilee). Sabbath is a weekly structural protest against the logic of extraction. Egypt had no Sabbath — endless brick production. YHWH\'s first act after liberation: give rest.'},
+  {id:'ebyonim',   tier:'theo', label:'Ebyonim',        sub:'The poor/bent-down',   x:285, y:80,   r:12,
+   desc:'The anawim, the ebyonim — the materially poor are the theological center of Hebrew cosmology. YHWH hears the shavah (cry) of the oppressed. Poverty is not spiritualized; it is a structural condition YHWH addresses structurally. The test of any theology: does it hear the cry?'},
+  {id:'torah',     tier:'theo', label:'Torah',          sub:'Instruction/Way',      x:80,  y:285,  r:12,
+   desc:'Not "law" in the Greek-Roman penal sense but instruction, way, path. Torah is how shalom is maintained in community. The misreading of Torah as punitive compliance mechanism is a Greek philosophical overlay. Torah\'s goal: flourishing. "Choose life."'},
+  {id:'nabi',      tier:'theo', label:'Nabi/Prophecy',  sub:'Consequence-speaker',  x:-75, y:275,  r:12,
+   desc:'Prophets (nabi) are consequence-speakers, not future-tellers. They name what the present moment is producing in light of covenantal logic. Amos on economic exploitation. Isaiah on imperial alliance. Jeremiah on false temple security. Prophecy is applied YLH.'},
+  {id:'exile',     tier:'theo', label:'Golah/Exile',    sub:'Theological crucible', x:-265, y:225, r:12,
+   desc:'Babylonian exile (597–539 BCE) is the theological forge. Loss of land, temple, king forced re-articulation of YHWH outside territorial logic. Can YHWH be worshipped in a foreign land? The exile produces the most generative Hebrew theology: universalized YHWH, suffering servant, apocalyptic imagination.'},
 
-  // TIER 4 — Imperial overlays
-  { id: 'logos', label: 'Logos', sublabel: 'Greek word-essence swap', x: 120, y: -280, r: 11, color: COLORS.imperial,
-    desc: 'John 1 swaps Hebrew dabar for Greek logos — shifting from event/thing to eternal rational principle. This is the Nicene rupture mechanism: YHWH-as-becoming replaced by God-as-static-essence. Hellenization of the covenant.' },
-  { id: 'ousia', label: 'Ousia / Substance', sublabel: 'Greek metaphysics', x: 0, y: -290, r: 11, color: COLORS.imperial,
-    desc: 'Greek philosophical category — being, substance, essence. Nicene theology imports ousia to define divine nature. Consequence: a God who IS rather than a God who ACTS. Marduk and Baal\'s static cosmic order finds a new vocabulary.' },
-  { id: 'empire_rome', label: 'Pax Romana', sublabel: 'Imperial cosmology', x: -120, y: -280, r: 11, color: COLORS.imperial,
-    desc: 'Roman imperial theology: Caesar as son of God, peace through military victory. Pax Romana is direct competitor to shalom. Early Christian theology was shaped in contest with this cosmology — and eventually absorbed it.' },
-  { id: 'psa', label: 'Penal Sub. Atonement', sublabel: 'Anselm 1098 CE', x: 320, y: 180, r: 11, color: COLORS.imperial,
-    desc: 'Anselm\'s satisfaction theory imports feudal honor logic into atonement. God as offended liege lord who demands payment. This is medieval governance architecture mapped onto the cross — not Hebrew covenantal logic.' },
-  { id: 'calvinism', label: 'TULIP / Calvinism', sublabel: 'Double predestination', x: 320, y: 280, r: 11, color: COLORS.imperial,
-    desc: 'Calvin\'s decretum horribile — some predestined to damnation. Consequence: a God who wills poverty, hierarchy, and election of the powerful. YLH reads this as Stoic fate-logic with Hebrew vocabulary.' },
+  // ── IMPERIAL OVERLAYS ──────────────────────────────────────────────────
+  {id:'logos',     tier:'imperial', label:'Logos',      sub:'Greek word-essence swap', x:115, y:-270, r:11,
+   desc:'John 1 swaps Hebrew dabar for Greek logos — shifting from event/act/thing to eternal rational organizing principle. This is the Nicene rupture mechanism. Philo of Alexandria (1st c. BCE) prepared the ground: a Hellenized Jew who reads Torah through Platonic metaphysics. The swap is not innocent; it produces a different God with a different politics.'},
+  {id:'ousia',     tier:'imperial', label:'Ousia',      sub:'Nicene substance logic', x:0,   y:-285, r:11,
+   desc:'Greek philosophical category — being, substance, essence. Nicene council (325 CE) uses homoousios to define Christ\'s nature. This is Aristotelian metaphysics with Hebrew names. Consequence: a God defined by what God IS (substance) rather than what God DOES (dabar/action). Marduk and Baal\'s static cosmic order finds its final Christian vocabulary here.'},
+  {id:'pax_roma',  tier:'imperial', label:'Pax Romana', sub:'Imperial cosmology',    x:-115, y:-270, r:11,
+   desc:'Roman imperial theology: Caesar as divi filius (son of the divine), peace through military conquest, gospel (euangelion) of Caesar\'s victory. Every major NT term — gospel, lord, savior, son of God — is a direct counter-claim to imperial Roman vocabulary. The question is whether Christianity absorbed the counter-claim or the original.'},
+  {id:'psa',       tier:'imperial', label:'Penal Sub. Atonement', sub:'Anselm 1098', x:315, y:175, r:11,
+   desc:'Anselm\'s satisfaction theory imports feudal honor logic into atonement. God as offended liege lord requiring payment to restore honor. Christ pays the debt. This is medieval European governance architecture mapped onto the cross — not Hebrew covenantal logic. The consequence: a retributive God, a transactional salvation, a church that can adjudicate forgiveness.'},
+  {id:'calvinism', tier:'imperial', label:'TULIP/Calvinism', sub:'Stoic fate-logic', x:315, y:275, r:11,
+   desc:'Calvin\'s decretum horribile — some predestined to damnation before creation. Consequence: a God who wills hierarchy, poverty, and the election of the powerful as signs of grace (Weber\'s Protestant ethic). YLH reads this as Stoic determinism with Hebrew vocabulary. The Calvinist God does not hear the cry of the ebyonim — God authored their condition.'},
 
-  // TIER 5 — Liberation threads
-  { id: 'jubilee', label: 'Jubilee', sublabel: 'Lev 25 / Year 50', x: -320, y: -140, r: 11, color: COLORS.liberation,
-    desc: 'Every 50 years: land returns to original families, debt cancelled, slaves freed. Jubilee is YHWH\'s built-in counter-algorithm against wealth accumulation. Liberation theology\'s economic foundation.' },
-  { id: 'exodus', label: "Yetzi'at Mitzrayim", sublabel: 'Exodus event', x: -350, y: -20, r: 13, color: COLORS.liberation,
-    desc: 'The Exodus is the founding event of Hebrew theology — not creation. YHWH is first known as liberator. All subsequent covenant logic is read through: "I am YHWH your God who brought you out of Egypt." The theological grammar is liberation.' },
-  { id: 'ger', label: 'Ger / Stranger', sublabel: 'Resident alien ethic', x: -340, y: 100, r: 11, color: COLORS.liberation,
-    desc: 'The ger (resident alien / stranger) appears 92 times in Torah. "You were strangers in Egypt." Hebrew cosmology hardwires the ethics of the stranger into covenantal memory. Imperial theology erases this.' },
-  { id: 'kingjr', label: 'Kingian Ethics', sublabel: 'Beloved Community', x: 0, y: 340, r: 11, color: COLORS.liberation,
-    desc: "MLK's Beloved Community as consequence-measure for any theology. King's triple evils — racism, poverty, militarism — are YLH's consequence audit categories. The arc bends toward justice = shalom." },
-  { id: 'libtheo', label: 'Liberation Theology', sublabel: 'Gutierrez / Cone / Jennings', x: 170, y: 320, r: 11, color: COLORS.liberation,
-    desc: 'Preferential option for the poor is archaeologically recoverable from Hebrew cosmology. Cone\'s Black Theology, Gutiérrez\'s structural analysis, Jennings\'s colonial Christianity — all reading the Hebrew substrate against imperial overlay.' },
+  // ── LIBERATION THREADS ─────────────────────────────────────────────────
+  {id:'jubilee',   tier:'liberation', label:'Jubilee',  sub:'Lev 25 · Year 50',    x:-320, y:-140, r:11,
+   desc:'Every 50 years: land returns to original families, debt cancelled, enslaved persons freed. Jubilee is YHWH\'s built-in counter-algorithm against the accumulation logic of empire. It assumes land concentration will happen and structurally reverses it. Liberation theology\'s economic foundation. Jesus announces his ministry by reading the Jubilee text (Luke 4:18-19).'},
+  {id:'exodus',    tier:'liberation', label:"Yetzi'at Mitzrayim", sub:'The founding event', x:-345, y:-20, r:14,
+   desc:'The Exodus is the founding event of Hebrew theology — not creation. YHWH is first known as liberator, not creator. All subsequent covenant logic is read through: "I am YHWH your God who brought you out of Egypt, out of the house of slavery." The theological grammar of liberation precedes the theological grammar of origins.'},
+  {id:'ger',       tier:'liberation', label:'Ger/Stranger', sub:'Resident alien ethic', x:-335, y:100, r:11,
+   desc:'The ger (resident alien, stranger) appears 92 times in Torah. The command is grounded in memory: "You were strangers in Egypt." Hebrew cosmology hardwires protection of the stranger into covenantal memory because YHWH heard the cry of strangers. Imperial theology erases this by re-centering the in-group.'},
+  {id:'kingjr',    tier:'liberation', label:'Kingian Ethics', sub:'Beloved Community', x:0,   y:340, r:11,
+   desc:"MLK's Beloved Community as consequence-measure for any theology. King's triple evils — racism, poverty, militarism — are YLH's consequence audit categories. The arc of the moral universe bends toward justice = shalom. King reads the Hebrew prophetic tradition directly; he is doing applied nabi theology."},
+  {id:'libtheo',   tier:'liberation', label:'Liberation Theology', sub:'Gutierrez/Cone/Jennings', x:165, y:320, r:11,
+   desc:'Preferential option for the poor is archaeologically recoverable from Hebrew cosmology. It is not an innovation — it is excavation. Gutiérrez\'s structural analysis of poverty, Cone\'s Black Theology reading YHWH as liberator of the oppressed, Jennings\'s account of colonial Christianity\'s displacement of the body — all reading the Hebrew substrate against imperial overlay.'},
 
-  // TIER 6 — Neighbor cosmologies
-  { id: 'marduk', label: 'Marduk / Enuma Elish', sublabel: 'Babylonian cosmology', x: -80, y: -310, r: 10, color: COLORS.neighbor,
-    desc: 'Babylonian creation epic — Marduk creates humans from the blood of a slain rebel god (Kingu) to serve the gods. Humans as servants of divine hierarchy. Genesis 1 (P source) is direct polemic against this cosmology.' },
-  { id: 'baal', label: 'Baal / Canaanite', sublabel: 'Storm-fertility cosmology', x: 80, y: -290, r: 10, color: COLORS.neighbor,
-    desc: "Canaanite Baal cycle — storm deity, fertility, death-rebirth. Israel borrowed, contested, and transformed Canaanite cosmology. YHWH absorbs Baal's storm imagery but refuses his fertility-cult economics." },
-  { id: 'maat', label: "Ma'at / Egyptian", sublabel: 'Cosmic order / truth', x: -200, y: -220, r: 10, color: COLORS.neighbor,
-    desc: "Egyptian ma'at — cosmic truth, order, justice — maintained by Pharaoh's ritual. Similar function to tzedek/mishpat but administered through royal hierarchy, not covenant. The Exodus is a polemic against ma'at." },
-  { id: 'aten', label: 'Aten Hypothesis', sublabel: 'Monotheism debate', x: -300, y: -200, r: 9, color: COLORS.neighbor,
-    desc: "Akhenaten's solar monotheism (14th c. BCE) — possible influence on Hebrew monotheism debated by scholars. Freud's Moses argument. Most ANE scholars reject direct lineage but acknowledge conceptual resonance." },
+  // ── LEVANT / UGARITIC SUBSTRATE ────────────────────────────────────────
+  {id:'ugarit',    tier:'levant', label:'Ugaritic Cosmology', sub:'Ras Shamra texts', x:-420, y:-230, r:13,
+   desc:'Discovered 1929 at Ras Shamra (Syria). The Ugaritic texts (14th–12th c. BCE) are the closest literary parallel to Hebrew scripture. The Baal Cycle, El\'s divine council, Mot and Yam — all appear in transformed form in the Psalms, Job, and prophetic literature. Hebrew cosmology is not original; it is a contestation and transformation of Ugaritic cosmology.'},
+  {id:'baal',      tier:'levant', label:'Baal',              sub:'Storm-fertility deity', x:-380, y:-310, r:11,
+   desc:'Canaanite storm deity. Baal Hadad — rider of the clouds, master of rain and fertility. YHWH absorbs Baal\'s storm imagery wholesale (Psalm 18, 29, 68). The Carmel confrontation (1 Kings 18) is not the defeat of a foreign god — it is a civil war within Israelite cosmological imagination. YHWH wins Baal\'s portfolio without ever fully exorcising his imagery.'},
+  {id:'mot',       tier:'levant', label:'Mot',               sub:'Death/Underworld deity', x:-430, y:-140, r:10,
+   desc:'Canaanite god of death and the underworld. In the Baal Cycle, Mot swallows Baal — death swallows life. Sheol in Hebrew scripture functions similarly: a shadowy underworld where even YHWH\'s presence is ambiguous (Psalm 88). The later development of resurrection theology (Daniel 12, Isaiah 26) is partly a claim that YHWH defeats Mot\'s logic — what Baal could not permanently achieve.'},
+  {id:'yam',       tier:'levant', label:'Yam',               sub:'Sea/chaos deity',       x:-430, y:-310, r:10,
+   desc:'Canaanite sea deity, representing chaos and disorder. In the Baal Cycle, Baal defeats Yam. In Hebrew scripture, YHWH defeats the sea (tehom, Rahab, Leviathan). Psalm 74, Job 41, Isaiah 51 — the combat myth is present, transformed. YHWH does what Baal did, but without needing the council\'s approval. The polemic is not against the myth but against the attribution.'},
+  {id:'anat',      tier:'levant', label:'Anat',              sub:'Warrior goddess',       x:-470, y:-230, r:9,
+   desc:'Canaanite warrior goddess, Baal\'s sister. Ferocious, bloodthirsty, devoted. Some scholars (Tikva Frymer-Kensky) argue her warrior attributes are distributed into YHWH\'s war imagery in the Hebrew texts — YHWH as divine warrior inherits Anat\'s register. The feminine warrior divine disappears as a named figure but leaves traces in the battle poetry.'},
+
+  // ── SUMERIAN / AKKADIAN SUBSTRATE ─────────────────────────────────────
+  {id:'enuma',     tier:'sumerian', label:'Enuma Elish',    sub:'Babylonian creation', x:120, y:-390, r:13,
+   desc:'Babylonian creation epic (12th c. BCE in written form; oral tradition much older). Marduk creates the cosmos by splitting Tiamat\'s body. Humans created from the blood of Kingu to serve the gods. Genesis 1 (P source) is direct point-by-point polemic against this cosmology. Same structure, opposite theology: YHWH does not fight chaos; humans are not slaves of the divine; creation is "very good."'},
+  {id:'marduk',    tier:'sumerian', label:'Marduk',         sub:'Babylonian supreme deity', x:60, y:-390, r:11,
+   desc:'Babylonian supreme deity who rises to head of the pantheon by defeating Tiamat. His ascent is political — the Enuma Elish is Babylon\'s theological justification for imperial hegemony. When P writes Genesis 1 in Babylonian exile, the target is explicit: our God does not need to fight to create; speech is sufficient. Anti-Marduk theology is proto-liberation theology.'},
+  {id:'enki',      tier:'sumerian', label:'Enki/Ea',        sub:'Wisdom/water deity',   x:200, y:-390, r:10,
+   desc:'Sumerian Enki (Akkadian: Ea) — god of wisdom, fresh water, magic, crafts. Enki is often the protector of humans against harsher divine decrees (he warns Utnapishtim of the flood). The Flood narrative in Genesis has direct literary dependence on Sumerian/Akkadian predecessors (Atrahasis, Gilgamesh Epic). YHWH\'s flood is a theological rewrite of Enki\'s world.'},
+  {id:'inanna',    tier:'sumerian', label:'Inanna/Ishtar',  sub:'Love/war/descent',     x:280, y:-370, r:10,
+   desc:'Sumerian Inanna (Akkadian: Ishtar) — goddess of love, war, and fertility. Her descent to the underworld and return is one of the oldest death-resurrection narratives (3rd millennium BCE). Scholars debate her influence on later resurrection theology in Second Temple Judaism and early Christianity. Asherah\'s suppression in Israelite tradition is partly the suppression of Inanna\'s register.'},
+  {id:'gilgamesh', tier:'sumerian', label:'Gilgamesh Epic', sub:'Flood/mortality quest', x:350, y:-310, r:10,
+   desc:'Epic of Gilgamesh (Sumerian sources ~2100 BCE; Akkadian version ~1200 BCE). Contains the Utnapishtim flood account — direct literary ancestor of the biblical Flood. Also: Gilgamesh\'s quest for immortality after Enkidu\'s death anticipates the Hebrew wrestling with death and Sheol. The Bible doesn\'t invent the flood story; it argues with it.'},
+
+  // ── EGYPTIAN SUBSTRATE ─────────────────────────────────────────────────
+  {id:'maat',      tier:'egyptian', label:"Ma'at",          sub:'Cosmic order/truth',  x:-195, y:-310, r:11,
+   desc:"Egyptian cosmic principle — truth, order, justice, balance — maintained by Pharaoh's ritual performance. Ma'at is structurally similar to tzedek/mishpat but administered through royal hierarchy, not covenant. The Exodus is a polemic against ma'at: YHWH's justice does not flow through Pharaoh. It overturns him. The ten plagues are a systematic dismantling of Egyptian cosmic order."},
+  {id:'aten',      tier:'egyptian', label:'Aten Hypothesis', sub:'Solar monotheism',   x:-295, y:-290, r:9,
+   desc:"Akhenaten's solar monotheism (14th c. BCE) — one god, the Aten, creator and sustainer. Freud's Moses and Monotheism argued for direct connection. Most ANE scholars (including Assmann) are cautious: possible conceptual resonance rather than direct lineage. The Great Hymn to the Aten has verbal parallels with Psalm 104. At minimum: monotheizing impulses existed in Egypt before Israel consolidated YHWH-alone theology."},
+  {id:'osiris',    tier:'egyptian', label:'Osiris',          sub:'Death/resurrection logic', x:-120, y:-360, r:10,
+   desc:"Egyptian god of death, resurrection, and the afterlife. Osiris murdered by Set, resurrected by Isis, becomes judge of the dead. Osiris is the oldest developed death-resurrection divine narrative in the region (3rd millennium BCE). His logic — death followed by divine vindication — enters Second Temple Jewish apocalypticism and shapes early Christian resurrection theology, though the Hebrew tradition contests and transforms it."},
+  {id:'thoth',     tier:'egyptian', label:'Thoth',           sub:'Divine speech/writing', x:-50, y:-380, r:9,
+   desc:"Egyptian god of writing, wisdom, divine speech — the tongue of Ra, the scribe of the gods. Thoth's 'word' creates and orders reality. This is the Egyptian version of dabar-as-creative-speech. The Memphite Theology (c. 700 BCE or earlier) presents Ptah/Thoth creating through thought and speech — direct parallel to Genesis 1. Whether this influenced Hebrew cosmology or reflects shared ANE logic is debated."},
+
+  // ── PERSIAN / ZOROASTRIAN SUBSTRATE ───────────────────────────────────
+  {id:'ahura',     tier:'persian', label:'Ahura Mazda',     sub:'Zoroastrian supreme',  x:300, y:-200, r:12,
+   desc:'Zoroastrian supreme deity — the Wise Lord, creator of all good, locked in cosmic struggle with Angra Mainyu (evil). Zoroastrianism introduces: cosmic dualism, a linear eschatology (history moving toward a final judgment), resurrection of the dead, individual judgment after death, angelic hierarchy, Satan as cosmic adversary. All of these appear in Second Temple Judaism after Persian contact (539 BCE onward). The Persian influence on Jewish cosmology is massive and underacknowledged.'},
+  {id:'angra',     tier:'persian', label:'Angra Mainyu',    sub:'Cosmic evil principle', x:360, y:-130, r:10,
+   desc:'The Zoroastrian principle of cosmic evil — Angra Mainyu (Ahriman). A genuinely opposed divine evil force, not subordinate to the supreme deity. Before Persian influence, the Hebrew Satan (ha-satan) is a prosecuting attorney in the divine council (Job 1-2), not a cosmic adversary. After Persian contact, the Satan figure becomes increasingly autonomous and evil — directly importing Zoroastrian dualism into Jewish cosmology.'},
+  {id:'persian_esc',tier:'persian', label:'Zoroastrian Eschatology', sub:'Linear time/final judgment', x:380, y:-50, r:10,
+   desc:'Zoroastrianism introduces linear history with a definitive end: a final battle, resurrection of the dead, judgment, and cosmic renewal. Hebrew cosmology before the exile tends toward cyclical or eternal time. Daniel (165 BCE), 1 Enoch, and the entire apocalyptic tradition reflect Zoroastrian eschatological logic. The Book of Revelation is Zoroastrian eschatology translated into Jewish-Christian imagery.'},
+
+  // ── SECOND TEMPLE EXPLOSION ────────────────────────────────────────────
+  {id:'apocalyptic',tier:'secondtemple', label:'Apocalypticism', sub:'Hidden revelation/end-times', x:240, y:210, r:12,
+   desc:'Second Temple Jewish apocalypticism (300 BCE–100 CE) — the genre of hidden revelation about cosmic events and history\'s end. Daniel, 1 Enoch, 4 Ezra, 2 Baruch. Apocalypticism synthesizes: Persian eschatology, Babylonian cosmic imagery, Hebrew prophetic tradition, and Greek cosmological speculation. It is where the feeding cosmologies collide and produce something new. Jesus and Paul both operate within apocalyptic frameworks.'},
+  {id:'angelology', tier:'secondtemple', label:'Angelology',    sub:'Hierarchical divine beings', x:300, y:130, r:11,
+   desc:'Second Temple period develops an elaborate angelology — named angels (Michael, Gabriel, Raphael, Uriel), angelic hierarchies, divine mediators. This imports Persian/Zoroastrian heavenly hierarchy into Jewish cosmology while maintaining YHWH\'s supremacy. The divine council becomes ordered, bureaucratized, and militarized. Angels become the infrastructure of cosmic governance.'},
+  {id:'satan_fig',  tier:'secondtemple', label:'Satan Figure',  sub:'Adversary becomes cosmic evil', x:355, y:30, r:11,
+   desc:'The evolution from ha-satan (prosecuting attorney in divine council, Job 1-2) to Satan (cosmic adversary, 1 Chronicles 21, Zechariah 3, and full development in 1 Enoch) tracks directly with Persian Zoroastrian influence post-exile. By the time of the New Testament, Satan is a cosmic adversary who rules "the present evil age." This is Angra Mainyu with Hebrew vocabulary. The shift has enormous consequence for theodicy.'},
+  {id:'merkabah',   tier:'secondtemple', label:'Merkabah Mysticism', sub:'Throne/chariot visions', x:240, y:290, r:10,
+   desc:"Merkabah (chariot) mysticism — Second Temple and early rabbinic tradition of ascending through heavenly palaces to the divine throne. Rooted in Ezekiel's chariot vision (Ezek 1). Developed into full mystical practice by 1st–6th c. CE. Where the divine council becomes a throne room, and the mystic seeks direct encounter with the divine presence. Influenced by Babylonian astronomical cosmology and Persian heavenly geography."},
+  {id:'enoch_trad', tier:'secondtemple', label:'Enoch Tradition', sub:'Fallen angels/cosmic secrets', x:160, y:390, r:10,
+   desc:'The Enoch literature (1 Enoch, 2 Enoch, 3 Enoch) — one of the most important Second Temple corpuses, largely excluded from the canon. Expands Genesis 6:1-4 (bene elohim taking human wives) into a full mythology of fallen angels (Watchers) who corrupt humanity. Contains: astral theology, calendrical cosmology, cosmic geography, prototype of apocalyptic literature. Jude 14-15 quotes 1 Enoch as scripture.'},
 ];
 
 const edges = [
-  ['yhwh','tohu'], ['yhwh','ruach'], ['yhwh','dabar'], ['yhwh','shalom'],
-  ['yhwh','hesed'], ['yhwh','tzedek'], ['yhwh','tehom'],
-  ['tohu','J'], ['tohu','E'], ['ruach','J'], ['dabar','J'],
-  ['shalom','D'], ['tzedek','D'], ['tehom','P'], ['hesed','E'],
-  ['P','marduk'], ['P','baal'], ['J','maat'], ['maat','aten'],
-  ['hesed','brit'], ['shalom','sabbath'], ['tzedek','ebyonim'],
-  ['dabar','torah'], ['tzedek','nabi'], ['tehom','exile'],
-  ['D','sabbath'], ['D','torah'], ['E','nabi'], ['P','exile'],
-  ['dabar','logos'], ['logos','ousia'], ['ousia','empire_rome'],
-  ['empire_rome','psa'], ['psa','calvinism'],
-  ['marduk','ousia'], ['baal','logos'],
-  ['tzedek','jubilee'], ['yhwh','exodus'], ['exodus','ger'],
-  ['exodus','ebyonim'], ['brit','kingjr'], ['nabi','kingjr'],
-  ['ebyonim','libtheo'], ['kingjr','libtheo'], ['sabbath','jubilee'],
-  ['ger','libtheo'], ['exile','nabi'], ['torah','ger'],
+  // YHWH → core
+  ['yhwh','tohu'],['yhwh','ruach'],['yhwh','dabar'],['yhwh','shalom'],['yhwh','hesed'],['yhwh','tzedek'],['yhwh','tehom'],
+  // YHWH → absorbed (absorption lines)
+  ['yhwh','el'],['yhwh','asherah'],['yhwh','council'],['yhwh','angel_yhwh'],['yhwh','hokmah'],
+  // El → absorbed
+  ['el','council'],['el','asherah'],
+  // Core → sources
+  ['tohu','J'],['tohu','E'],['ruach','J'],['dabar','J'],['shalom','D'],['tzedek','D'],['tehom','P'],['hesed','E'],
+  // Core → theo bursts
+  ['hesed','brit'],['shalom','sabbath'],['tzedek','ebyonim'],['dabar','torah'],['tzedek','nabi'],['tehom','exile'],
+  ['shalom','nabi'],
+  // Sources → theo bursts
+  ['D','sabbath'],['D','torah'],['D','jubilee'],['E','nabi'],['P','exile'],['J','nachash'],
+  // Sources → neighbor/absorbed
+  ['P','enuma'],['P','marduk'],['P','baal'],['J','maat'],['J','el'],['E','el'],
+  // Levant → Hebrew
+  ['ugarit','el'],['ugarit','baal'],['ugarit','mot'],['ugarit','yam'],['ugarit','anat'],
+  ['baal','yhwh'],['baal','logos'],['baal','ousia'],['mot','tehom'],['yam','tehom'],['anat','council'],
+  // Sumerian/Akkadian → Hebrew
+  ['enuma','marduk'],['enuma','P'],['enuma','tohu'],['marduk','ousia'],
+  ['enki','gilgamesh'],['gilgamesh','tehom'],['gilgamesh','exile'],
+  ['inanna','asherah'],['inanna','hokmah'],
+  // Egyptian → Hebrew
+  ['maat','J'],['maat','tzedek'],['aten','yhwh'],['osiris','apocalyptic'],['thoth','dabar'],['thoth','hokmah'],
+  // Persian → Second Temple
+  ['ahura','angelology'],['ahura','persian_esc'],['angra','satan_fig'],['persian_esc','apocalyptic'],
+  ['ahura','council'],
+  // Second Temple internal
+  ['exile','apocalyptic'],['exile','angelology'],['exile','enoch_trad'],
+  ['council','angelology'],['council','satan_fig'],['nachash','satan_fig'],
+  ['apocalyptic','merkabah'],['apocalyptic','enoch_trad'],['angelology','satan_fig'],
+  ['hokmah','logos'],['hokmah','apocalyptic'],
+  // Imperial overlays
+  ['dabar','logos'],['logos','ousia'],['ousia','pax_roma'],['pax_roma','psa'],['psa','calvinism'],
+  ['marduk','ousia'],
+  // Liberation threads
+  ['tzedek','jubilee'],['yhwh','exodus'],['exodus','ger'],['exodus','ebyonim'],
+  ['brit','kingjr'],['nabi','kingjr'],['ebyonim','libtheo'],['kingjr','libtheo'],
+  ['sabbath','jubilee'],['ger','libtheo'],['exile','nabi'],['torah','ger'],
+  ['nabi','libtheo'],['apocalyptic','liberation'],
 ];
+
+const TIER_COLORS = {};
+Object.entries(TIERS).forEach(([k,v]) => TIER_COLORS[k] = v.color);
 
 function getNode(id) { return nodes.find(n => n.id === id); }
 
-let hoveredNode = null;
-let animFrame = 0;
+let hoveredNode = null, animFrame = 0;
+let activeFilter = null;
+
+// Build legend
+const legendEl = document.getElementById('legend');
+Object.entries(TIERS).forEach(([k,v]) => {
+  const d = document.createElement('div');
+  d.innerHTML = `<span style="background:${v.color}"></span>${v.label.toUpperCase()}`;
+  legendEl.appendChild(d);
+});
+
+// Build filter bar
+const filterBar = document.getElementById('filter-bar');
+const allBtn = document.createElement('button');
+allBtn.className = 'fbtn active';
+allBtn.textContent = 'ALL';
+allBtn.style.borderColor = '#c9a227';
+allBtn.style.background = '#c9a227';
+allBtn.style.color = '#1a1a1a';
+allBtn.onclick = () => setFilter(null, allBtn);
+filterBar.appendChild(allBtn);
+
+const filterBtns = {};
+Object.entries(TIERS).forEach(([k,v]) => {
+  const btn = document.createElement('button');
+  btn.className = 'fbtn';
+  btn.textContent = k.toUpperCase();
+  btn.style.borderColor = v.color;
+  btn.style.color = v.color;
+  btn.onclick = () => setFilter(k, btn);
+  filterBar.appendChild(btn);
+  filterBtns[k] = btn;
+});
+
+function setFilter(tier, clickedBtn) {
+  activeFilter = tier;
+  allBtn.classList.remove('active');
+  allBtn.style.background = 'rgba(18,18,18,0.9)';
+  allBtn.style.color = '#aaa';
+  Object.values(filterBtns).forEach(b => {
+    b.classList.remove('active');
+    b.style.background = 'rgba(18,18,18,0.9)';
+  });
+  clickedBtn.classList.add('active');
+  const c = tier ? TIERS[tier].color : '#c9a227';
+  clickedBtn.style.background = c;
+  clickedBtn.style.color = '#1a1a1a';
+}
+
+function nodeAlpha(node) {
+  if (!activeFilter) return 1;
+  return node.tier === activeFilter ? 1 : 0.08;
+}
+function edgeAlpha(na, nb) {
+  if (!activeFilter) return 1;
+  return (na.tier === activeFilter || nb.tier === activeFilter) ? 0.6 : 0.03;
+}
 
 function draw() {
   ctx.clearRect(0, 0, W, H);
   animFrame++;
 
   ctx.save();
-  ctx.translate(W / 2 + pan.x, H / 2 + pan.y);
+  ctx.translate(W/2 + pan.x, H/2 + pan.y);
   ctx.scale(zoom, zoom);
 
-  // Starfield background
-  ctx.save();
-  const starSeed = 42;
-  for (let i = 0; i < 120; i++) {
-    const sx = (((i * 137 + starSeed) % 800) - 400);
-    const sy = (((i * 97 + starSeed * 2) % 600) - 300);
-    const sr = 0.5 + (i % 3) * 0.4;
-    const sa = 0.1 + (i % 5) * 0.06 + 0.03 * Math.sin(animFrame * 0.02 + i);
+  // Starfield
+  for (let i = 0; i < 160; i++) {
+    const sx = ((i * 137 + 42) % 1200) - 600;
+    const sy = ((i * 97 + 84) % 900) - 450;
+    const sa = 0.06 + (i%4)*0.04 + 0.02*Math.sin(animFrame*0.018+i);
     ctx.beginPath();
-    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.arc(sx, sy, 0.5+(i%3)*0.35, 0, Math.PI*2);
     ctx.fillStyle = `rgba(245,240,232,${sa})`;
     ctx.fill();
   }
-  ctx.restore();
 
   // Edges
-  edges.forEach(([a, b]) => {
+  edges.forEach(([a,b]) => {
     const na = getNode(a), nb = getNode(b);
     if (!na || !nb) return;
-    const isHovered = hoveredNode && (hoveredNode.id === a || hoveredNode.id === b);
+    const isHov = hoveredNode && (hoveredNode.id===a || hoveredNode.id===b);
+    const alpha = edgeAlpha(na, nb);
     ctx.beginPath();
     ctx.moveTo(na.x, na.y);
     ctx.lineTo(nb.x, nb.y);
-    ctx.strokeStyle = isHovered ? 'rgba(201,162,39,0.75)' : 'rgba(245,240,232,0.10)';
-    ctx.lineWidth = isHovered ? 1.4 / zoom : 0.7 / zoom;
+    ctx.strokeStyle = isHov ? `rgba(201,162,39,0.85)` : `rgba(245,240,232,${0.09 * alpha})`;
+    ctx.lineWidth = (isHov ? 1.3 : 0.6) / zoom;
     ctx.stroke();
   });
 
   // Nodes
   nodes.forEach(node => {
-    const isHovered = hoveredNode && hoveredNode.id === node.id;
-    const pulse = node.glow ? 0.7 + 0.3 * Math.sin(animFrame * 0.04) : 0;
+    const isHov = hoveredNode && hoveredNode.id === node.id;
+    const alpha = nodeAlpha(node);
+    const pulse = node.glow ? 0.7 + 0.3*Math.sin(animFrame*0.038) : 0;
+    const col = node.color || TIER_COLORS[node.tier];
 
-    if (node.glow) {
-      const grad = ctx.createRadialGradient(node.x, node.y, node.r * 0.5, node.x, node.y, node.r * 3.5);
-      grad.addColorStop(0, `rgba(201,162,39,${0.3 + pulse * 0.12})`);
-      grad.addColorStop(1, 'rgba(201,162,39,0)');
+    if (node.glow && alpha > 0.5) {
+      const g = ctx.createRadialGradient(node.x,node.y,node.r*0.4, node.x,node.y,node.r*4);
+      g.addColorStop(0, `rgba(201,162,39,${(0.28+pulse*0.12)*alpha})`);
+      g.addColorStop(1, 'rgba(201,162,39,0)');
       ctx.beginPath();
-      ctx.arc(node.x, node.y, node.r * 3.5, 0, Math.PI * 2);
-      ctx.fillStyle = grad;
+      ctx.arc(node.x,node.y,node.r*4,0,Math.PI*2);
+      ctx.fillStyle = g;
       ctx.fill();
     }
 
-    if (isHovered) {
-      const grad = ctx.createRadialGradient(node.x, node.y, node.r, node.x, node.y, node.r * 2.8);
-      grad.addColorStop(0, node.color + '55');
-      grad.addColorStop(1, 'rgba(0,0,0,0)');
+    if (isHov && alpha > 0.5) {
+      const g = ctx.createRadialGradient(node.x,node.y,node.r, node.x,node.y,node.r*2.8);
+      g.addColorStop(0, col+'44');
+      g.addColorStop(1,'rgba(0,0,0,0)');
       ctx.beginPath();
-      ctx.arc(node.x, node.y, node.r * 2.8, 0, Math.PI * 2);
-      ctx.fillStyle = grad;
+      ctx.arc(node.x,node.y,node.r*2.8,0,Math.PI*2);
+      ctx.fillStyle=g;
       ctx.fill();
     }
 
+    ctx.globalAlpha = alpha;
     ctx.beginPath();
-    ctx.arc(node.x, node.y, isHovered ? node.r + 2 : node.r, 0, Math.PI * 2);
-    ctx.fillStyle = node.color + (isHovered ? 'ff' : 'cc');
+    ctx.arc(node.x,node.y,isHov?node.r+2:node.r,0,Math.PI*2);
+    ctx.fillStyle = col + (isHov?'ff':'cc');
     ctx.fill();
-    ctx.strokeStyle = isHovered ? '#ffffff' : node.color;
-    ctx.lineWidth = (isHovered ? 1.5 : 0.8) / zoom;
+    ctx.strokeStyle = isHov ? '#ffffff' : col;
+    ctx.lineWidth = (isHov?1.5:0.7)/zoom;
     ctx.stroke();
 
-    const fontSize = node.r > 20 ? 11 : (node.r > 12 ? 9 : 8);
-    ctx.font = `600 ${fontSize}px 'Cinzel', serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = node.r > 20 ? '#1a1a1a' : '#f5f0e8';
-    const label = node.label.length > 12 ? node.label.split(' ')[0] : node.label;
-    ctx.fillText(label, node.x, node.y - (node.sublabel && node.r >= 13 ? 3 : 0));
-
-    if (node.sublabel && node.r >= 13) {
-      ctx.font = `400 7px 'Space Mono', monospace`;
-      ctx.fillStyle = node.r > 20 ? 'rgba(26,26,26,0.7)' : 'rgba(245,240,232,0.65)';
-      ctx.fillText(node.sublabel.substring(0, 18), node.x, node.y + 7);
+    const fs = node.r>22?11:(node.r>12?9:8);
+    const lbl = node.label.length>13 ? node.label.split(/[\/\s]/)[0] : node.label;
+    ctx.font = `600 ${fs}px 'Cinzel', serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = node.r>22 ? '#1a1a1a' : '#f5f0e8';
+    ctx.fillText(lbl, node.x, node.y - (node.sub&&node.r>=12?3:0));
+    if (node.sub && node.r>=12) {
+      ctx.font=`400 7px 'Space Mono',monospace`;
+      ctx.fillStyle = node.r>22?'rgba(26,26,26,0.65)':'rgba(245,240,232,0.6)';
+      ctx.fillText(node.sub.substring(0,20), node.x, node.y+7);
     }
+    ctx.globalAlpha = 1;
   });
 
   ctx.restore();
   requestAnimationFrame(draw);
 }
 
-function getHit(mx, my) {
-  const cx = (mx - W / 2 - pan.x) / zoom;
-  const cy = (my - H / 2 - pan.y) / zoom;
-  return nodes.find(n => Math.hypot(n.x - cx, n.y - cy) < n.r + 8) || null;
+function getHit(mx,my) {
+  const cx=(mx-W/2-pan.x)/zoom, cy=(my-H/2-pan.y)/zoom;
+  return nodes.find(n=>Math.hypot(n.x-cx,n.y-cy)<n.r+8)||null;
 }
 
 canvas.addEventListener('mousemove', e => {
-  const rect = canvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left;
-  const my = e.clientY - rect.top;
-  const hit = getHit(mx, my);
-  hoveredNode = hit;
-  const panel = document.getElementById('info-panel');
+  const rect=canvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  const hit=getHit(mx,my);
+  hoveredNode=hit;
+  const panel=document.getElementById('info-panel');
   if (hit) {
-    document.getElementById('ip-title').textContent = hit.label;
-    document.getElementById('ip-desc').textContent = hit.desc;
-    panel.style.display = 'block';
-    canvas.style.cursor = 'pointer';
+    document.getElementById('ip-title').textContent=hit.label;
+    document.getElementById('ip-cat').style.color=TIER_COLORS[hit.tier];
+    document.getElementById('ip-cat').textContent=TIERS[hit.tier].label;
+    document.getElementById('ip-desc').textContent=hit.desc;
+    panel.style.display='block';
+    canvas.style.cursor='pointer';
   } else {
-    panel.style.display = 'none';
-    canvas.style.cursor = dragging ? 'grabbing' : 'grab';
+    panel.style.display='none';
+    canvas.style.cursor=dragging?'grabbing':'grab';
   }
-  if (dragging && lastMouse) {
-    pan.x += mx - lastMouse.x;
-    pan.y += my - lastMouse.y;
-    lastMouse = { x: mx, y: my };
+  if (dragging&&lastMouse) {
+    pan.x+=mx-lastMouse.x; pan.y+=my-lastMouse.y;
+    lastMouse={x:mx,y:my};
   }
 });
-
-canvas.addEventListener('mousedown', e => {
-  dragging = true;
-  const rect = canvas.getBoundingClientRect();
-  lastMouse = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+canvas.addEventListener('mousedown', e=>{
+  dragging=true;
+  const rect=canvas.getBoundingClientRect();
+  lastMouse={x:e.clientX-rect.left,y:e.clientY-rect.top};
 });
-canvas.addEventListener('mouseup', () => { dragging = false; lastMouse = null; });
-canvas.addEventListener('mouseleave', () => {
-  dragging = false; hoveredNode = null;
-  document.getElementById('info-panel').style.display = 'none';
+canvas.addEventListener('mouseup',()=>{dragging=false;lastMouse=null;});
+canvas.addEventListener('mouseleave',()=>{
+  dragging=false;hoveredNode=null;
+  document.getElementById('info-panel').style.display='none';
 });
-
-canvas.addEventListener('wheel', e => {
+canvas.addEventListener('wheel',e=>{
   e.preventDefault();
-  const rect = canvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left;
-  const my = e.clientY - rect.top;
-  const factor = e.deltaY < 0 ? 1.1 : 0.9;
-  const newZoom = Math.max(0.3, Math.min(4, zoom * factor));
-  pan.x = (pan.x - (mx - W/2)) * (newZoom / zoom) + (mx - W/2);
-  pan.y = (pan.y - (my - H/2)) * (newZoom / zoom) + (my - H/2);
-  zoom = newZoom;
-}, { passive: false });
+  const rect=canvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  const f=e.deltaY<0?1.1:0.9;
+  const nz=Math.max(0.25,Math.min(5,zoom*f));
+  pan.x=(pan.x-(mx-W/2))*(nz/zoom)+(mx-W/2);
+  pan.y=(pan.y-(my-H/2))*(nz/zoom)+(my-H/2);
+  zoom=nz;
+},{passive:false});
 
-let lastTouchDist = null;
-canvas.addEventListener('touchstart', e => {
-  if (e.touches.length === 1) {
-    dragging = true;
-    lastMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  }
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{
+  if(e.touches.length===1){dragging=true;lastMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};}
 });
-canvas.addEventListener('touchmove', e => {
+canvas.addEventListener('touchmove',e=>{
   e.preventDefault();
-  if (e.touches.length === 1 && dragging) {
-    pan.x += e.touches[0].clientX - lastMouse.x;
-    pan.y += e.touches[0].clientY - lastMouse.y;
-    lastMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  } else if (e.touches.length === 2) {
-    const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-    if (lastTouchDist) zoom = Math.max(0.3, Math.min(4, zoom * d / lastTouchDist));
-    lastTouchDist = d;
+  if(e.touches.length===1&&dragging){
+    pan.x+=e.touches[0].clientX-lastMouse.x;
+    pan.y+=e.touches[0].clientY-lastMouse.y;
+    lastMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};
+  } else if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist) zoom=Math.max(0.25,Math.min(5,zoom*d/lastTouchDist));
+    lastTouchDist=d;
   }
-}, { passive: false });
-canvas.addEventListener('touchend', () => { dragging = false; lastTouchDist = null; });
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
 
 draw();
 </script>
