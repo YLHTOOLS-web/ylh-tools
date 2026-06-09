@@ -20,7 +20,7 @@
     --purple-bg: #ede8f5;
     --purple-text: #4a3a7a;
     --gold-bg: #f5edd8;
-    --gold-text: #7a5a10;
+    --gold-text: #5c4308; /* Darkened for enhanced AAA accessibility contrast */
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -93,6 +93,14 @@
     border: 1px solid var(--border);
     border-left: 4px solid var(--ink);
     padding: 18px 20px;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-left-width 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* Tactile focus states for deep reading scans */
+  .rule-card:hover {
+    transform: translateX(4px);
+    border-left-width: 8px;
+    box-shadow: 0 4px 20px rgba(26,26,26,0.04);
   }
 
   .rule-id { font-size: 8px; letter-spacing: 3px; color: var(--mid); margin-bottom: 4px; }
