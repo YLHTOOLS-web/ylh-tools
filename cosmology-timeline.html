@@ -116,3 +116,639 @@
     left: 50%;
     top: 0;
     bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom,
+      var(--ice) 0%,
+      var(--deep-memory) 20%,
+      var(--oral) 40%,
+      var(--ane) 55%,
+      var(--hebrew) 65%,
+      var(--exile) 75%,
+      var(--hellenistic) 82%,
+      var(--imperial) 90%,
+      var(--modern) 100%
+    );
+    transform: translateX(-50%);
+    opacity: 0.4;
+  }
+
+  .era {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 2rem;
+    position: relative;
+    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .era:nth-child(even) { justify-content: flex-end; }
+  .era:nth-child(odd) { justify-content: flex-start; }
+
+  .era-content {
+    width: 45%;
+    padding: 1.5rem;
+    border-radius: 6px;
+    position: relative;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(232,224,208,0.05);
+    backdrop-filter: blur(4px);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+  }
+
+  .era:nth-child(odd) .era-content {
+    text-align: right;
+    border-right: 3px solid transparent;
+  }
+
+  .era:nth-child(even) .era-content {
+    text-align: left;
+    border-left: 3px solid transparent;
+  }
+
+  .era-content:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .dot {
+    position: absolute;
+    left: 50%;
+    top: 2rem;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    z-index: 2;
+    transition: transform 0.3s ease;
+  }
+
+  .era-content:hover ~ .dot {
+    transform: translateX(-50%) scale(1.3);
+  }
+
+  .date {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+    opacity: 0.9;
+  }
+
+  .era-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(0.85rem, 2.2vw, 1.1rem);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    line-height: 1.4;
+  }
+
+  .era-body {
+    font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+    line-height: 1.7;
+    color: rgba(232,224,208,0.75);
+    font-weight: 300;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    margin-bottom: 0.6rem;
+    font-weight: 700;
+  }
+
+  .ice-age { border-color: var(--ice) !important; }
+  .ice-age .era-title, .ice-age .date { color: var(--ice); }
+  .ice-age + .dot { background: var(--ice); box-shadow: 0 0 15px var(--ice); }
+  .ice-age .tag { background: rgba(168,216,234,0.15); color: var(--ice); }
+
+  .melt { border-color: var(--glacial) !important; }
+  .melt .era-title, .melt .date { color: var(--glacial); }
+  .melt + .dot { background: var(--glacial); box-shadow: 0 0 15px var(--glacial); }
+  .melt .tag { background: rgba(126,200,200,0.15); color: var(--glacial); }
+
+  .deep-mem { border-color: var(--deep-memory) !important; }
+  .deep-mem .era-title, .deep-mem .date { color: #5aafd4; }
+  .deep-mem + .dot { background: var(--deep-memory); box-shadow: 0 0 15px var(--deep-memory); }
+  .deep-mem .tag { background: rgba(45,106,138,0.25); color: #5aafd4; }
+
+  .oral-t { border-color: var(--oral) !important; }
+  .oral-t .era-title, .oral-t .date { color: #e8a84a; }
+  .oral-t + .dot { background: var(--oral); box-shadow: 0 0 15px var(--oral); }
+  .oral-t .tag { background: rgba(193,127,36,0.15); color: #e8a84a; }
+
+  .ane-t { border-color: var(--ane) !important; }
+  .ane-t .era-title, .ane-t .date { color: #c47070; }
+  .ane-t + .dot { background: var(--ane); box-shadow: 0 0 15px var(--ane); }
+  .ane-t .tag { background: rgba(139,58,58,0.15); color: #c47070; }
+
+  .hebrew-t { border-color: var(--hebrew) !important; }
+  .hebrew-t .era-title, .hebrew-t .date { color: #7abf94; }
+  .hebrew-t + .dot { background: var(--hebrew); box-shadow: 0 0 15px var(--hebrew); }
+  .hebrew-t .tag { background: rgba(74,124,89,0.15); color: #7abf94; }
+
+  .exile-t { border-color: var(--exile) !important; }
+  .exile-t .era-title, .exile-t .date { color: #a880d4; }
+  .exile-t + .dot { background: var(--exile); box-shadow: 0 0 15px var(--exile); }
+  .exile-t .tag { background: rgba(107,76,138,0.15); color: #a880d4; }
+
+  .hellen-t { border-color: var(--hellenistic) !important; }
+  .hellen-t .era-title, .hellen-t .date { color: #d4b060; }
+  .hellen-t + .dot { background: var(--hellenistic); box-shadow: 0 0 15px var(--hellenistic); }
+  .hellen-t .tag { background: rgba(138,106,42,0.15); color: #d4b060; }
+
+  .imperial-t { border-color: var(--imperial) !important; }
+  .imperial-t .era-title, .imperial-t .date { color: #d4826a; }
+  .imperial-t + .dot { background: var(--imperial); box-shadow: 0 0 15px var(--imperial); }
+  .imperial-t .tag { background: rgba(122,58,42,0.15); color: #d4826a; }
+
+  .modern-t { border-color: var(--modern) !important; }
+  .modern-t .era-title, .modern-t .date { color: #aaaaaa; }
+  .modern-t + .dot { background: var(--modern); box-shadow: 0 0 15px #666; }
+  .modern-t .tag { background: rgba(58,58,58,0.25); color: #aaaaaa; }
+
+  .footnote {
+    max-width: 760px;
+    margin: 4rem auto;
+    padding: 2rem 1.5rem;
+    border-top: 1px solid rgba(168,216,234,0.15);
+    text-align: center;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: rgba(232,224,208,0.4);
+    line-height: 1.8;
+  }
+
+  .footnote em {
+    display: block;
+    margin-top: 1rem;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--oral);
+    font-style: normal;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ■■ COMPACT EXPLAINER MODAL ARCHITECTURE ■■ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 8, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .modal-content {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-subtle);
+    border-top: 4px solid var(--ice);
+    max-width: 780px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 2.5rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    position: relative;
+    border-radius: 4px;
+    text-align: left;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: rgba(232,224,208,0.4);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .close-btn:hover { color: var(--ice); }
+
+  .brief-header { margin-bottom: 1.5rem; }
+  
+  .brief-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--oral);
+    margin-bottom: 0.5rem;
+  }
+
+  .brief-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .brief-subtitle {
+    font-size: 1rem;
+    color: rgba(232,224,208,0.5);
+    font-style: italic;
+    margin-top: 0.25rem;
+  }
+
+  .brief-author {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    color: rgba(232,224,208,0.4);
+    margin-top: 0.5rem;
+  }
+
+  .brief-divider {
+    border: 0;
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 1.5rem 0;
+  }
+
+  .brief-body h3 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
+    margin: 2rem 0 1rem;
+    color: var(--ice);
+    border-left: 2px solid var(--oral);
+    padding-left: 10px;
+  }
+
+  .brief-body p {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: rgba(232,224,208,0.8);
+    margin-bottom: 1.25rem;
+    font-weight: 300;
+  }
+
+  .brief-card {
+    background: rgba(255,255,255,0.01);
+    border: 1px solid rgba(232,224,208,0.03);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    position: relative;
+    border-radius: 4px;
+  }
+
+  .brief-card h4 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .brief-card p { font-size: 0.9rem; margin-bottom: 0; line-height: 1.6; }
+
+  .brief-card .b-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: rgba(232,224,208,0.4);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  /* Layer Card Theme Bindings */
+  .bc-ice { border-left: 3px solid var(--ice); } .bc-ice h4 { color: var(--ice); }
+  .bc-melt { border-left: 3px solid var(--glacial); } .bc-melt h4 { color: var(--glacial); }
+  .bc-deep { border-left: 3px solid var(--deep-memory); } .bc-deep h4 { color: #5aafd4; }
+  .bc-oral { border-left: 3px solid var(--oral); } .bc-oral h4 { color: #e8a84a; }
+  .bc-ane { border-left: 3px solid var(--ane); } .bc-ane h4 { color: #c47070; }
+  .bc-heb { border-left: 3px solid var(--hebrew); } .bc-heb h4 { color: #7abf94; }
+  .bc-exi { border-left: 3px solid var(--exile); } .bc-exi h4 { color: #a880d4; }
+  .bc-hel { border-left: 3px solid var(--hellenistic); } .bc-hel h4 { color: #d4b060; }
+  .bc-imp { border-left: 3px solid var(--imperial); } .bc-imp h4 { color: #d4826a; }
+
+  .brief-methodology {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--oral);
+    padding: 1.5rem;
+    margin: 2rem 0;
+    border-radius: 4px;
+  }
+
+  .b-panel-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: rgba(232,224,208,0.5);
+    margin-bottom: 0.75rem;
+  }
+
+  .brief-methodology ul { list-style: none; padding-left: 0; }
+  
+  .brief-methodology li {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+    position: relative;
+    padding-left: 1.25rem;
+    color: rgba(232,224,208,0.75);
+  }
+
+  .brief-methodology li::before {
+    content: "▪";
+    position: absolute;
+    left: 0;
+    color: var(--oral);
+    font-size: 0.7rem;
+    top: 2px;
+  }
+
+  .brief-footer {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: rgba(232,224,208,0.3);
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  @media (max-width: 768px) {
+    .spine { left: 16px; transform: none; }
+    .era { justify-content: flex-end !important; padding-left: 40px; margin-bottom: 1.5rem; }
+    .era-content { width: 100% !important; text-align: left !important; }
+    .era:nth-child(odd) .era-content { border-right: none; border-left: 3px solid transparent; }
+    .dot { left: 16px; top: 2.2rem; transform: translateX(-50%); }
+    .era-content:hover ~ .dot { transform: translateX(-50%) scale(1.2); }
+    .modal-content { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1>The Cosmological Deep Timeline</h1>
+  <p class="subtitle">From Ice Age Memory to Modern Misreading</p>
+</header>
+
+<div class="trigger-container">
+  <button class="explainer-btn" onclick="toggleTimelineExplainer()">
+    [EXE] READ DEEP TIMELINE EXPLAINER
+  </button>
+</div>
+
+<div class="depth-label">↓ descending into deep time ↓</div>
+
+<main class="timeline">
+  <div class="spine"></div>
+
+  <section class="era">
+    <article class="era-content ice-age">
+      <span class="tag">Ice Age</span>
+      <time class="date">~115,000 – 11,700 BCE</time>
+      <h2 class="era-title">The Glacial World</h2>
+      <p class="era-body">Sea levels 400 feet lower. Coastlines unrecognizable. Megafauna. Human communities calibrated to a planet that no longer exists. The original stable world — before the trauma sequence begins.</p>
+    </article>
+    <div class="dot"></div>
+  </section>
+
+  <section class="era">
+    <article class="era-content melt">
+      <span class="tag">Catastrophe</span>
+      <time class="date">~12,000 – 6,000 BCE</time>
+      <h2 class="era-title">The Great Melt & Floods</h2>
+      <p class="era-body">Ice sheets collapse. Persian Gulf fills from dry land. Black Sea breaches — 50 cubic km of water per day for 300+ days. Doggerland swallowed. Coastlines move hundreds of miles. Entire inhabited worlds go underwater. Floods come up AND come down simultaneously. This is the original trauma event.</p>
+    </article>
+    <div class="dot"></div>
+  </section>
+
+  <section class="era">
+    <article class="era-content deep-mem">
+      <span class="tag">Deep Memory</span>
+      <time class="date">~10,000 – 4,000 BCE</time>
+      <h2 class="era-title">Tehom. Tohu Vavohu. The Deep.</h2>
+      <p class="era-body">Survivors encode catastrophic water memory into cosmology. Two oceans — above and below. Earth suspended between them on pillars. The pre-creation state is the flood state. The cosmic architecture is built to explain what they watched happen to their world. This is not mythology. This is geological event memory.</p>
+    </article>
+    <div class="dot"></div>
+  </section>
+
+  <section class="era">
+    <article class="era-content oral-t">
+      <span class="tag">Oral Transmission</span>
+      <time class="date">~8,000 – 1,000 BCE</time>
+      <h2 class="era-title">~400 Generations of Memory</h2>
+      <p class="era-body">No writing. The human body is the storage technology. Story, ritual, song, repeated exactly. Ice age trauma compressed into cosmological syntax and carried forward through hundreds of generations before a single word is written down. The tehom, the raqia, the layered earth — all traveling orally through time.</p>
+    </article>
+    <div class="dot"></div>
+  </section>
+
+  <section class="era">
+    <article class="era-content ane-t">
+      <span class="tag">ANE Cosmology</span>
+      <time class="date">~3,500 – 1,200 BCE</time>
+      <h2 class="era-title">The Kingship Cosmology Emerges</h2>
+      <p class="era-body">Sumer. Akkad. Babylon. Egypt. The cosmos is a kingdom with a divine council, vassal treaties, tribute systems, and territorial claims. The storm deity rides clouds and hurls lightning. Rain is governance. Drought is political decision. Marduk defeats Tiamat. Baal thunders over Lebanon. The flood memory gets organized into a cosmic political architecture.</p>
+    </article>
+    <div class="dot"></div>
+  </section>
+
+  <section class="era">
+    <article class="era-content hebrew-t">
+      <span class="tag">Early Yahwism</span>
+      <time class="date">~1,200 – 900 BCE</time>
+      <h2 class="era-title">YHWH Enters the Divine Council</h2>
+      <p class="era-body">YHWH rises within the Canaanite pantheon. Psalm 29 is a Baal hymn with the name changed. The elim (divine council) are real. The land is a morally sensitive organism. Covenant is a suzerainty treaty. Thunder is qol — kinetic force. The cosmological architecture is fully ANE. This is henotheism not monotheism.</p>
+    </article>
+    <div class="dot"></div>
+  </section>
+
+  <section class="era">
+    <article class="era-content exile-t">
+      <span class="tag">Babylonian Exile</span>
+      <time class="date">~586 – 539 BCE</time>
+      <h2 class="era-title">Metaphysical Rupture</h2>
+      <p class="era-body">Jerusalem destroyed. Temple gone. King deported. Land lost. The entire land-based, temple-based cosmology collapses. The trauma sequence runs at maximum force. The Priestly tradition responds by making YHWH portable — Torah replaces temple, Sabbath replaces land. YHWH becomes universal not from theological evolution but from survival necessity. The texts get written down and edited here.</p>
+    </article>
+    <div class="dot"></div>
+  </section>
+
+  <section class="era">
+    <article class="era-content hellen-t">
+      <span class="tag">The Substitution Event</span>
+      <time class="date">~330 – 100 BCE</time>
+      <h2 class="era-title">Greek Metaphysics Captures Hebrew Syntax</h2>
+      <p class="era-body">Alexander's conquests. The Septuagint translation. Qol (thunder/force) becomes Logos (rational principle). Kavod (physical weight) becomes abstract glory. Tehom loses its cosmological terror. The dabar→Logos swap happens. Hebrew covenantal categories get refilled with Greek ontological content. The text now says Greek things in Hebrew words.</p>
+    </article>
+    <div class="dot"></div>
+  </section>
+
+  <section class="era">
+    <article class="era-content imperial-t">
+      <span class="tag">Roman Imperial Christianity</span>
+      <time class="date">~325 – 600 CE</time>
+      <h2 class="era-title">The Nicene Consolidation</h2>
+      <p class="era-body">Constantine. The Council of Nicaea. Greek substance metaphysics fused with Hebrew covenant religion inside Roman imperial administration. The divine council becomes heresy. The land's moral agency disappears. Absolute property rights replace covenant land tenure. The layered cosmology becomes allegory. The trauma memory is spiritualized into personal salvation narrative.</p>
+    </article>
+    <div class="dot"></div>
+  </section>
+
+  <section class="era">
+    <article class="era-content modern-t">
+      <span class="tag">The Current Moment</span>
+      <time class="date">Present</time>
+      <h2 class="era-title">Reading Ice Age Memory as Self-Help</h2>
+      <p class="era-body">People carry texts encoding 12,000 years of cosmological memory — ice age floods, ANE kingship systems, oral tradition across 400 generations — and read them for personal therapeutic benefit. The category error is not small. The cosmological syntax has been severed from its architecture. The political theology has been privatized. The land's moral agency has been erased.</p>
+    </article>
+    <div class="dot"></div>
+  </section>
+</main>
+
+<footer class="footnote">
+  The texts were not written for you personally.<br>
+  They were written by communities surviving geological catastrophe,<br>
+  imperial capture, exile, and metaphysical rupture —<br>
+  encoding survival data in the only storage technology available:<br>
+  the human body, carrying it forward through 400 generations before ink touched clay.
+  <em>Yahwist Liberation Hermeneutic — Consequence-First Analysis</em>
+</footer>
+
+<div id="explainerModal" class="modal-overlay" onclick="closeExplainerOnOverlay(event)">
+  <div class="modal-content">
+    <button class="close-btn" onclick="toggleTimelineExplainer()">[×] CLOSE ARCHIVE</button>
+    
+    <div class="brief-header">
+      <div class="brief-meta">YLH ANALYSIS INFRASTRUCTURE · STRUCTURAL PAYLOAD · CC BY 4.0</div>
+      <h2 class="brief-title">The Cosmological Deep Timeline</h2>
+      <div class="brief-subtitle">A Short Explainer</div>
+      <div class="brief-author">Brandy Mitchell | YLH</div>
+    </div>
+
+    <hr class="brief-divider">
+
+    <div class="brief-body">
+      <h3>What This Timeline Is</h3>
+      <p>Most people reading the Bible assume they are engaging a religious text produced in the ancient Near East roughly 2,000 to 3,000 years ago. That is partially true. But it misses the deeper problem.</p>
+      <p>The cosmological framework embedded in the Hebrew Bible — the layered earth, the waters above and below, the dome of the sky, the morally sensitive land, the divine council — is not an Iron Age invention. It encodes memory that is significantly older. This timeline maps how old that memory actually is, and what happened to it along the way.</p>
+
+      <h3>The Layers, In Plain Language</h3>
+      
+      <div class="brief-card bc-ice">
+        <span class="b-date">115,000 – 11,700 BCE</span>
+        <h4>The Ice Age</h4>
+        <p>Human communities spent tens of thousands of years calibrated to a glacial world. Different coastlines. Different animals. A planet that no longer exists. This is the original stable world before the catastrophe sequence begins.</p>
+      </div>
+
+      <div class="brief-card bc-melt">
+        <span class="b-date">12,000 – 6,000 BCE</span>
+        <h4>The Great Melt and Floods</h4>
+        <p>This is verified geology. As the last ice age ended, sea levels rose approximately 400 feet globally over several thousand years. Entire inhabited regions went underwater — the Persian Gulf basin, the Black Sea lowlands, Doggerland in the North Sea. These were not small weather events. They were catastrophic, generational, world-ending from the perspective of the communities living through them. Floods came up from the ground and down from the sky simultaneously, exactly as the Hebrew cosmology describes.</p>
+      </div>
+
+      <div class="brief-card bc-deep">
+        <span class="b-date">10,000 – 4,000 BCE</span>
+        <h4>Deep Memory Encoded in Cosmology</h4>
+        <p>Communities surviving these events encoded what they experienced into cosmological frameworks. The <em>tehom</em> — the primordial deep — is the subterranean ocean. The <em>raqia</em> — the dome — holds back the upper ocean. The earth floats on pillars between two bodies of water. This is not primitive mythology. It is careful structural modeling of a world that demonstrably flooded from above and below. The flood narrative in Genesis is not heavy rain. It is cosmological architecture failing — both oceans releasing simultaneously.</p>
+      </div>
+
+      <div class="brief-card bc-oral">
+        <span class="b-date">8,000 – 1,000 BCE</span>
+        <h4>Oral Transmission</h4>
+        <p>Before writing, the human body was the storage technology. These cosmological frameworks traveled through story, ritual, and song across hundreds of generations before anyone wrote them down. The material in the Hebrew Bible is significantly older than the manuscripts that contain it. This is a working hypothesis supported by comparative oral tradition studies, not a proven fact — but it is a serious scholarly position.</p>
+      </div>
+
+      <div class="brief-card bc-ane">
+        <span class="b-date">3,500 – 1,200 BCE</span>
+        <h4>ANE Kingship Cosmology</h4>
+        <p>By the time Mesopotamian civilization develops writing, the flood memory has been organized into a full political cosmology. The cosmos is a kingdom. The deity is a storm king who governs through rain, drought, thunder, and lightning. Covenant is a suzerainty treaty. The divine council is real. The Baal cycle at Ugarit and the Babylonian Enuma Elish both operate inside this framework. This is the world Yahwism emerges from — not separate from it.</p>
+      </div>
+
+      <div class="brief-card bc-heb">
+        <span class="b-date">1,200 – 900 BCE</span>
+        <h4>Early Yahwism</h4>
+        <p>YHWH enters the tradition as a member of the Canaanite divine council, rising to supremacy through what Psalm 82 records as a divine council judgment. Psalm 29 is, by near-scholarly consensus, a Baal thunderstorm hymn with YHWH substituted for Baal. The Hebrew word <em>qol</em> means thunder and kinetic force — not rational speech. The land is a morally sensitive organism that accumulates debt and expels its inhabitants when the covenant fails. This is henotheism — YHWH as highest among many — not monotheism.</p>
+      </div>
+
+      <div class="brief-card bc-exi">
+        <span class="b-date">586 – 539 BCE</span>
+        <h4>Babylonian Exile</h4>
+        <p>Jerusalem is destroyed. The temple is gone. The king is deported. The entire land-based, temple-based, kinship-based cosmology collapses. This is the trauma sequence running at full force. The Priestly tradition responds by producing a portable religion — Torah replaces temple, Sabbath replaces land, purity codes replace geographic holiness. Most scholars believe the major editorial work on the Hebrew Bible happens here. The texts as we have them are significantly shaped by this crisis.</p>
+      </div>
+
+      <div class="brief-card bc-hel">
+        <span class="b-date">330 – 100 BCE</span>
+        <h4>The Greek Substitution</h4>
+        <p>This is where the most consequential damage happens. Greek metaphysics — through Alexander's conquests and then the Septuagint translation — gets layered over Hebrew cosmological categories. <em>Qol</em> (thunder, force) gets read through <em>Logos</em> (rational principle). <em>Kavod</em> (physical weight, presence) becomes abstract glory. <em>Tehom</em> loses its terror. The Hebrew words remain but they get refilled with Greek ontological content. John 1:1 — "In the beginning was the Logos" — is not a translation of Hebrew thought. It is a Greek philosophical rewrite of Genesis 1 using Stoic vocabulary. That move shapes everything that comes after.</p>
+      </div>
+
+      <div class="brief-card bc-imp">
+        <span class="b-date">325 – 600 CE</span>
+        <h4>Roman Imperial Christianity</h4>
+        <p>The Council of Nicaea fuses Greek substance metaphysics with Hebrew covenant religion inside Roman imperial administration. The divine council becomes heresy. Absolute property rights replace covenant land tenure. The layered cosmology becomes allegory. The morally sensitive land disappears. Personal salvation replaces covenantal community obligation. The political theology of a displaced minority community gets converted into the official religion of an empire — which requires stripping out everything that made it dangerous to power.</p>
+      </div>
+
+      <h3>The Present</h3>
+      <p>People read texts encoding 12,000 years of cosmological memory and treat them as personal therapeutic literature or devotional guides to individual spiritual experience. The category error is significant. Without understanding the ANE kingship system, the layered cosmology, the covenant as suzerainty treaty, and the ice age memory compressed into the Genesis framework — the reader cannot see what the text is actually doing.</p>
+
+      <div class="brief-methodology">
+        <div class="b-panel-title">// VERIFIED SCHOLARSHIP (ENACTED DATA)</div>
+        <ul>
+          <li>The post-glacial sea level rise and specific flood events (Black Sea, Persian Gulf, Doggerland)</li>
+          <li>The Ugaritic connections to Psalm 29 (Frank Moore Cross, H.L. Ginsberg, near-consensus)</li>
+          <li>The ANE suzerainty treaty structure of Deuteronomy</li>
+          <li>The Babylonian exile as the major editorial moment for the Hebrew Bible</li>
+          <li>The Septuagint as a Hellenistic translation event that introduces Greek categories</li>
+          <li>The Nicene Council and its imperial context</li>
+        </ul>
+
+        <div class="b-panel-title" style="margin-top:1.5rem;">// INTERPRETIVE FRAMEWORK</div>
+        <ul>
+          <li>The direct causal link between ice age floods and specific Hebrew cosmological features is a compelling hypothesis, not settled consensus</li>
+          <li>The oral transmission timeline is approximate</li>
+          <li>The 400 generations figure is a rough calculation, not a precise count</li>
+        </ul>
+      </div>
+
+      <h3>The Analytical Method</h3>
+      <p>This timeline applies the Yahwist Liberation Hermeneutic — reading the text by consequence, not by canonical authority. The question is not what the text means in isolation but what kind of world produced it, what problem it was solving for the community that produced it, and what happens when the cosmological substrate gets substituted without acknowledgment.</p>
+      <p>The texts were not written for therapeutic self-help. They were written by communities surviving geological catastrophe, imperial capture, exile, and metaphysical rupture — encoding survival data in the only storage technology available: the human body, carrying memory forward across generations before ink touched clay.</p>
+    </div>
+    
+    <div class="brief-footer">
+      YLH COMPONENT ARCHITECTURE · DEEP TIMELINE PROTOCOL · END DATA
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleTimelineExplainer() {
+    const modal = document.getElementById('explainerModal');
+    const isVisible = modal.style.display === 'flex';
+    
+    if (isVisible) {
+      modal.style.display = 'none';
+      document.body.style.overflow = ''; // Unlocks body track scrolling
+    } else {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden'; // Locks body timeline slider
+    }
+  }
+
+  function closeExplainerOnOverlay(event) {
+    if (event.target.id === 'explainerModal') {
+      toggleTimelineExplainer();
+    }
+  }
+</script>
+
+</body>
+</html>
