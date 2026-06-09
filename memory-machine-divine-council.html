@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Machine · The Divine Council · YLH Tools</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&family=Space+Mono:wght@400;700&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f5f0e8;font-family:'IM Fell English',serif;color:#1a1a1a;min-height:100vh;padding:2rem 1rem}
+.mm-shell{max-width:720px;margin:0 auto}
+.mm-header{margin-bottom:1.5rem;border-bottom:1px solid #1a1a1a;padding-bottom:1rem}
+.mm-title{font-family:'Cinzel',serif;font-size:26px;font-weight:600;color:#1a1a1a;letter-spacing:0.04em;margin-bottom:4px}
+.mm-subtitle{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#888;margin-bottom:12px}
+.mm-question{font-family:'IM Fell English',serif;font-size:15px;color:#444;font-style:italic}
+.trace-nav{display:flex;gap:0;margin-bottom:1.5rem;border:1px solid #1a1a1a;overflow:hidden}
+.trace-btn{flex:1;padding:8px 4px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.06em;text-transform:uppercase;background:transparent;border:none;border-right:1px solid #1a1a1a;cursor:pointer;color:#888;transition:all 0.2s}
+.trace-btn:last-child{border-right:none}
+.trace-btn.active{background:#1a1a1a;color:#f5f0e8}
+.trace-btn.active .btn-num{color:#c9a227}
+.btn-num{display:block;font-size:11px;font-weight:700;color:#c9a227;margin-bottom:2px}
+.layer-display{background:#f5f0e8;border:1px solid #1a1a1a;padding:1.75rem}
+.layer-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:#c9a227;margin-bottom:8px}
+.layer-title{font-family:'Cinzel',serif;font-size:20px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.layer-era{font-family:'Space Mono',monospace;font-size:10px;color:#888;margin-bottom:16px}
+.layer-body{font-family:'IM Fell English',serif;font-size:15px;line-height:1.75;color:#2a2a2a;margin-bottom:0.85rem}
+.evidence-block{border-left:2px solid #c9a227;padding:10px 14px;margin:12px 0;background:rgba(201,162,39,0.06)}
+.evidence-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#c9a227;margin-bottom:4px}
+.evidence-text{font-family:'IM Fell English',serif;font-size:13px;font-style:italic;color:#444;line-height:1.6}
+.pressure-section{margin-top:1.25rem}
+.pressure-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#888;margin-bottom:8px}
+.pressure-items{display:flex;flex-wrap:wrap;gap:6px}
+.pressure-chip{font-family:'Space Mono',monospace;font-size:9px;padding:4px 10px;border:1px solid;letter-spacing:0.06em;text-transform:uppercase}
+.chip-empire{border-color:#a03030;color:#a03030;background:rgba(160,48,48,0.06)}
+.chip-erase{border-color:#555;color:#555;background:rgba(85,85,85,0.06)}
+.chip-preserve{border-color:#2a6e4e;color:#2a6e4e;background:rgba(42,110,78,0.06)}
+.chip-transmit{border-color:#1a5e8a;color:#1a5e8a;background:rgba(26,94,138,0.06)}
+.chip-mutate{border-color:#7a5abf;color:#7a5abf;background:rgba(122,90,191,0.06)}
+.chip-recover{border-color:#c9a227;color:#c9a227;background:rgba(201,162,39,0.08)}
+.survival-bar-wrap{margin-top:1.25rem}
+.survival-bar-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#888;margin-bottom:6px;display:flex;justify-content:space-between}
+.survival-track{height:6px;background:#e8e8e8;border:1px solid #1a1a1a;position:relative}
+.survival-fill{height:100%;background:#c9a227;transition:width 0.6s ease}
+.artifact-strip{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.artifact-tag{font-family:'Space Mono',monospace;font-size:9px;padding:3px 8px;border:1px solid;letter-spacing:0.06em;text-transform:uppercase}
+.artifact-tag.survives{border-color:#2a6e4e;color:#2a6e4e;background:rgba(42,110,78,0.06)}
+.artifact-tag.lost{border-color:#a03030;color:#a03030;background:rgba(160,48,48,0.06);text-decoration:line-through}
+.artifact-tag.transformed{border-color:#7a5abf;color:#7a5abf;background:rgba(122,90,191,0.06)}
+.artifact-tag.recovered{border-color:#c9a227;color:#c9a227;background:rgba(201,162,39,0.08)}
+.layer-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(26,26,26,0.15)}
+.nav-btn{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;background:transparent;border:1px solid #1a1a1a;padding:8px 16px;cursor:pointer;color:#1a1a1a;transition:all 0.2s}
+.nav-btn:hover{background:#1a1a1a;color:#f5f0e8}
+.nav-btn:disabled{opacity:0.25;cursor:default}
+.nav-btn:disabled:hover{background:transparent;color:#1a1a1a}
+.step-indicator{font-family:'Space Mono',monospace;font-size:10px;color:#888;letter-spacing:0.1em}
+.mm-footer{margin-top:1rem;padding-top:0.75rem;border-top:1px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.footer-credit{font-family:'Space Mono',monospace;font-size:9px;color:#888;letter-spacing:0.06em}
+.footer-note{font-family:'IM Fell English',serif;font-size:12px;font-style:italic;color:#888}
+@media(max-width:600px){
+  .trace-btn{font-size:8px;padding:6px 2px}
+  .btn-num{font-size:10px}
+  .mm-title{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div class="mm-shell">
+
+<div class="mm-header">
+  <div class="mm-subtitle">Memory Machine · Trace 01</div>
+  <div class="mm-title">The Divine Council</div>
+  <div class="mm-question">How does a memory survive when the empire needs it to disappear?</div>
+</div>
+
+<div class="trace-nav" id="traceNav">
+  <button class="trace-btn active" onclick="goTo(0)"><span class="btn-num">01</span>Origin</button>
+  <button class="trace-btn" onclick="goTo(1)"><span class="btn-num">02</span>Transmission</button>
+  <button class="trace-btn" onclick="goTo(2)"><span class="btn-num">03</span>Pressure</button>
+  <button class="trace-btn" onclick="goTo(3)"><span class="btn-num">04</span>Survival</button>
+  <button class="trace-btn" onclick="goTo(4)"><span class="btn-num">05</span>Mutation</button>
+  <button class="trace-btn" onclick="goTo(5)"><span class="btn-num">06</span>Reuse</button>
+</div>
+
+<div class="layer-display" id="layerDisplay"></div>
+
+<div class="mm-footer">
+  <div class="footer-credit">Brandy Mitchell · YLH · CC BY 4.0</div>
+  <div class="footer-note">Anthropology births epistemology</div>
+</div>
+
+</div>
+
+<script>
+const layers = [
+  {
+    label: "Origin Layer",
+    title: "El presides over the assembly of gods",
+    era: "Bronze Age ANE · c. 2000–1200 BCE",
+    body: `Before YHWH, there was El. And before El stood alone, he sat at the head of a council.\n\nAcross the ancient Near East — Ugarit, Babylon, Assyria — the cosmos was governed not by a single deity but by a divine assembly. El, the high god of the Canaanite pantheon, presided over a council of seventy divine sons. Decisions about the fate of nations, weather, warfare, and fertility were made collectively. The gods deliberated. The gods disagreed. The gods acted.\n\nThis was not metaphor. This was cosmology — a description of how power actually worked in the universe. The heavenly court mirrored the earthly court. Kings ruled because the divine assembly authorized it. The cosmos was a bureaucracy with a throne at the top.\n\nIsrael emerged from inside this world.`,
+    evidence: [
+      { label: "Ugaritic Texts (c. 1400–1200 BCE)", text: "The assembly of El's divine sons, the ʿdt ʾil, appears throughout the Baal Cycle — a council of divine beings beneath El presiding over cosmic order." },
+      { label: "Deut 32:8–9 (likely oldest stratum)", text: "'When the Most High gave the nations their inheritance... he set up boundaries for the peoples according to the number of the sons of God [bene elohim]. For YHWH's portion is his people...' — YHWH receives Israel as one deity among a pantheon." }
+    ],
+    pressure: [
+      { type: "transmit", label: "Oral kinship memory" },
+      { type: "transmit", label: "Priestly liturgy" },
+      { type: "transmit", label: "Royal court tradition" }
+    ],
+    artifacts: [
+      { text: "Ugaritic Baal Cycle", status: "survives" },
+      { text: "El enthroned imagery", status: "survives" },
+      { text: "Names of council members", status: "lost" },
+      { text: "Assembly ritual texts", status: "lost" }
+    ],
+    survivalPct: 90,
+    survivalLabel: "Memory intact"
+  },
+  {
+    label: "Transmission Layer",
+    title: "YHWH enters the council — and then chairs it",
+    era: "Iron Age Israel · c. 1200–600 BCE",
+    body: `Something decisive happened in the transition from Canaanite to Israelite religion: YHWH did not replace El — YHWH absorbed El. El's titles (El Elyon, El Shaddai), El's council, El's cosmic role — all of it was transferred to YHWH.\n\nBut the council remained. The divine assembly survived this transition because it was structurally necessary. You cannot have a king without a court. You cannot have cosmic governance without deliberation. The memory of the council did not disappear — it was rehoused.\n\nThis is how Israel carried the older cosmology forward: not by erasing it, but by placing YHWH at its head. The "sons of God" became YHWH's court. The divine assembly became YHWH's audience. The council was preserved — but its political meaning was being quietly renegotiated.\n\nThe older polycentric structure was slowly becoming a monarchy.`,
+    evidence: [
+      { label: "Psalm 82:1", text: "'God [Elohim] presides in the great assembly; he renders judgment among the gods [elohim].' — YHWH is the judge of the divine council, not yet its only member." },
+      { label: "1 Kings 22:19–23", text: "The prophet Micaiah sees YHWH enthroned with the host of heaven standing on his right and left — a fully operational divine court deliberating about Ahab's fate." }
+    ],
+    pressure: [
+      { type: "preserve", label: "Prophetic vision literature" },
+      { type: "transmit", label: "Temple liturgy" },
+      { type: "empire", label: "Assyrian imperial pressure" },
+      { type: "erase", label: "Yahweh-alone movement" }
+    ],
+    artifacts: [
+      { text: "Divine assembly scenes (Ps 82, 1 Kings 22)", status: "survives" },
+      { text: "YHWH as council judge", status: "survives" },
+      { text: "Named divine council members", status: "lost" },
+      { text: "Autonomy of council members", status: "lost" }
+    ],
+    survivalPct: 65,
+    survivalLabel: "Memory transformed"
+  },
+  {
+    label: "Pressure Layer",
+    title: "The exile creates a crisis — and a solution",
+    era: "Babylonian Exile & Return · c. 597–400 BCE",
+    body: `Babylon destroyed the temple. Babylon ended the monarchy. Babylon took the people. And in doing so, Babylon created the conditions for a theological revolution.\n\nIf YHWH was the god of Israel's land and temple, what did it mean that Babylon's gods had apparently won? The answer came from the Priestly writers and Deutero-Isaiah: YHWH was not defeated because YHWH was never merely local. YHWH was the creator of heaven and earth. YHWH was the only god. The other gods were not defeated rivals — they were nothing at all.\n\nThis is the moment that the divine council becomes dangerous. A council implies peers. Peers imply limits on YHWH's sovereignty. The exile demanded absolute sovereignty — because absolute sovereignty was the only theological answer to imperial defeat.\n\nThe council did not disappear. But it was being aggressively demoted. The "sons of God" were becoming angels. The divine assembly was becoming a messenger service. The memory was being transformed under imperial pressure.`,
+    evidence: [
+      { label: "Isaiah 40:25–26", text: "'To whom will you compare me? Or who is my equal? says the Holy One.' — The polemical monotheizing move is explicit. The council is being erased from the cosmological architecture." },
+      { label: "Job 1–2 (preserving older form)", text: "The Adversary [ha-satan] appears as a member of the divine court — a prosecuting attorney in YHWH's assembly. The council structure is intact but its members are subordinate functionaries." }
+    ],
+    pressure: [
+      { type: "empire", label: "Babylonian imperial theology" },
+      { type: "erase", label: "Monotheizing editorial redaction" },
+      { type: "preserve", label: "Job's resistance to easy answers" },
+      { type: "erase", label: "Canonical standardization" }
+    ],
+    artifacts: [
+      { text: "Angelic council (transformed)", status: "survives" },
+      { text: "ha-satan as council member (Job)", status: "survives" },
+      { text: "Peer gods in council", status: "lost" },
+      { text: "Council votes / deliberation", status: "lost" }
+    ],
+    survivalPct: 35,
+    survivalLabel: "Memory under erasure"
+  },
+  {
+    label: "Survival Layer",
+    title: "What the canon kept — and what it couldn't kill",
+    era: "Second Temple Period · c. 400–100 BCE",
+    body: `The divine council almost didn't make it. But it did — and the survival is written in the seams.\n\nThe texts that preserved the council memory were not trying to. Psalm 82 kept it because the scene was too theologically useful for a different argument — YHWH judging corrupt divine powers. Job 1–2 kept it because the adversarial framing required a courtroom. Deuteronomy 32:8 kept it in its earliest textual layer, later softened from "sons of God" to "sons of Israel" in the Masoretic tradition — a scribal correction that reveals exactly what the editors were trying to erase.\n\nWhat survived is a fingerprint. Not the living memory of a functioning divine council, but the impression it left in texts written when the council was already being suppressed. You can see the council in the negative space — in what the editors changed, in what the scribes softened, in what the Second Temple angelology had to reconstruct from fragments.\n\nThe memory survived because it was embedded in cosmological architecture that could not be fully disowned. You cannot excise the foundation while keeping the house.`,
+    evidence: [
+      { label: "Dead Sea Scrolls — 4QDeut (Deut 32:8)", text: "The Qumran text reads 'according to the number of the sons of God [bene elohim]' — confirming an older layer that the Masoretic scribes later changed to 'sons of Israel.'" },
+      { label: "Songs of the Sabbath Sacrifice (4Q400–407)", text: "The Dead Sea Scrolls reconstruct an elaborate angelic liturgy in the heavenly temple — seven chief priests presiding over seven councils. The assembly structure is fully operational, now populated entirely by angels." }
+    ],
+    pressure: [
+      { type: "preserve", label: "Scribal oversight" },
+      { type: "preserve", label: "Dead Sea Scroll traditions" },
+      { type: "preserve", label: "Apocalyptic literature" },
+      { type: "erase", label: "Masoretic standardization" }
+    ],
+    artifacts: [
+      { text: "Ps 82 — council in judgment", status: "survives" },
+      { text: "Job 1–2 — ha-satan scene", status: "survives" },
+      { text: "Deut 32:8 oldest form (DSS)", status: "survives" },
+      { text: "Council ritual / liturgy", status: "lost" },
+      { text: "Peer cosmology", status: "lost" }
+    ],
+    survivalPct: 28,
+    survivalLabel: "Memory as residue"
+  },
+  {
+    label: "Mutation Layer",
+    title: "The council becomes a demonology",
+    era: "Second Temple apocalypticism through early Christianity · c. 300 BCE – 400 CE",
+    body: `Here is where the memory takes its strangest turn.\n\nThe divine council — cosmic governance architecture, a structure for explaining how power moves through the universe — gets inverted. The council members who were demoted from gods to angels get demoted again: from angels to demons. The Watchers of 1 Enoch, drawn from Genesis 6:1–4 (the sons of God who married human women), become the origin story of evil itself. Fallen council members, expelled from the assembly, become the adversarial powers that afflict humanity.\n\nWhat was once a polycentric model of cosmic governance becomes the infrastructure for cosmic warfare. The council is no longer where decisions are made — it is where the rebellion happened.\n\nEarly Christian apocalypticism inherits this architecture wholesale. Paul's principalities and powers, the rulers of this age, the cosmic forces of evil in the heavenly realms — these are demoted council members. The same beings who once deliberated with El now occupy a theology of domination that requires defeated enemies.\n\nThe governance memory became a war mythology.`,
+    evidence: [
+      { label: "1 Enoch 6–11 (Book of the Watchers, c. 300–200 BCE)", text: "Two hundred Watchers, divine council members, descend to earth and corrupt humanity. Their leader Azazel teaches warfare and oppression. YHWH imprisons them until final judgment. The council's rebellion becomes the origin of human suffering." },
+      { label: "Ephesians 6:12", text: "'For our struggle is not against flesh and blood, but against the rulers, against the authorities, against the powers of this dark world and against the spiritual forces of evil in the heavenly realms.' — demoted council members, now enemy combatants." }
+    ],
+    pressure: [
+      { type: "mutate", label: "Apocalyptic genre requirements" },
+      { type: "mutate", label: "Hellenistic dualism" },
+      { type: "empire", label: "Roman imperial theology" },
+      { type: "erase", label: "Loss of governance cosmology" }
+    ],
+    artifacts: [
+      { text: "Watchers tradition (1 Enoch)", status: "transformed" },
+      { text: "Principalities & powers (Paul)", status: "transformed" },
+      { text: "ha-satan as cosmic adversary", status: "transformed" },
+      { text: "Council as governance structure", status: "lost" },
+      { text: "Polycentric cosmic deliberation", status: "lost" }
+    ],
+    survivalPct: 18,
+    survivalLabel: "Memory inverted"
+  },
+  {
+    label: "Reuse Layer",
+    title: "Psalm 82 is read again — by different readers",
+    era: "19th century – present · African American theological tradition",
+    body: `Psalm 82 is the most direct survival of the divine council tradition in the Hebrew Bible. YHWH stands in the divine assembly and indicts the gods for failing to defend the poor, the orphan, the weak, the destitute. The gods are sentenced to death like mortals.\n\nThis text circulated for centuries within Christian canonical tradition without generating significant commentary on its council structure. Its polytheistic substrate — YHWH judging other divine beings — was typically explained away as poetic address to human judges or as metaphor.\n\nBeginning in the 19th century and accelerating through the 20th, African American theologians and preachers began reading Psalm 82 as a direct address to the problem of unjust power. The text's framing — divine beings who hold authority and have failed to use it justly, and who face accountability for that failure — was applied to concrete historical conditions.\n\nHoward Thurman (Jesus and the Disinherited, 1949) identified the Hebrew prophetic tradition as consistently addressed to people living under economic and political domination. James Cone (God of the Oppressed, 1975) placed YHWH's character in direct relationship to solidarity with the poor, reading texts like Psalm 82 as evidence of a theological pattern running through the Hebrew Bible.\n\nThe council cosmology itself — the governance architecture, the identity of the divine beings, the ANE substrate — was not the object of this reading. What was reactivated was a specific function the text carried: the indictment of power that has failed its obligations.`,
+    evidence: [
+      { label: "Howard Thurman, Jesus and the Disinherited (1949)", text: "Thurman identifies the Hebrew prophetic tradition as consistently addressed to people 'with their backs against the wall' — tracing a pattern of divine address to the economically and politically marginal across the canon." },
+      { label: "James Cone, God of the Oppressed (1975)", text: "Cone argues that YHWH's identity in the Hebrew Bible is inseparable from the liberation of oppressed peoples. Psalm 82 functions within this reading as evidence of a pattern: the deity holds power accountable for its treatment of the vulnerable." }
+    ],
+    pressure: [
+      { type: "recover", label: "Theological recontextualization" },
+      { type: "recover", label: "Black church hermeneutics" },
+      { type: "preserve", label: "Diasporic oral tradition" },
+      { type: "empire", label: "Ongoing conditions of domination" }
+    ],
+    artifacts: [
+      { text: "Ps 82 accountability function", status: "recovered" },
+      { text: "Divine indictment of power", status: "recovered" },
+      { text: "Council governance cosmology", status: "lost" },
+      { text: "ANE polytheistic substrate", status: "lost" },
+      { text: "Identity of council members", status: "lost" }
+    ],
+    survivalPct: 45,
+    survivalLabel: "Function recovered — structure lost"
+  }
+];
+
+let current = 0;
+
+function render() {
+  const l = layers[current];
+  document.querySelectorAll('.trace-btn').forEach((b,i) => b.classList.toggle('active', i === current));
+
+  const bodyHTML = l.body.split('\n\n').map(p =>
+    `<p class="layer-body">${p}</p>`
+  ).join('');
+
+  const evidenceHTML = l.evidence.map(e => `
+    <div class="evidence-block">
+      <div class="evidence-label">${e.label}</div>
+      <div class="evidence-text">${e.text}</div>
+    </div>
+  `).join('');
+
+  const pressureHTML = l.pressure.map(p =>
+    `<span class="pressure-chip chip-${p.type}">${p.label}</span>`
+  ).join('');
+
+  const artifactHTML = l.artifacts.map(a =>
+    `<span class="artifact-tag ${a.status}">${a.text}</span>`
+  ).join('');
+
+  document.getElementById('layerDisplay').innerHTML = `
+    <div class="layer-label">${l.label}</div>
+    <div class="layer-title">${l.title}</div>
+    <div class="layer-era">${l.era}</div>
+    ${bodyHTML}
+    ${evidenceHTML}
+    <div class="pressure-section">
+      <div class="pressure-label">Forces acting on this memory</div>
+      <div class="pressure-items">${pressureHTML}</div>
+    </div>
+    <div class="survival-bar-wrap">
+      <div class="survival-bar-label">
+        <span>Memory integrity</span>
+        <span>${l.survivalLabel}</span>
+      </div>
+      <div class="survival-track">
+        <div class="survival-fill" style="width:${l.survivalPct}%"></div>
+      </div>
+    </div>
+    <div class="pressure-section">
+      <div class="pressure-label">What was carried — what was dropped</div>
+      <div class="artifact-strip">${artifactHTML}</div>
+    </div>
+    <div class="layer-nav">
+      <button class="nav-btn" onclick="goTo(${current-1})" ${current===0?'disabled':''}>← Previous</button>
+      <span class="step-indicator">${current+1} / ${layers.length}</span>
+      <button class="nav-btn" onclick="goTo(${current+1})" ${current===layers.length-1?'disabled':''}>Next →</button>
+    </div>
+  `;
+}
+
+function goTo(i) {
+  if(i < 0 || i >= layers.length) return;
+  current = i;
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
