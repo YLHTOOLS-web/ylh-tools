@@ -3,406 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmological Deep Time</title>
+<title>WorldBuilder: An Anthropology of Human Reality Systems</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap');
 
-  :root {
-    --ice: #a8d8ea;
-    --glacial: #7ec8c8;
-    --deep-memory: #2d6a8a;
-    --oral: #c17f24;
-    --ane: #8b3a3a;
-    --hebrew: #4a7c59;
-    --exile: #6b4c8a;
-    --hellenistic: #8a6a2a;
-    --imperial: #7a3a2a;
-    --modern: #3a3a3a;
-    --bg: #0a0a0f;
-    --text: #e8e0d0;
-  }
+:root {
+  --void: #080504;
+  --ash: #111009;
+  --ember: #c8602a;
+  --gold: #d4a843;
+  --pale: #e8d5a0;
+  --iron: #2a1e0f;
+  --clay: #5a3a10;
+  --smoke: rgba(232,213,160,0.06);
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+*{margin:0;padding:0;box-sizing:border-box;}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Crimson Pro', serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+html,body{
+  background:var(--void);
+  color:var(--pale);
+  font-family:'IM Fell English',Georgia,serif;
+  min-height: 100vh;
+  overflow-x:hidden;
+}
 
-  .header {
-    text-align: center;
-    padding: 4rem 1rem 2rem;
-    position: relative;
-  }
+/* ── STARFIELD ── */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0.1}50%{opacity:var(--o,0.7)}}
 
-  .header::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(ellipse at center top, rgba(168,216,234,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
+/* ── HEADER ── */
+header{
+  position:relative;z-index:10;
+  text-align:center;
+  padding:48px 24px 32px;
+  border-bottom:1px solid rgba(212,168,67,0.15);
+}
+.prog-title{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(18px,4vw,32px);
+  color:var(--gold);
+  letter-spacing:4px;
+  text-shadow:0 0 40px rgba(212,168,67,0.4);
+  animation:glow 4s ease-in-out infinite alternate;
+}
+@keyframes glow{from{text-shadow:0 0 20px rgba(212,168,67,0.3)}to{text-shadow:0 0 60px rgba(212,168,67,0.6),0 0 100px rgba(200,96,42,0.2)}}
+.prog-sub{
+  font-family:'IM Fell English',serif;
+  font-style:italic;
+  font-size:clamp(12px,1.8vw,16px);
+  color:var(--pale);
+  opacity:0.55;
+  margin-top:10px;
+  letter-spacing:2px;
+}
 
-  h1 {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(1.4rem, 5vw, 2.2rem);
-    letter-spacing: 0.15em;
-    color: var(--ice);
-    text-shadow: 0 0 40px rgba(168,216,234,0.3);
-    line-height: 1.4;
-  }
-
-  .subtitle {
-    font-size: clamp(0.85rem, 2.5vw, 1.1rem);
-    color: rgba(232,224,208,0.5);
-    font-style: italic;
-    margin-top: 0.75rem;
-    letter-spacing: 0.1em;
-  }
-
-  .depth-label {
-    text-align: center;
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.25em;
-    color: rgba(232,224,208,0.3);
-    margin: 2rem 0;
-    text-transform: uppercase;
-  }
-
-  .timeline {
-    position: relative;
-    max-width: 900px;
-    margin: 2rem auto;
-    padding: 0 1rem 4rem;
-  }
-
-  /* Central spine */
-  .spine {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: linear-gradient(to bottom,
-      var(--ice) 0%,
-      var(--deep-memory) 20%,
-      var(--oral) 40%,
-      var(--ane) 55%,
-      var(--hebrew) 65%,
-      var(--exile) 75%,
-      var(--hellenistic) 82%,
-      var(--imperial) 90%,
-      var(--modern) 100%
-    );
-    transform: translateX(-50%);
-    opacity: 0.4;
-  }
-
-  .era {
-    display: flex;
-    justify-content: flex-between;
-    width: 100%;
-    margin-bottom: 2rem;
-    position: relative;
-    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  /* Directional logic using flex instead of empty spacer divs */
-  .era:nth-child(even) { justify-content: flex-end; }
-  .era:nth-child(odd) { justify-content: flex-start; }
-
-  .era-content {
-    width: 45%;
-    padding: 1.5rem;
-    border-radius: 6px;
-    position: relative;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(232,224,208,0.05);
-    backdrop-filter: blur(4px);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
-  }
-
-  .era:nth-child(odd) .era-content {
-    text-align: right;
-    border-right: 3px solid transparent;
-  }
-
-  .era:nth-child(even) .era-content {
-    text-align: left;
-    border-left: 3px solid transparent;
-  }
-
-  .era-content:hover {
-    transform: translateY(-4px);
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  /* Node Dots tethered to timeline spine */
-  .dot {
-    position: absolute;
-    left: 50%;
-    top: 2rem; /* Aligns dot near the top header of the card instead of shifting based on body length */
-    transform: translateX(-50%);
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 2px solid var(--bg);
-    z-index: 2;
-    transition: transform 0.3s ease;
-  }
-
-  .era-content:hover ~ .dot {
-    transform: translateX(-50%) scale(1.3);
-  }
-
-  .date {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(0.7rem, 2vw, 0.85rem);
-    letter-spacing: 0.05em;
-    margin-bottom: 0.4rem;
-    opacity: 0.9;
-  }
-
-  .era-title {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(0.85rem, 2.2vw, 1.1rem);
-    font-weight: 700;
-    margin-bottom: 0.6rem;
-    line-height: 1.4;
-  }
-
-  .era-body {
-    font-size: clamp(0.8rem, 1.8vw, 0.95rem);
-    line-height: 1.7;
-    color: rgba(232,224,208,0.75);
-    font-weight: 300;
-  }
-
-  .tag {
-    display: inline-block;
-    font-size: 0.6rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 0.2rem 0.6rem;
-    border-radius: 3px;
-    margin-bottom: 0.6rem;
-    font-weight: 700;
-  }
-
-  /* ERA SPECIFIC THEMES (Cleaned up inheritance syntax) */
-  .ice-age { border-color: var(--ice) !important; }
-  .ice-age .era-title, .ice-age .date { color: var(--ice); }
-  .ice-age + .dot { background: var(--ice); box-shadow: 0 0 15px var(--ice); }
-  .ice-age .tag { background: rgba(168,216,234,0.15); color: var(--ice); }
-
-  .melt { border-color: var(--glacial) !important; }
-  .melt .era-title, .melt .date { color: var(--glacial); }
-  .melt + .dot { background: var(--glacial); box-shadow: 0 0 15px var(--glacial); }
-  .melt .tag { background: rgba(126,200,200,0.15); color: var(--glacial); }
-
-  .deep-mem { border-color: var(--deep-memory) !important; }
-  .deep-mem .era-title, .deep-mem .date { color: #5aafd4; }
-  .deep-mem + .dot { background: var(--deep-memory); box-shadow: 0 0 15px var(--deep-memory); }
-  .deep-mem .tag { background: rgba(45,106,138,0.25); color: #5aafd4; }
-
-  .oral-t { border-color: var(--oral) !important; }
-  .oral-t .era-title, .oral-t .date { color: #e8a84a; }
-  .oral-t + .dot { background: var(--oral); box-shadow: 0 0 15px var(--oral); }
-  .oral-t .tag { background: rgba(193,127,36,0.15); color: #e8a84a; }
-
-  .ane-t { border-color: var(--ane) !important; }
-  .ane-t .era-title, .ane-t .date { color: #c47070; }
-  .ane-t + .dot { background: var(--ane); box-shadow: 0 0 15px var(--ane); }
-  .ane-t .tag { background: rgba(139,58,58,0.15); color: #c47070; }
-
-  .hebrew-t { border-color: var(--hebrew) !important; }
-  .hebrew-t .era-title, .hebrew-t .date { color: #7abf94; }
-  .hebrew-t + .dot { background: var(--hebrew); box-shadow: 0 0 15px var(--hebrew); }
-  .hebrew-t .tag { background: rgba(74,124,89,0.15); color: #7abf94; }
-
-  .exile-t { border-color: var(--exile) !important; }
-  .exile-t .era-title, .exile-t .date { color: #a880d4; }
-  .exile-t + .dot { background: var(--exile); box-shadow: 0 0 15px var(--exile); }
-  .exile-t .tag { background: rgba(107,76,138,0.15); color: #a880d4; }
-
-  .hellen-t { border-color: var(--hellenistic) !important; }
-  .hellen-t .era-title, .hellen-t .date { color: #d4b060; }
-  .hellen-t + .dot { background: var(--hellenistic); box-shadow: 0 0 15px var(--hellenistic); }
-  .hellen-t .tag { background: rgba(138,106,42,0.15); color: #d4b060; }
-
-  .imperial-t { border-color: var(--imperial) !important; }
-  .imperial-t .era-title, .imperial-t .date { color: #d4826a; }
-  .imperial-t + .dot { background: var(--imperial); box-shadow: 0 0 15px var(--imperial); }
-  .imperial-t .tag { background: rgba(122,58,42,0.15); color: #d4826a; }
-
-  .modern-t { border-color: var(--modern) !important; }
-  .modern-t .era-title, .modern-t .date { color: #aaaaaa; }
-  .modern-t + .dot { background: var(--modern); box-shadow: 0 0 15px #666; }
-  .modern-t .tag { background: rgba(58,58,58,0.25); color: #aaaaaa; }
-
-  .footnote {
-    max-width: 760px;
-    margin: 4rem auto;
-    padding: 2rem 1.5rem;
-    border-top: 1px solid rgba(168,216,234,0.15);
-    text-align: center;
-    font-size: 0.9rem;
-    font-style: italic;
-    color: rgba(232,224,208,0.4);
-    line-height: 1.8;
-  }
-
-  .footnote em {
-    display: block;
-    margin-top: 1rem;
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 0.75rem;
-    letter-spacing: 0.15em;
-    color: var(--oral);
-    font-style: normal;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Robust Responsive Layout Change */
-  @media (max-width: 768px) {
-    .spine { left: 16px; transform: none; }
-    .era { justify-content: flex-end !important; padding-left: 40px; margin-bottom: 1.5rem; }
-    .era-content { width: 100% !important; text-align: left !important; }
-    .era:nth-child(odd) .era-content { border-right: none; border-left: 3px solid transparent; }
-    .dot { left: 16px; top: 2.2rem; transform: translateX(-50%); }
-    .era-content:hover ~ .dot { transform: translateX(-50%) scale(1.2); }
-  }
-</style>
-</head>
-<body>
-
-<header class="header">
-  <h1>The Cosmological Deep Timeline</h1>
-  <p class="subtitle">From Ice Age Memory to Modern Misreading</p>
-</header>
-
-<div class="depth-label">↓ descending into deep time ↓</div>
-
-<main class="timeline">
-  <div class="spine"></div>
-
-  <section class="era">
-    <article class="era-content ice-age">
-      <span class="tag">Ice Age</span>
-      <time class="date">~115,000 – 11,700 BCE</time>
-      <h2 class="era-title">The Glacial World</h2>
-      <p class="era-body">Sea levels 400 feet lower. Coastlines unrecognizable. Megafauna. Human communities calibrated to a planet that no longer exists. The original stable world — before the trauma sequence begins.</p>
-    </article>
-    <div class="dot"></div>
-  </section>
-
-  <section class="era">
-    <article class="era-content melt">
-      <span class="tag">Catastrophe</span>
-      <time class="date">~12,000 – 6,000 BCE</time>
-      <h2 class="era-title">The Great Melt & Floods</h2>
-      <p class="era-body">Ice sheets collapse. Persian Gulf fills from dry land. Black Sea breaches — 50 cubic km of water per day for 300+ days. Doggerland swallowed. Coastlines move hundreds of miles. Entire inhabited worlds go underwater. Floods come up AND come down simultaneously. This is the original trauma event.</p>
-    </article>
-    <div class="dot"></div>
-  </section>
-
-  <section class="era">
-    <article class="era-content deep-mem">
-      <span class="tag">Deep Memory</span>
-      <time class="date">~10,000 – 4,000 BCE</time>
-      <h2 class="era-title">Tehom. Tohu Vavohu. The Deep.</h2>
-      <p class="era-body">Survivors encode catastrophic water memory into cosmology. Two oceans — above and below. Earth suspended between them on pillars. The pre-creation state is the flood state. The cosmic architecture is built to explain what they watched happen to their world. This is not mythology. This is geological event memory.</p>
-    </article>
-    <div class="dot"></div>
-  </section>
-
-  <section class="era">
-    <article class="era-content oral-t">
-      <span class="tag">Oral Transmission</span>
-      <time class="date">~8,000 – 1,000 BCE</time>
-      <h2 class="era-title">~400 Generations of Memory</h2>
-      <p class="era-body">No writing. The human body is the storage technology. Story, ritual, song, repeated exactly. Ice age trauma compressed into cosmological syntax and carried forward through hundreds of generations before a single word is written down. The tehom, the raqia, the layered earth — all traveling orally through time.</p>
-    </article>
-    <div class="dot"></div>
-  </section>
-
-  <section class="era">
-    <article class="era-content ane-t">
-      <span class="tag">ANE Cosmology</span>
-      <time class="date">~3,500 – 1,200 BCE</time>
-      <h2 class="era-title">The Kingship Cosmology Emerges</h2>
-      <p class="era-body">Sumer. Akkad. Babylon. Egypt. The cosmos is a kingdom with a divine council, vassal treaties, tribute systems, and territorial claims. The storm deity rides clouds and hurls lightning. Rain is governance. Drought is political decision. Marduk defeats Tiamat. Baal thunders over Lebanon. The flood memory gets organized into a cosmic political architecture.</p>
-    </article>
-    <div class="dot"></div>
-  </section>
-
-  <section class="era">
-    <article class="era-content hebrew-t">
-      <span class="tag">Early Yahwism</span>
-      <time class="date">~1,200 – 900 BCE</time>
-      <h2 class="era-title">YHWH Enters the Divine Council</h2>
-      <p class="era-body">YHWH rises within the Canaanite pantheon. Psalm 29 is a Baal hymn with the name changed. The elim (divine council) are real. The land is a morally sensitive organism. Covenant is a suzerainty treaty. Thunder is qol — kinetic force. The cosmological architecture is fully ANE. This is henotheism not monotheism.</p>
-    </article>
-    <div class="dot"></div>
-  </section>
-
-  <section class="era">
-    <article class="era-content exile-t">
-      <span class="tag">Babylonian Exile</span>
-      <time class="date">~586 – 539 BCE</time>
-      <h2 class="era-title">Metaphysical Rupture</h2>
-      <p class="era-body">Jerusalem destroyed. Temple gone. King deported. Land lost. The entire land-based, temple-based cosmology collapses. The trauma sequence runs at maximum force. The Priestly tradition responds by making YHWH portable — Torah replaces temple, Sabbath replaces land. YHWH becomes universal not from theological evolution but from survival necessity. The texts get written down and edited here.</p>
-    </article>
-    <div class="dot"></div>
-  </section>
-
-  <section class="era">
-    <article class="era-content hellen-t">
-      <span class="tag">The Substitution Event</span>
-      <time class="date">~330 – 100 BCE</time>
-      <h2 class="era-title">Greek Metaphysics Captures Hebrew Syntax</h2>
-      <p class="era-body">Alexander's conquests. The Septuagint translation. Qol (thunder/force) becomes Logos (rational principle). Kavod (physical weight) becomes abstract glory. Tehom loses its cosmological terror. The dabar→Logos swap happens. Hebrew covenantal categories get refilled with Greek ontological content. The text now says Greek things in Hebrew words.</p>
-    </article>
-    <div class="dot"></div>
-  </section>
-
-  <section class="era">
-    <article class="era-content imperial-t">
-      <span class="tag">Roman Imperial Christianity</span>
-      <time class="date">~325 – 600 CE</time>
-      <h2 class="era-title">The Nicene Consolidation</h2>
-      <p class="era-body">Constantine. The Council of Nicaea. Greek substance metaphysics fused with Hebrew covenant religion inside Roman imperial administration. The divine council becomes heresy. The land's moral agency disappears. Absolute property rights replace covenant land tenure. The layered cosmology becomes allegory. The trauma memory is spiritualized into personal salvation narrative.</p>
-    </article>
-    <div class="dot"></div>
-  </section>
-
-  <section class="era">
-    <article class="era-content modern-t">
-      <span class="tag">The Current Moment</span>
-      <time class="date">Present</time>
-      <h2 class="era-title">Reading Ice Age Memory as Self-Help</h2>
-      <p class="era-body">People carry texts encoding 12,000 years of cosmological memory — ice age floods, ANE kingship systems, oral tradition across 400 generations — and read them for personal therapeutic benefit. The category error is not small. The cosmological syntax has been severed from its architecture. The political theology has been privatized. The land's moral agency has been erased.</p>
-    </article>
-    <div class="dot"></div>
-  </section>
-</main>
-
-<footer class="footnote">
-  The texts were not written for you personally.<br>
-  They were written by communities surviving geological catastrophe,<br>
-  imperial capture, exile, and metaphysical rupture —<br>
-  encoding survival data in the only storage technology available:<br>
-  the human body, carrying it forward through 400 generations before ink touched clay.
-  <em>Yahwist Liberation Hermeneutic — Consequence-First Analysis</em>
-</footer>
-
-</body>
-</html>
+/* ── OPERATING QUESTIONS ── */
+.questions-bar{
+  position:relative;z-index:10;
+  display:flex;flex
