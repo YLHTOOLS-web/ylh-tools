@@ -59,7 +59,6 @@ html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; f
   border: 0.5px solid rgba(255,255,255,0.1);
   transition: right 0.2s ease;
 }
-/* Adjust layout spacing if sidebar closes */
 #hint.sidebar-closed { right: 14px; }
 
 #filter-bar {
@@ -74,11 +73,45 @@ html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; f
   transition: all 0.15s; text-transform: uppercase; white-space: nowrap;
 }
 .fbtn.active { color: #1a1a1a; }
+
+/* Visual Zoom Controls Panel */
+#zoom-controls {
+  position: fixed; bottom: 200px; left: 14px;
+  display: flex; flex-direction: column; gap: 6px; z-index: 5;
+}
+.zbtn {
+  width: 36px; height: 36px; background: rgba(18, 18, 18, 0.95);
+  border: 1px solid rgba(201, 162, 39, 0.35); color: #f5f0e8;
+  border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 16px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.zbtn:hover { border-color: #c9a227; background: #c9a227; color: #1a1a1a; }
+.zbtn:active { transform: scale(0.95); }
+
+#zoom-display {
+  width: 52px; background: rgba(18, 18, 18, 0.95);
+  border: 1px solid rgba(201, 162, 39, 0.2); border-radius: 6px;
+  padding: 6px 4px; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; color: #aaa; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+#zoom-display .zlbl { font-size: 7px; letter-spacing: 0.08em; color: #666; text-transform: uppercase; margin-bottom: 2px; }
+#zoom-display .zval { font-size: 10px; font-weight: bold; color: #c9a227; }
 </style>
 </head>
 <body>
 
 <canvas id="canvas"></canvas>
+
+<div id="zoom-controls">
+  <button class="zbtn" id="z-in" title="Zoom In">+</button>
+  <button class="zbtn" id="z-out" title="Zoom Out">−</button>
+  <button class="zbtn" id="z-reset" title="Reset View" style="font-size:12px;">⟲</button>
+  <div id="zoom-display">
+    <div class="zlbl">Zoom</div>
+    <div class="zval" id="z-percent">100%</div>
+  </div>
+</div>
 
 <div id="sidebar">
   <div class="node-title" id="ip-title"></div>
@@ -93,7 +126,7 @@ html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; f
 
 <div id="filter-bar"></div>
 <div id="legend"></div>
-<div id="hint">DRAG TO PAN &nbsp;|&nbsp; SHIFT+CLICK TO ZOOM IN (+) &nbsp;|&nbsp; ALT+CLICK TO ZOOM OUT (-)</div>
+<div id="hint">DRAG TO PAN &nbsp;|&nbsp; HOVER OR CLICK NODES TO EXPLORE SUBSTRATES</div>
 
 <script>
 const canvas = document.getElementById('canvas');
@@ -324,7 +357,7 @@ function createFilterButtons() {
       btn.style.background = value.color;
       btn.style.color = '#1a1a1a';
     }
-    btn.innerText = value.label.split(' (')[0]; // short form
+    btn.innerText = value.label.split(' (')[0]; 
     btn.onclick = () => { activeFilter = key; selectNode(null); updateFilters(); };
     filterBar.appendChild(btn);
   });
@@ -361,9 +394,32 @@ function toWorld(pos) {
   };
 }
 
+// UI Zoom Trigger Handlers
+const percentDisplay = document.getElementById('z-percent');
+function updateZoomDisplay() {
+  percentDisplay.innerText = Math.round(zoom * 100) + '%';
+}
+updateZoomDisplay();
+
+document.getElementById('z-in').addEventListener('click', () => {
+  zoom *= 1.25;
+  if (zoom > 4) zoom = 4;
+  updateZoomDisplay();
+});
+
+document.getElementById('z-out').addEventListener('click', () => {
+  zoom /= 1.25;
+  if (zoom < 0.15) zoom = 0.15;
+  updateZoomDisplay();
+});
+
+document.getElementById('z-reset').addEventListener('click', () => {
+  zoom = 0.88;
+  pan = { x: 0, y: 0 };
+  updateZoomDisplay();
+});
+
 canvas.addEventListener('mousedown', e => {
-  // If clicking with modifiers, prioritize Zoom instead of Drag
-  if (e.shiftKey || e.altKey) return;
   dragging = true;
   lastMouse = getMousePos(e);
 });
@@ -375,7 +431,6 @@ window.addEventListener('mousemove', e => {
     pan.y += mouse.y - lastMouse.y;
     lastMouse = mouse;
   } else {
-    // Hover check
     const world = toWorld(mouse);
     let found = null;
     for(let i=nodes.length-1; i>=0; i--) {
@@ -399,26 +454,6 @@ window.addEventListener('mouseup', () => { dragging = false; lastMouse = null; }
 
 canvas.addEventListener('click', e => {
   const mouse = getMousePos(e);
-  const worldBefore = toWorld(mouse);
-
-  // Modular Mouse Click Zoom Overrides (+ / - Controls)
-  if (e.shiftKey) {
-    // Zoom In
-    zoom *= 1.35;
-    if(zoom > 4) zoom = 4;
-    pan.x = mouse.x - W/2 - worldBefore.x * zoom;
-    pan.y = mouse.y - H/2 - worldBefore.y * zoom;
-    return;
-  } else if (e.altKey) {
-    // Zoom Out
-    zoom /= 1.35;
-    if(zoom < 0.15) zoom = 0.15;
-    pan.x = mouse.x - W/2 - worldBefore.x * zoom;
-    pan.y = mouse.y - H/2 - worldBefore.y * zoom;
-    return;
-  }
-
-  // Normal Selection Check
   const world = toWorld(mouse);
   let found = null;
   for(let i=nodes.length-1; i>=0; i--) {
@@ -434,7 +469,7 @@ canvas.addEventListener('click', e => {
   selectNode(found);
 });
 
-// Kill traditional trackpad wheel pinch event entirely to prevent overlap
+// Lock traditional wheel zooming mechanics out completely
 canvas.addEventListener('wheel', e => e.preventDefault(), { passive: false });
 
 function selectNode(node) {
