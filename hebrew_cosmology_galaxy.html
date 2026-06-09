@@ -8,27 +8,32 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; }
+html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; font-family: 'Space Mono', monospace; }
 #canvas { display: block; width: 100%; height: 100vh; cursor: grab; }
 #canvas:active { cursor: grabbing; }
-#info-panel {
-  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  background: rgba(18,18,18,0.97); border: 1px solid #c9a227;
-  border-radius: 8px; padding: 14px 20px; max-width: 420px; width: 92%;
-  display: none; font-family: 'IM Fell English', serif;
-  color: #f5f0e8; text-align: center; pointer-events: none;
+
+/* Sidebar Layout to prevent covering the network lines */
+#sidebar {
+  position: fixed; top: 0; right: 0; width: 380px; height: 100vh;
+  background: rgba(14, 14, 14, 0.98); border-left: 1px solid rgba(201,162,39,0.3);
+  padding: 30px 24px; display: none; flex-direction: column;
+  color: #f5f0e8; overflow-y: auto; z-index: 10;
+  box-shadow: -5px 0 25px rgba(0,0,0,0.5);
 }
-#info-panel .node-title {
-  font-family: 'Cinzel', serif; font-size: 12px; color: #c9a227;
-  letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 5px;
+#sidebar .node-title {
+  font-family: 'Cinzel', serif; font-size: 18px; color: #c9a227;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px;
+  line-height: 1.3;
 }
-#info-panel .node-cat {
-  font-family: 'Space Mono', monospace; font-size: 8px;
-  letter-spacing: 0.1em; margin-bottom: 7px; text-transform: uppercase;
+#sidebar .node-cat {
+  font-family: 'Space Mono', monospace; font-size: 9px;
+  letter-spacing: 0.12em; margin-bottom: 20px; text-transform: uppercase;
+  border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;
 }
-#info-panel .node-desc { font-size: 11.5px; line-height: 1.6; color: #ddd; }
+#sidebar .node-desc { font-family: 'IM Fell English', serif; font-size: 14px; line-height: 1.6; color: #dddddd; }
+
 #legend {
-  position: fixed; top: 14px; right: 14px;
+  position: fixed; bottom: 14px; left: 14px;
   font-family: 'Space Mono', monospace; font-size: 8px; color: #999;
   line-height: 2.1; background: rgba(18,18,18,0.9);
   padding: 10px 14px; border-radius: 6px;
@@ -36,6 +41,7 @@ html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; }
 }
 #legend div { display: flex; align-items: center; gap: 7px; }
 #legend span { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
 #title-block {
   position: fixed; top: 14px; left: 14px;
   font-family: 'Cinzel', serif; color: #c9a227;
@@ -45,11 +51,21 @@ html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; }
 }
 #title-block h1 { font-size: 12px; letter-spacing: 0.14em; font-weight: 600; }
 #title-block p { font-family: 'Space Mono', monospace; font-size: 7.5px; color: #777; margin-top: 3px; }
-#hint { position: fixed; bottom: 14px; right: 14px; font-family: 'Space Mono', monospace; font-size: 7.5px; color: #555; }
+
+#hint { 
+  position: fixed; bottom: 14px; right: 400px; 
+  font-family: 'Space Mono', monospace; font-size: 8px; color: #aaa;
+  background: rgba(18,18,18,0.9); padding: 6px 12px; border-radius: 4px;
+  border: 0.5px solid rgba(255,255,255,0.1);
+  transition: right 0.2s ease;
+}
+/* Adjust layout spacing if sidebar closes */
+#hint.sidebar-closed { right: 14px; }
+
 #filter-bar {
   position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
   display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
-  pointer-events: all; max-width: 500px;
+  pointer-events: all; max-width: 500px; z-index: 5;
 }
 .fbtn {
   font-family: 'Space Mono', monospace; font-size: 7.5px; letter-spacing: 0.08em;
@@ -61,19 +77,23 @@ html, body { width: 100%; height: 100%; background: #1a1a1a; overflow: hidden; }
 </style>
 </head>
 <body>
+
 <canvas id="canvas"></canvas>
-<div id="info-panel">
+
+<div id="sidebar">
   <div class="node-title" id="ip-title"></div>
   <div class="node-cat" id="ip-cat"></div>
   <div class="node-desc" id="ip-desc"></div>
 </div>
+
 <div id="title-block">
   <h1>HEBREW COSMOLOGY GALAXY</h1>
   <p>YLH TOOLS · BRANDY MITCHELL · CC BY 4.0</p>
 </div>
+
 <div id="filter-bar"></div>
 <div id="legend"></div>
-<div id="hint">DRAG · SCROLL TO ZOOM · HOVER TO READ</div>
+<div id="hint">DRAG TO PAN &nbsp;|&nbsp; SHIFT+CLICK TO ZOOM IN (+) &nbsp;|&nbsp; ALT+CLICK TO ZOOM OUT (-)</div>
 
 <script>
 const canvas = document.getElementById('canvas');
@@ -89,16 +109,16 @@ window.addEventListener('resize', resize);
 let pan = {x:0,y:0}, zoom = 0.88, dragging = false, lastMouse = null;
 
 const TIERS = {
-  core:      { label: 'Core Hebrew Cosmology',         color: '#c9a227' },
-  absorbed:  { label: 'Absorbed/Contested Divinity',   color: '#d4845a' },
-  source:    { label: 'Documentary Sources (JEDP)',     color: '#7a5abf' },
-  theo:      { label: 'Theological Burst',              color: '#4a9e8e' },
-  imperial:  { label: 'Imperial Overlay',               color: '#c0674a' },
+  core:       { label: 'Core Hebrew Cosmology',          color: '#c9a227' },
+  absorbed:   { label: 'Absorbed/Contested Divinity',   color: '#d4845a' },
+  source:     { label: 'Documentary Sources (JEDP)',     color: '#7a5abf' },
+  theo:       { label: 'Theological Burst',              color: '#4a9e8e' },
+  imperial:   { label: 'Imperial Overlay',               color: '#c0674a' },
   liberation:{ label: 'Liberation Thread',              color: '#5a8a5a' },
-  levant:    { label: 'Levant/Ugaritic Substrate',      color: '#7a8eaa' },
-  sumerian:  { label: 'Sumerian/Akkadian Substrate',    color: '#6a7a5a' },
-  egyptian:  { label: 'Egyptian Substrate',             color: '#a07840' },
-  persian:   { label: 'Persian/Zoroastrian Substrate',  color: '#7a5a7a' },
+  levant:     { label: 'Levant/Ugaritic Substrate',      color: '#7a8eaa' },
+  sumerian:   { label: 'Sumerian/Akkadian Substrate',    color: '#6a7a5a' },
+  egyptian:   { label: 'Egyptian Substrate',             color: '#a07840' },
+  persian:    { label: 'Persian/Zoroastrian Substrate',  color: '#7a5a7a' },
   secondtemple:{ label: 'Second Temple Explosion',      color: '#5a7a9e' },
 };
 
@@ -126,7 +146,7 @@ const nodes = [
    desc:'Head of the Canaanite pantheon. Ancient, patriarchal, dwelling at the source of the rivers. His titles — El Shaddai, El Elyon, El Olam, El Roi — all appear in the patriarchal narratives. Exodus 6:3 is P admitting the merger: "I appeared as El Shaddai; by YHWH I was not known." YHWH absorbed El\'s identity, titles, and divine council role. Frank Moore Cross: the identification was nearly total.'},
   {id:'asherah',   tier:'absorbed', label:'Asherah',    sub:'YHWH\'s consort, suppressed', x:-310, y:-80, r:13,
    desc:'El\'s consort in Ugaritic texts; possibly YHWH\'s consort in early Israelite practice. Kuntillet Ajrud inscriptions (8th c. BCE): "YHWH of Samaria and his Asherah." Asherah poles condemned repeatedly in Deuteronomistic history — meaning they existed and were venerated. The Josianic reform (621 BCE) is partly an anti-Asherah campaign. She was not an aberration; she was the old cosmology persisting.'},
-  {id:'council',   tier:'absorbed', label:'Divine Council', sub:'Bene Elohim',    x:-310, y:30,   r:13,
+  {id:'council',   tier:'absorbed', label:'Divine Council', sub:'Bene Elohim',    x:-310, y:30,    r:13,
    desc:'\'Adat El — the assembly of divine beings. Psalm 82: YHWH stands in the divine council and judges the elohim. Job 1-2: the bene elohim present themselves before YHWH, including the Adversary. Genesis 6:1-4: bene elohim take human wives. This is not monotheism — it is monolatry consolidating toward monotheism. The council is real; its members are being demoted.'},
   {id:'angel_yhwh',tier:'absorbed', label:'Angel of YHWH', sub:'Hypostasis/early theophany', x:-200, y:-280, r:12,
    desc:'In early texts, the Angel of YHWH is functionally indistinguishable from YHWH (Genesis 16, 22, Exodus 3). Moses speaks to the Angel at the burning bush but the text says YHWH spoke. This is a remnant of an older hypostasis tradition — YHWH having a divine alter-ego or messenger-self. Later texts tame this by clearly separating messenger from sender.'},
@@ -160,9 +180,9 @@ const nodes = [
    desc:'Babylonian exile (597–539 BCE) is the theological forge. Loss of land, temple, king forced re-articulation of YHWH outside territorial logic. Can YHWH be worshipped in a foreign land? The exile produces the most generative Hebrew theology: universalized YHWH, suffering servant, apocalyptic imagination.'},
 
   // ── IMPERIAL OVERLAYS ──────────────────────────────────────────────────
-  {id:'logos',     tier:'imperial', label:'Logos',      sub:'Greek word-essence swap', x:115, y:-270, r:11,
+  {id:'logos',     tier:'imperial', label:'Logos',       sub:'Greek word-essence swap', x:115, y:-270, r:11,
    desc:'John 1 swaps Hebrew dabar for Greek logos — shifting from event/act/thing to eternal rational organizing principle. This is the Nicene rupture mechanism. Philo of Alexandria (1st c. BCE) prepared the ground: a Hellenized Jew who reads Torah through Platonic metaphysics. The swap is not innocent; it produces a different God with a different politics.'},
-  {id:'ousia',     tier:'imperial', label:'Ousia',      sub:'Nicene substance logic', x:0,   y:-285, r:11,
+  {id:'ousia',     tier:'imperial', label:'Ousia',       sub:'Nicene substance logic', x:0,   y:-285, r:11,
    desc:'Greek philosophical category — being, substance, essence. Nicene council (325 CE) uses homoousios to define Christ\'s nature. This is Aristotelian metaphysics with Hebrew names. Consequence: a God defined by what God IS (substance) rather than what God DOES (dabar/action). Marduk and Baal\'s static cosmic order finds its final Christian vocabulary here.'},
   {id:'pax_roma',  tier:'imperial', label:'Pax Romana', sub:'Imperial cosmology',    x:-115, y:-270, r:11,
    desc:'Roman imperial theology: Caesar as divi filius (son of the divine), peace through military conquest, gospel (euangelion) of Caesar\'s victory. Every major NT term — gospel, lord, savior, son of God — is a direct counter-claim to imperial Roman vocabulary. The question is whether Christianity absorbed the counter-claim or the original.'},
@@ -186,41 +206,41 @@ const nodes = [
   // ── LEVANT / UGARITIC SUBSTRATE ────────────────────────────────────────
   {id:'ugarit',    tier:'levant', label:'Ugaritic Cosmology', sub:'Ras Shamra texts', x:-420, y:-230, r:13,
    desc:'Discovered 1929 at Ras Shamra (Syria). The Ugaritic texts (14th–12th c. BCE) are the closest literary parallel to Hebrew scripture. The Baal Cycle, El\'s divine council, Mot and Yam — all appear in transformed form in the Psalms, Job, and prophetic literature. Hebrew cosmology is not original; it is a contestation and transformation of Ugaritic cosmology.'},
-  {id:'baal',      tier:'levant', label:'Baal',              sub:'Storm-fertility deity', x:-380, y:-310, r:11,
+  {id:'baal',      tier:'levant', label:'Baal',               sub:'Storm-fertility deity', x:-380, y:-310, r:11,
    desc:'Canaanite storm deity. Baal Hadad — rider of the clouds, master of rain and fertility. YHWH absorbs Baal\'s storm imagery wholesale (Psalm 18, 29, 68). The Carmel confrontation (1 Kings 18) is not the defeat of a foreign god — it is a civil war within Israelite cosmological imagination. YHWH wins Baal\'s portfolio without ever fully exorcising his imagery.'},
-  {id:'mot',       tier:'levant', label:'Mot',               sub:'Death/Underworld deity', x:-430, y:-140, r:10,
+  {id:'mot',       tier:'levant', label:'Mot',                sub:'Death/Underworld deity', x:-430, y:-140, r:10,
    desc:'Canaanite god of death and the underworld. In the Baal Cycle, Mot swallows Baal — death swallows life. Sheol in Hebrew scripture functions similarly: a shadowy underworld where even YHWH\'s presence is ambiguous (Psalm 88). The later development of resurrection theology (Daniel 12, Isaiah 26) is partly a claim that YHWH defeats Mot\'s logic — what Baal could not permanently achieve.'},
-  {id:'yam',       tier:'levant', label:'Yam',               sub:'Sea/chaos deity',       x:-430, y:-310, r:10,
+  {id:'yam',       tier:'levant', label:'Yam',                sub:'Sea/chaos deity',       x:-430, y:-310, r:10,
    desc:'Canaanite sea deity, representing chaos and disorder. In the Baal Cycle, Baal defeats Yam. In Hebrew scripture, YHWH defeats the sea (tehom, Rahab, Leviathan). Psalm 74, Job 41, Isaiah 51 — the combat myth is present, transformed. YHWH does what Baal did, but without needing the council\'s approval. The polemic is not against the myth but against the attribution.'},
-  {id:'anat',      tier:'levant', label:'Anat',              sub:'Warrior goddess',       x:-470, y:-230, r:9,
+  {id:'anat',      tier:'levant', label:'Anat',               sub:'Warrior goddess',       x:-470, y:-230, r:9,
    desc:'Canaanite warrior goddess, Baal\'s sister. Ferocious, bloodthirsty, devoted. Some scholars (Tikva Frymer-Kensky) argue her warrior attributes are distributed into YHWH\'s war imagery in the Hebrew texts — YHWH as divine warrior inherits Anat\'s register. The feminine warrior divine disappears as a named figure but leaves traces in the battle poetry.'},
 
   // ── SUMERIAN / AKKADIAN SUBSTRATE ─────────────────────────────────────
-  {id:'enuma',     tier:'sumerian', label:'Enuma Elish',    sub:'Babylonian creation', x:120, y:-390, r:13,
+  {id:'enuma',     tier:'sumerian', label:'Enuma Elish',     sub:'Babylonian creation', x:120, y:-390, r:13,
    desc:'Babylonian creation epic (12th c. BCE in written form; oral tradition much older). Marduk creates the cosmos by splitting Tiamat\'s body. Humans created from the blood of Kingu to serve the gods. Genesis 1 (P source) is direct point-by-point polemic against this cosmology. Same structure, opposite theology: YHWH does not fight chaos; humans are not slaves of the divine; creation is "very good."'},
-  {id:'marduk',    tier:'sumerian', label:'Marduk',         sub:'Babylonian supreme deity', x:60, y:-390, r:11,
+  {id:'marduk',    tier:'sumerian', label:'Marduk',          sub:'Babylonian supreme deity', x:60, y:-390, r:11,
    desc:'Babylonian supreme deity who rises to head of the pantheon by defeating Tiamat. His ascent is political — the Enuma Elish is Babylon\'s theological justification for imperial hegemony. When P writes Genesis 1 in Babylonian exile, the target is explicit: our God does not need to fight to create; speech is sufficient. Anti-Marduk theology is proto-liberation theology.'},
-  {id:'enki',      tier:'sumerian', label:'Enki/Ea',        sub:'Wisdom/water deity',   x:200, y:-390, r:10,
+  {id:'enki',      tier:'sumerian', label:'Enki/Ea',         sub:'Wisdom/water deity',   x:200, y:-390, r:10,
    desc:'Sumerian Enki (Akkadian: Ea) — god of wisdom, fresh water, magic, crafts. Enki is often the protector of humans against harsher divine decrees (he warns Utnapishtim of the flood). The Flood narrative in Genesis has direct literary dependence on Sumerian/Akkadian predecessors (Atrahasis, Gilgamesh Epic). YHWH\'s flood is a theological rewrite of Enki\'s world.'},
-  {id:'inanna',    tier:'sumerian', label:'Inanna/Ishtar',  sub:'Love/war/descent',     x:280, y:-370, r:10,
+  {id:'inanna',    tier:'sumerian', label:'Inanna/Ishtar',   sub:'Love/war/descent',     x:280, y:-370, r:10,
    desc:'Sumerian Inanna (Akkadian: Ishtar) — goddess of love, war, and fertility. Her descent to the underworld and return is one of the oldest death-resurrection narratives (3rd millennium BCE). Scholars debate her influence on later resurrection theology in Second Temple Judaism and early Christianity. Asherah\'s suppression in Israelite tradition is partly the suppression of Inanna\'s register.'},
   {id:'gilgamesh', tier:'sumerian', label:'Gilgamesh Epic', sub:'Flood/mortality quest', x:350, y:-310, r:10,
    desc:'Epic of Gilgamesh (Sumerian sources ~2100 BCE; Akkadian version ~1200 BCE). Contains the Utnapishtim flood account — direct literary ancestor of the biblical Flood. Also: Gilgamesh\'s quest for immortality after Enkidu\'s death anticipates the Hebrew wrestling with death and Sheol. The Bible doesn\'t invent the flood story; it argues with it.'},
 
   // ── EGYPTIAN SUBSTRATE ─────────────────────────────────────────────────
-  {id:'maat',      tier:'egyptian', label:"Ma'at",          sub:'Cosmic order/truth',  x:-195, y:-310, r:11,
+  {id:'maat',      tier:'egyptian', label:"Ma'at",           sub:'Cosmic order/truth',  x:-195, y:-310, r:11,
    desc:"Egyptian cosmic principle — truth, order, justice, balance — maintained by Pharaoh's ritual performance. Ma'at is structurally similar to tzedek/mishpat but administered through royal hierarchy, not covenant. The Exodus is a polemic against ma'at: YHWH's justice does not flow through Pharaoh. It overturns him. The ten plagues are a systematic dismantling of Egyptian cosmic order."},
   {id:'aten',      tier:'egyptian', label:'Aten Hypothesis', sub:'Solar monotheism',   x:-295, y:-290, r:9,
    desc:"Akhenaten's solar monotheism (14th c. BCE) — one god, the Aten, creator and sustainer. Freud's Moses and Monotheism argued for direct connection. Most ANE scholars (including Assmann) are cautious: possible conceptual resonance rather than direct lineage. The Great Hymn to the Aten has verbal parallels with Psalm 104. At minimum: monotheizing impulses existed in Egypt before Israel consolidated YHWH-alone theology."},
-  {id:'osiris',    tier:'egyptian', label:'Osiris',          sub:'Death/resurrection logic', x:-120, y:-360, r:10,
+  {id:'osiris',    tier:'egyptian', label:'Osiris',           sub:'Death/resurrection logic', x:-120, y:-360, r:10,
    desc:"Egyptian god of death, resurrection, and the afterlife. Osiris murdered by Set, resurrected by Isis, becomes judge of the dead. Osiris is the oldest developed death-resurrection divine narrative in the region (3rd millennium BCE). His logic — death followed by divine vindication — enters Second Temple Jewish apocalypticism and shapes early Christian resurrection theology, though the Hebrew tradition contests and transforms it."},
-  {id:'thoth',     tier:'egyptian', label:'Thoth',           sub:'Divine speech/writing', x:-50, y:-380, r:9,
+  {id:'thoth',     tier:'egyptian', label:'Thoth',            sub:'Divine speech/writing', x:-50, y:-380, r:9,
    desc:"Egyptian god of writing, wisdom, divine speech — the tongue of Ra, the scribe of the gods. Thoth's 'word' creates and orders reality. This is the Egyptian version of dabar-as-creative-speech. The Memphite Theology (c. 700 BCE or earlier) presents Ptah/Thoth creating through thought and speech — direct parallel to Genesis 1. Whether this influenced Hebrew cosmology or reflects shared ANE logic is debated."},
 
   // ── PERSIAN / ZOROASTRIAN SUBSTRATE ───────────────────────────────────
-  {id:'ahura',     tier:'persian', label:'Ahura Mazda',     sub:'Zoroastrian supreme',  x:300, y:-200, r:12,
+  {id:'ahura',     tier:'persian', label:'Ahura Mazda',      sub:'Zoroastrian supreme',  x:300, y:-200, r:12,
    desc:'Zoroastrian supreme deity — the Wise Lord, creator of all good, locked in cosmic struggle with Angra Mainyu (evil). Zoroastrianism introduces: cosmic dualism, a linear eschatology (history moving toward a final judgment), resurrection of the dead, individual judgment after death, angelic hierarchy, Satan as cosmic adversary. All of these appear in Second Temple Judaism after Persian contact (539 BCE onward). The Persian influence on Jewish cosmology is massive and underacknowledged.'},
-  {id:'angra',     tier:'persian', label:'Angra Mainyu',    sub:'Cosmic evil principle', x:360, y:-130, r:10,
+  {id:'angra',     tier:'persian', label:'Angra Mainyu',     sub:'Cosmic evil principle', x:360, y:-130, r:10,
    desc:'The Zoroastrian principle of cosmic evil — Angra Mainyu (Ahriman). A genuinely opposed divine evil force, not subordinate to the supreme deity. Before Persian influence, the Hebrew Satan (ha-satan) is a prosecuting attorney in the divine council (Job 1-2), not a cosmic adversary. After Persian contact, the Satan figure becomes increasingly autonomous and evil — directly importing Zoroastrian dualism into Jewish cosmology.'},
   {id:'persian_esc',tier:'persian', label:'Zoroastrian Eschatology', sub:'Linear time/final judgment', x:380, y:-50, r:10,
    desc:'Zoroastrianism introduces linear history with a definitive end: a final battle, resurrection of the dead, judgment, and cosmic renewal. Hebrew cosmology before the exile tends toward cyclical or eternal time. Daniel (165 BCE), 1 Enoch, and the entire apocalyptic tradition reflect Zoroastrian eschatological logic. The Book of Revelation is Zoroastrian eschatology translated into Jewish-Christian imagery.'},
@@ -228,9 +248,9 @@ const nodes = [
   // ── SECOND TEMPLE EXPLOSION ────────────────────────────────────────────
   {id:'apocalyptic',tier:'secondtemple', label:'Apocalypticism', sub:'Hidden revelation/end-times', x:240, y:210, r:12,
    desc:'Second Temple Jewish apocalypticism (300 BCE–100 CE) — the genre of hidden revelation about cosmic events and history\'s end. Daniel, 1 Enoch, 4 Ezra, 2 Baruch. Apocalypticism synthesizes: Persian eschatology, Babylonian cosmic imagery, Hebrew prophetic tradition, and Greek cosmological speculation. It is where the feeding cosmologies collide and produce something new. Jesus and Paul both operate within apocalyptic frameworks.'},
-  {id:'angelology', tier:'secondtemple', label:'Angelology',    sub:'Hierarchical divine beings', x:300, y:130, r:11,
+  {id:'angelology', tier:'secondtemple', label:'Angelology',     sub:'Hierarchical divine beings', x:300, y:130, r:11,
    desc:'Second Temple period develops an elaborate angelology — named angels (Michael, Gabriel, Raphael, Uriel), angelic hierarchies, divine mediators. This imports Persian/Zoroastrian heavenly hierarchy into Jewish cosmology while maintaining YHWH\'s supremacy. The divine council becomes ordered, bureaucratized, and militarized. Angels become the infrastructure of cosmic governance.'},
-  {id:'satan_fig',  tier:'secondtemple', label:'Satan Figure',  sub:'Adversary becomes cosmic evil', x:355, y:30, r:11,
+  {id:'satan_fig',  tier:'secondtemple', label:'Satan Figure',   sub:'Adversary becomes cosmic evil', x:355, y:30, r:11,
    desc:'The evolution from ha-satan (prosecuting attorney in divine council, Job 1-2) to Satan (cosmic adversary, 1 Chronicles 21, Zechariah 3, and full development in 1 Enoch) tracks directly with Persian Zoroastrian influence post-exile. By the time of the New Testament, Satan is a cosmic adversary who rules "the present evil age." This is Angra Mainyu with Hebrew vocabulary. The shift has enormous consequence for theodicy.'},
   {id:'merkabah',   tier:'secondtemple', label:'Merkabah Mysticism', sub:'Throne/chariot visions', x:240, y:290, r:10,
    desc:"Merkabah (chariot) mysticism — Second Temple and early rabbinic tradition of ascending through heavenly palaces to the divine throne. Rooted in Ezekiel's chariot vision (Ezek 1). Developed into full mystical practice by 1st–6th c. CE. Where the divine council becomes a throne room, and the mystic seeks direct encounter with the divine presence. Influenced by Babylonian astronomical cosmology and Persian heavenly geography."},
@@ -247,257 +267,321 @@ const edges = [
   ['el','council'],['el','asherah'],
   // Core → sources
   ['tohu','J'],['tohu','E'],['ruach','J'],['dabar','J'],['shalom','D'],['tzedek','D'],['tehom','P'],['hesed','E'],
-  // Core → theo bursts
-  ['hesed','brit'],['shalom','sabbath'],['tzedek','ebyonim'],['dabar','torah'],['tzedek','nabi'],['tehom','exile'],
-  ['shalom','nabi'],
-  // Sources → theo bursts
-  ['D','sabbath'],['D','torah'],['D','jubilee'],['E','nabi'],['P','exile'],['J','nachash'],
-  // Sources → neighbor/absorbed
-  ['P','enuma'],['P','marduk'],['P','baal'],['J','maat'],['J','el'],['E','el'],
-  // Levant → Hebrew
-  ['ugarit','el'],['ugarit','baal'],['ugarit','mot'],['ugarit','yam'],['ugarit','anat'],
-  ['baal','yhwh'],['baal','logos'],['baal','ousia'],['mot','tehom'],['yam','tehom'],['anat','council'],
-  // Sumerian/Akkadian → Hebrew
-  ['enuma','marduk'],['enuma','P'],['enuma','tohu'],['marduk','ousia'],
-  ['enki','gilgamesh'],['gilgamesh','tehom'],['gilgamesh','exile'],
-  ['inanna','asherah'],['inanna','hokmah'],
-  // Egyptian → Hebrew
-  ['maat','J'],['maat','tzedek'],['aten','yhwh'],['osiris','apocalyptic'],['thoth','dabar'],['thoth','hokmah'],
-  // Persian → Second Temple
-  ['ahura','angelology'],['ahura','persian_esc'],['angra','satan_fig'],['persian_esc','apocalyptic'],
-  ['ahura','council'],
-  // Second Temple internal
-  ['exile','apocalyptic'],['exile','angelology'],['exile','enoch_trad'],
-  ['council','angelology'],['council','satan_fig'],['nachash','satan_fig'],
-  ['apocalyptic','merkabah'],['apocalyptic','enoch_trad'],['angelology','satan_fig'],
-  ['hokmah','logos'],['hokmah','apocalyptic'],
-  // Imperial overlays
-  ['dabar','logos'],['logos','ousia'],['ousia','pax_roma'],['pax_roma','psa'],['psa','calvinism'],
-  ['marduk','ousia'],
-  // Liberation threads
-  ['tzedek','jubilee'],['yhwh','exodus'],['exodus','ger'],['exodus','ebyonim'],
-  ['brit','kingjr'],['nabi','kingjr'],['ebyonim','libtheo'],['kingjr','libtheo'],
-  ['sabbath','jubilee'],['ger','libtheo'],['exile','nabi'],['torah','ger'],
-  ['nabi','libtheo'],['apocalyptic','liberation'],
+  // YHWH → theo bursts
+  ['yhwh','brit'],['yhwh','sabbath'],['yhwh','ebyonim'],['yhwh','torah'],['yhwh','nabi'],['yhwh','exile'],
+  // sources → theo bursts
+  ['J','brit'],['E','brit'],['D','tzedek'],['D','ebyonim'],['P','sabbath'],['P','torah'],['exile','P'],
+  // Substrates → Core/Absorbed (The feeding lines)
+  ['ugarit','el'],['ugarit','council'],['baal','yhwh'],['mot','tehom'],['yam','tehom'],['anat','yhwh'],
+  ['enuma','tohu'],['enuma','tehom'],['marduk','yhwh'],['enki','ruach'],['inanna','asherah'],['gilgamesh','tehom'],
+  ['maat','tzedek'],['aten','yhwh'],['osiris','yhwh'],['thoth','dabar'],
+  // Persian → Second Temple & Imperial
+  ['ahura','yhwh'],['angra','satan_fig'],['persian_esc','apocalyptic'],['ahura','angelology'],
+  // Second Temple Connections
+  ['exile','apocalyptic'],['council','angelology'],['nachash','satan_fig'],['council','satan_fig'],
+  ['apocalyptic','merkabah'],['apocalyptic','enoch_trad'],['angelology','enoch_trad'],
+  // Imperial Overlays (The ruptures/swaps)
+  ['dabar','logos'],['hokmah','logos'],['logos','ousia'],['pax_roma','logos'],
+  ['ousia','psa'],['psa','calvinism'],
+  // Liberation Threads (The excavation)
+  ['exodus','yhwh'],['exodus','jubilee'],['jubilee','ebyonim'],['ger','ebyonim'],['ebyonim','libtheo'],
+  ['nabi','libtheo'],['exodus','libtheo'],['nabi','kingjr'],['shalom','kingjr'],['libtheo','kingjr']
 ];
 
-const TIER_COLORS = {};
-Object.entries(TIERS).forEach(([k,v]) => TIER_COLORS[k] = v.color);
+// Map node lookup
+const nodeMap = {};
+nodes.forEach(n => nodeMap[n.id] = n);
 
-function getNode(id) { return nodes.find(n => n.id === id); }
-
-let hoveredNode = null, animFrame = 0;
-let activeFilter = null;
-
-// Build legend
-const legendEl = document.getElementById('legend');
-Object.entries(TIERS).forEach(([k,v]) => {
-  const d = document.createElement('div');
-  d.innerHTML = `<span style="background:${v.color}"></span>${v.label.toUpperCase()}`;
-  legendEl.appendChild(d);
+// Build adjacent list for filtering
+const adj = {};
+nodes.forEach(n => adj[n.id] = []);
+edges.forEach(([u, v]) => {
+  if(adj[u] && adj[v]) {
+    adj[u].push(v);
+    adj[v].push(u);
+  }
 });
 
-// Build filter bar
+// Build filter buttons
 const filterBar = document.getElementById('filter-bar');
-const allBtn = document.createElement('button');
-allBtn.className = 'fbtn active';
-allBtn.textContent = 'ALL';
-allBtn.style.borderColor = '#c9a227';
-allBtn.style.background = '#c9a227';
-allBtn.style.color = '#1a1a1a';
-allBtn.onclick = () => setFilter(null, allBtn);
-filterBar.appendChild(allBtn);
+let activeFilter = 'all';
 
-const filterBtns = {};
-Object.entries(TIERS).forEach(([k,v]) => {
-  const btn = document.createElement('button');
-  btn.className = 'fbtn';
-  btn.textContent = k.toUpperCase();
-  btn.style.borderColor = v.color;
-  btn.style.color = v.color;
-  btn.onclick = () => setFilter(k, btn);
-  filterBar.appendChild(btn);
-  filterBtns[k] = btn;
+function createFilterButtons() {
+  filterBar.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = `fbtn ${activeFilter==='all'?'active':''}`;
+  allBtn.style.borderColor = '#999';
+  if(activeFilter==='all') allBtn.style.background = '#999';
+  allBtn.innerText = 'Show All';
+  allBtn.onclick = () => { activeFilter = 'all'; selectNode(null); updateFilters(); };
+  filterBar.appendChild(allBtn);
+
+  Object.entries(TIERS).forEach(([key, value]) => {
+    const btn = document.createElement('button');
+    btn.className = `fbtn ${activeFilter===key?'active':''}`;
+    btn.style.borderColor = value.color;
+    if(activeFilter === key) {
+      btn.style.background = value.color;
+      btn.style.color = '#1a1a1a';
+    }
+    btn.innerText = value.label.split(' (')[0]; // short form
+    btn.onclick = () => { activeFilter = key; selectNode(null); updateFilters(); };
+    filterBar.appendChild(btn);
+  });
+}
+
+function updateFilters() {
+  createFilterButtons();
+}
+updateFilters();
+
+// Build Legend
+const legend = document.getElementById('legend');
+Object.entries(TIERS).forEach(([key, value]) => {
+  const div = document.createElement('div');
+  const span = document.createElement('span');
+  span.style.background = value.color;
+  div.appendChild(span);
+  div.appendChild(document.createTextNode(value.label));
+  legend.appendChild(div);
 });
 
-function setFilter(tier, clickedBtn) {
-  activeFilter = tier;
-  allBtn.classList.remove('active');
-  allBtn.style.background = 'rgba(18,18,18,0.9)';
-  allBtn.style.color = '#aaa';
-  Object.values(filterBtns).forEach(b => {
-    b.classList.remove('active');
-    b.style.background = 'rgba(18,18,18,0.9)';
-  });
-  clickedBtn.classList.add('active');
-  const c = tier ? TIERS[tier].color : '#c9a227';
-  clickedBtn.style.background = c;
-  clickedBtn.style.color = '#1a1a1a';
+// Interaction state
+let hoveredNode = null;
+let selectedNode = null;
+
+function getMousePos(e) {
+  return { x: e.clientX, y: e.clientY };
 }
 
-function nodeAlpha(node) {
-  if (!activeFilter) return 1;
-  return node.tier === activeFilter ? 1 : 0.08;
-}
-function edgeAlpha(na, nb) {
-  if (!activeFilter) return 1;
-  return (na.tier === activeFilter || nb.tier === activeFilter) ? 0.6 : 0.03;
+function toWorld(pos) {
+  return {
+    x: (pos.x - W/2 - pan.x) / zoom,
+    y: (pos.y - H/2 - pan.y) / zoom
+  };
 }
 
+canvas.addEventListener('mousedown', e => {
+  // If clicking with modifiers, prioritize Zoom instead of Drag
+  if (e.shiftKey || e.altKey) return;
+  dragging = true;
+  lastMouse = getMousePos(e);
+});
+
+window.addEventListener('mousemove', e => {
+  const mouse = getMousePos(e);
+  if (dragging && lastMouse) {
+    pan.x += mouse.x - lastMouse.x;
+    pan.y += mouse.y - lastMouse.y;
+    lastMouse = mouse;
+  } else {
+    // Hover check
+    const world = toWorld(mouse);
+    let found = null;
+    for(let i=nodes.length-1; i>=0; i--) {
+      const n = nodes[i];
+      if (activeFilter !== 'all' && n.tier !== activeFilter) continue;
+      const dx = world.x - n.x;
+      const dy = world.y - n.y;
+      if (dx*dx + dy*dy < n.r*n.r) {
+        found = n;
+        break;
+      }
+    }
+    if (found !== hoveredNode) {
+      hoveredNode = found;
+      updateSidebar(hoveredNode || selectedNode);
+    }
+  }
+});
+
+window.addEventListener('mouseup', () => { dragging = false; lastMouse = null; });
+
+canvas.addEventListener('click', e => {
+  const mouse = getMousePos(e);
+  const worldBefore = toWorld(mouse);
+
+  // Modular Mouse Click Zoom Overrides (+ / - Controls)
+  if (e.shiftKey) {
+    // Zoom In
+    zoom *= 1.35;
+    if(zoom > 4) zoom = 4;
+    pan.x = mouse.x - W/2 - worldBefore.x * zoom;
+    pan.y = mouse.y - H/2 - worldBefore.y * zoom;
+    return;
+  } else if (e.altKey) {
+    // Zoom Out
+    zoom /= 1.35;
+    if(zoom < 0.15) zoom = 0.15;
+    pan.x = mouse.x - W/2 - worldBefore.x * zoom;
+    pan.y = mouse.y - H/2 - worldBefore.y * zoom;
+    return;
+  }
+
+  // Normal Selection Check
+  const world = toWorld(mouse);
+  let found = null;
+  for(let i=nodes.length-1; i>=0; i--) {
+    const n = nodes[i];
+    if (activeFilter !== 'all' && n.tier !== activeFilter) continue;
+    const dx = world.x - n.x;
+    const dy = world.y - n.y;
+    if (dx*dx + dy*dy < n.r*n.r) {
+      found = n;
+      break;
+    }
+  }
+  selectNode(found);
+});
+
+// Kill traditional trackpad wheel pinch event entirely to prevent overlap
+canvas.addEventListener('wheel', e => e.preventDefault(), { passive: false });
+
+function selectNode(node) {
+  selectedNode = node;
+  updateSidebar(node || hoveredNode);
+}
+
+const sidebar = document.getElementById('sidebar');
+const hintText = document.getElementById('hint');
+const ipTitle = document.getElementById('ip-title');
+const ipCat = document.getElementById('ip-cat');
+const ipDesc = document.getElementById('ip-desc');
+
+function updateSidebar(node) {
+  if (!node) {
+    sidebar.style.display = 'none';
+    hintText.classList.add('sidebar-closed');
+    return;
+  }
+  sidebar.style.display = 'flex';
+  hintText.classList.remove('sidebar-closed');
+  ipTitle.innerText = node.label + (node.sub ? ` (${node.sub})` : '');
+  ipCat.innerText = TIERS[node.tier].label;
+  ipCat.style.color = TIERS[node.tier].color;
+  ipDesc.innerText = node.desc;
+}
+
+// Main Draw Loop
 function draw() {
   ctx.clearRect(0, 0, W, H);
-  animFrame++;
-
   ctx.save();
   ctx.translate(W/2 + pan.x, H/2 + pan.y);
   ctx.scale(zoom, zoom);
 
-  // Starfield
-  for (let i = 0; i < 160; i++) {
-    const sx = ((i * 137 + 42) % 1200) - 600;
-    const sy = ((i * 97 + 84) % 900) - 450;
-    const sa = 0.06 + (i%4)*0.04 + 0.02*Math.sin(animFrame*0.018+i);
-    ctx.beginPath();
-    ctx.arc(sx, sy, 0.5+(i%3)*0.35, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(245,240,232,${sa})`;
-    ctx.fill();
-  }
+  const focusNode = hoveredNode || selectedNode;
+  const isHighlightMode = !!focusNode;
 
-  // Edges
-  edges.forEach(([a,b]) => {
-    const na = getNode(a), nb = getNode(b);
-    if (!na || !nb) return;
-    const isHov = hoveredNode && (hoveredNode.id===a || hoveredNode.id===b);
-    const alpha = edgeAlpha(na, nb);
+  // Draw Edges
+  edges.forEach(([uid, vid]) => {
+    const u = nodeMap[uid];
+    const v = nodeMap[vid];
+    if(!u || !v) return;
+
+    if (activeFilter !== 'all' && u.tier !== activeFilter && v.tier !== activeFilter) return;
+
+    let isEdgeHigh = false;
+    if (isHighlightMode) {
+      if (focusNode.id === u.id || focusNode.id === v.id) {
+        isEdgeHigh = true;
+      }
+    }
+
     ctx.beginPath();
-    ctx.moveTo(na.x, na.y);
-    ctx.lineTo(nb.x, nb.y);
-    ctx.strokeStyle = isHov ? `rgba(201,162,39,0.85)` : `rgba(245,240,232,${0.09 * alpha})`;
-    ctx.lineWidth = (isHov ? 1.3 : 0.6) / zoom;
+    ctx.moveTo(u.x, u.y);
+    ctx.lineTo(v.x, v.y);
+
+    if (isHighlightMode) {
+      if (isEdgeHigh) {
+        ctx.strokeStyle = u.id === focusNode.id ? TIERS[v.tier].color : TIERS[u.tier].color;
+        ctx.lineWidth = 1.5 / zoom;
+      } else {
+        ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+        ctx.lineWidth = 0.5 / zoom;
+      }
+    } else {
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 0.5 / zoom;
+    }
     ctx.stroke();
   });
 
-  // Nodes
-  nodes.forEach(node => {
-    const isHov = hoveredNode && hoveredNode.id === node.id;
-    const alpha = nodeAlpha(node);
-    const pulse = node.glow ? 0.7 + 0.3*Math.sin(animFrame*0.038) : 0;
-    const col = node.color || TIER_COLORS[node.tier];
+  // Draw Nodes
+  nodes.forEach(n => {
+    if (activeFilter !== 'all' && n.tier !== activeFilter) return;
 
-    if (node.glow && alpha > 0.5) {
-      const g = ctx.createRadialGradient(node.x,node.y,node.r*0.4, node.x,node.y,node.r*4);
-      g.addColorStop(0, `rgba(201,162,39,${(0.28+pulse*0.12)*alpha})`);
-      g.addColorStop(1, 'rgba(201,162,39,0)');
-      ctx.beginPath();
-      ctx.arc(node.x,node.y,node.r*4,0,Math.PI*2);
-      ctx.fillStyle = g;
-      ctx.fill();
+    let isNodeHigh = false;
+    let isNeighbor = false;
+    if (isHighlightMode) {
+      if (focusNode.id === n.id) isNodeHigh = true;
+      else if (adj[focusNode.id].includes(n.id)) isNeighbor = true;
     }
 
-    if (isHov && alpha > 0.5) {
-      const g = ctx.createRadialGradient(node.x,node.y,node.r, node.x,node.y,node.r*2.8);
-      g.addColorStop(0, col+'44');
-      g.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.beginPath();
-      ctx.arc(node.x,node.y,node.r*2.8,0,Math.PI*2);
-      ctx.fillStyle=g;
-      ctx.fill();
+    const color = TIERS[n.tier].color;
+
+    ctx.save();
+    ctx.translate(n.x, n.y);
+
+    if (n.glow || isNodeHigh) {
+      ctx.shadowBlur = isNodeHigh ? 25 : 15;
+      ctx.shadowColor = color;
     }
 
-    ctx.globalAlpha = alpha;
+    if (isNodeHigh) {
+      ctx.beginPath();
+      ctx.arc(0, 0, n.r + 5, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
     ctx.beginPath();
-    ctx.arc(node.x,node.y,isHov?node.r+2:node.r,0,Math.PI*2);
-    ctx.fillStyle = col + (isHov?'ff':'cc');
-    ctx.fill();
-    ctx.strokeStyle = isHov ? '#ffffff' : col;
-    ctx.lineWidth = (isHov?1.5:0.7)/zoom;
-    ctx.stroke();
-
-    const fs = node.r>22?11:(node.r>12?9:8);
-    const lbl = node.label.length>13 ? node.label.split(/[\/\s]/)[0] : node.label;
-    ctx.font = `600 ${fs}px 'Cinzel', serif`;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle = node.r>22 ? '#1a1a1a' : '#f5f0e8';
-    ctx.fillText(lbl, node.x, node.y - (node.sub&&node.r>=12?3:0));
-    if (node.sub && node.r>=12) {
-      ctx.font=`400 7px 'Space Mono',monospace`;
-      ctx.fillStyle = node.r>22?'rgba(26,26,26,0.65)':'rgba(245,240,232,0.6)';
-      ctx.fillText(node.sub.substring(0,20), node.x, node.y+7);
+    ctx.arc(0, 0, n.r, 0, Math.PI*2);
+    
+    if (isHighlightMode) {
+      if (isNodeHigh || isNeighbor) {
+        ctx.fillStyle = color;
+      } else {
+        ctx.fillStyle = 'rgba(40,40,40,0.2)';
+      }
+    } else {
+      ctx.fillStyle = color;
     }
-    ctx.globalAlpha = 1;
+    ctx.fill();
+
+    ctx.shadowBlur = 0; 
+    
+    let labelAlpha = 1;
+    if (isHighlightMode && !isNodeHigh && !isNeighbor) {
+      labelAlpha = 0.15;
+    }
+
+    ctx.fillStyle = `rgba(255, 245, 230, ${labelAlpha})`;
+    ctx.font = `bold ${Math.max(8, n.r * 0.55)}px 'Space Mono', monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    if (n.r > 12) {
+      ctx.fillText(n.label.substring(0,6), 0, 0);
+    } else {
+      ctx.font = `6px 'Space Mono', monospace`;
+      ctx.fillText(n.label.substring(0,4), 0, 0);
+    }
+
+    if (zoom > 1.2 && (isNodeHigh || isNeighbor || !isHighlightMode)) {
+      ctx.fillStyle = `rgba(200, 200, 200, 0.8)`;
+      ctx.font = `7px 'Cinzel', serif`;
+      ctx.fillText(n.label, 0, n.r + 10);
+    }
+
+    ctx.restore();
   });
 
   ctx.restore();
   requestAnimationFrame(draw);
 }
 
-function getHit(mx,my) {
-  const cx=(mx-W/2-pan.x)/zoom, cy=(my-H/2-pan.y)/zoom;
-  return nodes.find(n=>Math.hypot(n.x-cx,n.y-cy)<n.r+8)||null;
-}
-
-canvas.addEventListener('mousemove', e => {
-  const rect=canvas.getBoundingClientRect();
-  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
-  const hit=getHit(mx,my);
-  hoveredNode=hit;
-  const panel=document.getElementById('info-panel');
-  if (hit) {
-    document.getElementById('ip-title').textContent=hit.label;
-    document.getElementById('ip-cat').style.color=TIER_COLORS[hit.tier];
-    document.getElementById('ip-cat').textContent=TIERS[hit.tier].label;
-    document.getElementById('ip-desc').textContent=hit.desc;
-    panel.style.display='block';
-    canvas.style.cursor='pointer';
-  } else {
-    panel.style.display='none';
-    canvas.style.cursor=dragging?'grabbing':'grab';
-  }
-  if (dragging&&lastMouse) {
-    pan.x+=mx-lastMouse.x; pan.y+=my-lastMouse.y;
-    lastMouse={x:mx,y:my};
-  }
-});
-canvas.addEventListener('mousedown', e=>{
-  dragging=true;
-  const rect=canvas.getBoundingClientRect();
-  lastMouse={x:e.clientX-rect.left,y:e.clientY-rect.top};
-});
-canvas.addEventListener('mouseup',()=>{dragging=false;lastMouse=null;});
-canvas.addEventListener('mouseleave',()=>{
-  dragging=false;hoveredNode=null;
-  document.getElementById('info-panel').style.display='none';
-});
-canvas.addEventListener('wheel',e=>{
-  e.preventDefault();
-  const rect=canvas.getBoundingClientRect();
-  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
-  const f=e.deltaY<0?1.1:0.9;
-  const nz=Math.max(0.25,Math.min(5,zoom*f));
-  pan.x=(pan.x-(mx-W/2))*(nz/zoom)+(mx-W/2);
-  pan.y=(pan.y-(my-H/2))*(nz/zoom)+(my-H/2);
-  zoom=nz;
-},{passive:false});
-
-let lastTouchDist=null;
-canvas.addEventListener('touchstart',e=>{
-  if(e.touches.length===1){dragging=true;lastMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};}
-});
-canvas.addEventListener('touchmove',e=>{
-  e.preventDefault();
-  if(e.touches.length===1&&dragging){
-    pan.x+=e.touches[0].clientX-lastMouse.x;
-    pan.y+=e.touches[0].clientY-lastMouse.y;
-    lastMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};
-  } else if(e.touches.length===2){
-    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-    if(lastTouchDist) zoom=Math.max(0.25,Math.min(5,zoom*d/lastTouchDist));
-    lastTouchDist=d;
-  }
-},{passive:false});
-canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
-
-draw();
+requestAnimationFrame(draw);
 </script>
 </body>
 </html>
