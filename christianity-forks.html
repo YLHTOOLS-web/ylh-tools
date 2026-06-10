@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christianity Version History — YLH Fork Comparison</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Space+Mono:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap');
+
+  :root {
+    --parchment: #f5f0e8;
+    --charcoal: #2a2a2a;
+    --neutral:   #e8e8e8;
+    --gold:      #c9a227;
+    --ink:       #1a1a1a;
+    --white:     #ffffff;
+    --mid:       #5a5a5a;
+    --border:    #d0c8b8;
+    --purple:    #7a5abf;
+    --purple-bg: #ede8f5;
+    --purple-txt:#4a3a7a;
+    --gold-bg:   #f5edd8;
+    --gold-txt:  #7a5a10;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 36px 28px 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
+
+  .eyebrow {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: var(--mid);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .main-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(20px, 4vw, 38px);
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+
+  .main-title span { color: var(--gold); }
+
+  .subtitle {
+    font-size: 11px;
+    color: var(--mid);
+    letter-spacing: 2px;
+    margin-top: 8px;
+  }
+
+  /* ── FORK NAV ── */
+  .fork-nav {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 28px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .fork-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--mid);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .fork-btn:hover {
+    border-color: var(--gold);
+    color: var(--ink);
+  }
+
+  .fork-btn.active {
+    background: var(--ink);
+    color: var(--white);
+    border-color: var(--ink);
+  }
+
+  /* ── MAIN CARD ── */
+  .card-wrap {
+    max-width: 900px;
+    margin: 24px auto 0;
+    padding: 0 28px 60px;
+  }
+
+  .fork-card {
+    display: none;
+  }
+
+  .fork-card.visible {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* card top band */
+  .card-header {
+    background: var(--charcoal);
+    padding: 22px 26px 18px;
+    border-bottom: 3px solid var(--gold);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  .fork-version {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .fork-name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(18px, 3.5vw, 30px);
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .fork-date {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #aaa;
+  }
+
+  /* card body */
+  .card-body {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: none;
+  }
+
+  .card-section {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--neutral);
+  }
+
+  .card-section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 7px;
+    letter-spacing: 4px;
+    color: var(--mid);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .card-section p {
+    font-family: 'IM Fell English', serif;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--ink);
+  }
+
+  /* rules grid inside card */
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (max-width: 580px) { .rules-grid { grid-template-columns: 1fr; } }
+
+  .rule-item {
+    background: var(--parchment);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--ink);
+    padding: 12px 14px;
+  }
+
+  .rule-cat {
+    font-size: 7px;
+    letter-spacing: 3px;
+    color: var(--mid);
+    margin-bottom: 4px;
+  }
+
+  .rule-val {
+    font-family: 'IM Fell English', serif;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  /* consequence block */
+  .consequence {
+    background: var(--neutral);
+    border-left: 4px solid var(--gold);
+    padding: 14px 18px;
+    margin-top: 4px;
+  }
+
+  .consequence .clabel {
+    font-size: 7px;
+    letter-spacing: 3px;
+    color: var(--gold-txt);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+
+  .consequence p {
+    font-family: 'IM Fell English', serif;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--charcoal);
+  }
+
+  /* ylh flag */
+  .ylh-flag {
+    background: var(--charcoal);
+    padding: 14px 18px;
+    margin-top: 4px;
+  }
+
+  .ylh-flag .flabel {
+    font-size: 7px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .ylh-flag p {
+    font-family: 'IM Fell English', serif;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #e8e4da;
+  }
+
+  .ylh-flag p em { color: var(--gold); font-style: normal; }
+
+  /* tags */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+  .tag {
+    font-size: 8px;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .tag.heb  { background: var(--gold-bg);   color: var(--gold-txt); border-color: #d4b870; }
+  .tag.grk  { background: var(--purple-bg); color: var(--purple-txt); border-color: #c8b8e8; }
+  .tag.lat  { background: #f0ece4; color: #4a3a2a; border-color: #c8b8a0; }
+  .tag.afr  { background: #e8f0e8; color: #2a5a2a; border-color: #a0c8a0; }
+  .tag.pent { background: #f0e8f5; color: #5a2a7a; border-color: #c0a0d8; }
+
+  /* nav arrows */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+  }
+
+  .nav-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .nav-btn:hover { background: var(--ink); color: var(--white); border-color: var(--ink); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-btn:disabled:hover { background: var(--white); color: var(--ink); border-color: var(--border); }
+
+  .fork-counter {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--mid);
+  }
+
+  /* progress bar */
+  .progress-bar {
+    height: 2px;
+    background: var(--neutral);
+    margin-bottom: 20px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.3s ease;
+  }
+
+  .gold-rule { height: 2px; background: var(--gold); margin: 0 0 20px; }
+
+  .footer {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: var(--mid);
+    text-align: center;
+    padding: 20px 28px 40px;
+    border-top: 1px solid var(--border);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="eyebrow">YLH Diagnostic Engine · Comparative OS Analysis · 2026</div>
+  <div class="main-title">CHRISTIANITY <span>VERSION HISTORY</span></div>
+  <div class="subtitle">Select a fork. Compare the operating system. Read the consequence ecology.</div>
+</div>
+
+<div class="fork-nav" id="forkNav"></div>
+
+<div class="card-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div id="cardContainer"></div>
+  <div class="nav-row">
+    <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">← Previous</button>
+    <span class="fork-counter" id="forkCounter"></span>
+    <button class="nav-btn" id="nextBtn" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<div class="footer">
+  Yahwist Liberation Hermeneutic · Brandy D. Cannon-Mitchell · Consequence-First Analysis<br>
+  YLH does not evaluate which fork is "correct." It maps what each fork generates.
+</div>
+
+<script>
+const forks = [
+  {
+    id: "jerusalem",
+    version: "FORK_01",
+    name: "Jerusalem Fork",
+    date: "c. 30–70 CE",
+    context: "The earliest Jesus movement, rooted in Second Temple Judaism. Torah-observant, temple-adjacent, and deeply embedded in Jewish apocalyptic expectation. Primary figures: James the Just, Peter, the Jerusalem community. The movement understood Jesus as Messiah within the Hebrew covenantal framework — not a break from Judaism but its prophetic fulfillment.",
+    rules: [
+      { cat: "Ontology", val: "Humanity is covenantally bound — capable of return and repair. No inherited corruption doctrine." },
+      { cat: "Cosmology", val: "YHWH's kingdom is breaking into this world now. The poor and marginalized are the primary sign of its arrival." },
+      { cat: "Soteriology", val: "Salvation as communal restoration — teshuvah, not transaction. Debt metaphors are economic, not metaphysical." },
+      { cat: "Epistemology", val: "Truth known through Torah practice, prophetic discernment, and communal discernment (Acts 15 model)." },
+      { cat: "Anthropology", val: "Whole-person embodied — nephesh. No soul/body split. The resurrection is bodily, not escape from flesh." },
+      { cat: "Authority", val: "Collegial and charismatic. James presides through recognized wisdom, not hierarchical office." }
+    ],
+    consequence: "Produces a community organized around mutual aid, table fellowship across class lines, and prophetic critique of empire. The Jerusalem community maintained a common purse (Acts 2–4).",
+    ylh: "This fork was effectively destroyed in 70 CE when Rome razed Jerusalem. Its suppression by the Pauline and later Latin traditions is not accidental — it represented a fundamentally different power architecture.",
+    tags: [
+      { label: "Hebrew substrate", cls: "heb" },
+      { label: "Torah-observant", cls: "heb" },
+      { label: "Pre-Nicene", cls: "lat" }
+    ]
+  },
+  {
+    id: "pauline",
+    version: "FORK_02",
+    name: "Pauline Mission Fork",
+    date: "c. 50–100 CE",
+    context: "Paul's letters represent a genuine theological innovation — taking the Jesus movement into the Greco-Roman diaspora and translating it across cultural frameworks. Paul is working in Greek philosophical categories but retains Jewish apocalyptic structure. Critical distinction: Paul's own letters vs. the Deutero-Pauline texts (Ephesians, Colossians, Pastorals) which later domesticated his more radical impulses.",
+    rules: [
+      { cat: "Ontology", val: "Creation is groaning and being renewed (Romans 8). The self is caught between two ages — 'already/not yet.'" },
+      { cat: "Cosmology", val: "Principalities and powers are real governance structures, not just spiritual entities. Empire is implicated." },
+      { cat: "Soteriology", val: "Justification by faith — participation in Christ's death/resurrection, not primarily debt payment. Galatians 3: no Jew/Greek, slave/free, male/female." },
+      { cat: "Epistemology", val: "The cross as epistemological disruption — foolishness to Greeks, scandal to Jews. Reverses conventional wisdom." },
+      { cat: "Anthropology", val: "Complex — pneuma/sarx not soul/body but two orientations toward existence. Often misread as dualism." },
+      { cat: "Authority", val: "Charismatic gifts distributed across the body. No single hierarchy — but later Deutero-Pauline texts install bishops and silence women." }
+    ],
+    consequence: "The authentic Pauline letters produce a community where social hierarchies are suspended at the table. The Deutero-Pauline domestication reinstalls household codes and gender hierarchy — the fork splits inside the canon itself.",
+    ylh: "This is where the first internal version conflict is detectable. The canon contains both the radical Paul (Galatians, Romans) and the domesticated Paul (Pastorals). Which Paul gets preached is a political choice.",
+    tags: [
+      { label: "Greek categories", cls: "grk" },
+      { label: "Jewish apocalyptic", cls: "heb" },
+      { label: "Diaspora context", cls: "lat" }
+    ]
+  },
+  {
+    id: "desert",
+    version: "FORK_03",
+    name: "Desert Monastic Fork",
+    date: "c. 250–500 CE",
+    context: "The desert fathers and mothers of Egypt, Syria, and Palestine — Antony, Pachomius, Macrina, Syncletica — represented a protest movement against the Constantinian church. When the empire adopted Christianity, the desert became the site of radical refusal. This tradition produced contemplative practice, poverty, and a counter-cultural anthropology.",
+    rules: [
+      { cat: "Ontology", val: "The self is a site of spiritual contest — not condemned but capable of transformation (theosis). Emphasis on practice over doctrine." },
+      { cat: "Cosmology", val: "The world is not evil but full of distraction. The desert is a laboratory for attention." },
+      { cat: "Soteriology", val: "Theosis — participation in divine life through ascetic practice and contemplation. Not forensic transaction." },
+      { cat: "Epistemology", val: "Knowledge through stillness (hesychia) and experience. Abba Poemen: 'Teach your mouth to say what is in your heart.'" },
+      { cat: "Anthropology", val: "Body disciplined but not condemned. Fasting as tool, not punishment. The Sayings reveal deep psychological insight." },
+      { cat: "Authority", val: "Earned through demonstrated wisdom and practice, not office. The abba/amma relationship is mentorship, not command." }
+    ],
+    consequence: "Produces communities of radical simplicity and psychological depth. The monastic tradition preserves libraries, cares for the poor, and maintains intellectual life through empire collapse.",
+    ylh: "The desert tradition is one of the few places Western Christianity preserved embodied practice over propositional doctrine. It also produced the first women theologians and leaders to leave substantial records — the ammas.",
+    tags: [
+      { label: "Egyptian context", cls: "afr" },
+      { label: "Theosis model", cls: "grk" },
+      { label: "Pre-Augustinian", cls: "lat" }
+    ]
+  },
+  {
+    id: "byzantine",
+    version: "FORK_04",
+    name: "Byzantine Fork",
+    date: "c. 330–1453 CE",
+    context: "Eastern Christianity centered in Constantinople, developing the Greek theological tradition through the Cappadocian Fathers (Basil, Gregory of Nyssa, Gregory of Nazianzus), Maximus the Confessor, and John of Damascus. This fork retained Greek philosophical categories but used them differently than the Latin West — emphasizing theosis, the apophatic tradition, and communal liturgy as the primary locus of theology.",
+    rules: [
+      { cat: "Ontology", val: "Human beings are icons — created in the image of God with capacity for divine likeness. Corruption dims the image; it does not destroy it." },
+      { cat: "Cosmology", val: "The cosmos is liturgy — creation participates in divine worship. Matter is sacramental, not suspect." },
+      { cat: "Soteriology", val: "Theosis: 'God became human so that humans might become divine' (Athanasius). Not debt payment — participation and transformation." },
+      { cat: "Epistemology", val: "Apophatic: God is known primarily through what cannot be said. Mystery is not failure — it is the shape of genuine encounter." },
+      { cat: "Anthropology", val: "The body is integral to salvation — hence icons, incense, prostrations. The resurrection transforms, not escapes, materiality." },
+      { cat: "Authority", val: "Conciliar — truth is discerned through councils, not papal monarchy. But caesaropapism (emperor controlling church) is a persistent distortion." }
+    ],
+    consequence: "Produces rich liturgical aesthetics, iconographic theology, and a more body-positive anthropology than the Latin West. But caesaropapism entangles the church with imperial power in ways that mirror Constantinian distortions.",
+    ylh: "Byzantine Christianity preserves the most substantial counter-evidence to the Latin/Augustinian build. Its suppression in Western theological education is consequential — it makes the Augustinian build look universal when it is regional.",
+    tags: [
+      { label: "Greek patristics", cls: "grk" },
+      { label: "Theosis model", cls: "grk" },
+      { label: "Conciliar authority", cls: "lat" }
+    ]
+  },
+  {
+    id: "augustinian",
+    version: "FORK_05",
+    name: "Latin / Augustinian Fork",
+    date: "c. 400–1500 CE",
+    context: "Augustine of Hippo's synthesis of Neoplatonism, Roman legal culture, and Christian theology became the dominant operating system of Western Christianity. Augustine's response to Pelagianism hardened original sin doctrine, his response to the Donatists gave theological cover to coercive state power, and his City of God framework structured the relationship between church and empire for a millennium.",
+    rules: [
+      { cat: "Ontology", val: "Original sin — inherited corruption transmitted through generation. The will is bound; without grace, humanity cannot choose good." },
+      { cat: "Cosmology", val: "Two cities: City of God vs. City of Man. The earthly city is ordered by lust for domination (libido dominandi)." },
+      { cat: "Soteriology", val: "Grace as irresistible divine gift to the elect. Predestination. Later systematized into Anselm's satisfaction theory." },
+      { cat: "Epistemology", val: "Divine illumination — truth requires God's direct illumination of the intellect. Faith precedes and enables reason." },
+      { cat: "Anthropology", val: "Soul over body — the soul is the true self. The body is the locus of concupiscence and sexual sin." },
+      { cat: "Authority", val: "Hierarchical — the church mediates grace through ordained priesthood. Later: papal supremacy, Inquisition logic." }
+    ],
+    consequence: "This is the source code for most of what Tony DeGruy correctly identified as 'later philosophical and political overlays.' It produces theological justification for coercion, colonialism, and sexual surveillance.",
+    ylh: "The Latin/Augustinian build is the most politically consequential fork in Western history. It is the operating system that traveled with colonial expansion. When people say 'Christianity teaches X,' they almost always mean this fork.",
+    tags: [
+      { label: "Neoplatonic substrate", cls: "grk" },
+      { label: "Roman legal culture", cls: "lat" },
+      { label: "Colonial export", cls: "lat" }
+    ]
+  },
+  {
+    id: "protestant",
+    version: "FORK_06",
+    name: "Protestant Fork",
+    date: "c. 1517–1700 CE",
+    context: "Luther, Calvin, Zwingli, and the Radical Reformers each produced distinct sub-forks. Luther challenged papal authority but retained Augustinian anthropology. Calvin systematized predestination into a governance architecture (Geneva theocracy). The Radical Reformation (Anabaptists, Münzer) represented a genuinely anti-imperial protest tradition that was violently suppressed by both Catholic and Protestant establishments.",
+    rules: [
+      { cat: "Ontology", val: "Total depravity (Calvinist build) — sin corrupts every faculty. Luther: simultaneously saint and sinner (simul justus et peccator)." },
+      { cat: "Cosmology", val: "Calvin: all of life is to be ordered under God's sovereignty. Produces a total governance architecture — theocracy is the goal." },
+      { cat: "Soteriology", val: "Sola fide, sola gratia — faith alone, grace alone. Justification is forensic declaration, not transformation. PSA codified." },
+      { cat: "Epistemology", val: "Sola scriptura — Scripture alone as authority. But interpretation is immediately contested, producing thousands of sub-forks." },
+      { cat: "Anthropology", val: "Retains Augustinian soul/body hierarchy. Sexuality remains dangerous. Work is now vocation — the Protestant work ethic (Weber)." },
+      { cat: "Authority", val: "Scripture over Pope — but Calvin's Geneva demonstrates that removing one hierarchy installs another. The Radical Reformers alone questioned hierarchy itself." }
+    ],
+    consequence: "The mainstream Protestant forks retained Augustinian anthropology while transferring authority from pope to scripture/pastor. The Calvinist build produced both modern capitalism (Weber) and democratic governance theory — in permanent tension.",
+    ylh: "The Radical Reformation is the suppressed fork within the Protestant fork. Münzer's peasant theology, the Anabaptist communities, and their insistence on non-coercion are closer to Jerusalem Fork logic than anything Luther or Calvin produced.",
+    tags: [
+      { label: "Augustinian inherited", cls: "lat" },
+      { label: "Sola scriptura", cls: "lat" },
+      { label: "Radical wing suppressed", cls: "heb" }
+    ]
+  },
+  {
+    id: "blackchurch",
+    version: "FORK_07",
+    name: "Black Church Fork",
+    date: "c. 1750–present",
+    context: "Forged under chattel slavery, the Black Church represents one of the most significant theological innovations in American history. Enslaved Africans received the Latin/Protestant build as a tool of subjugation — and systematically decoded, subverted, and reconstructed it. The Invisible Institution, the spirituals, Nat Turner, Richard Allen, Jarena Lee, Howard Thurman, and Martin Luther King Jr. are all nodes in this fork.",
+    rules: [
+      { cat: "Ontology", val: "Imago Dei as political claim — the humanity of Black people is non-negotiable. Dignity precedes and overrides social status." },
+      { cat: "Cosmology", val: "The God of the Exodus is the governing metaphor. YHWH sides with the oppressed against Pharaoh. This world is the site of liberation." },
+      { cat: "Soteriology", val: "Salvation is communal and historical — liberation from actual bondage, not only forensic justification. Thurman: Jesus identified with the disinherited." },
+      { cat: "Epistemology", val: "The suffering community has privileged access to truth about power. Experience of oppression is hermeneutical data, not noise." },
+      { cat: "Anthropology", val: "The body is sacred and resilient. Blackness is not a deficit. Joy, music, and embodied worship are theological acts." },
+      { cat: "Authority", val: "Communal and prophetic. The preacher is accountable to the congregation. Women exercise leadership despite formal exclusion." }
+    ],
+    consequence: "Produces the abolition movement, the Civil Rights Movement, mutual aid networks, and Black liberation theology. Also the site of ongoing internal tension between prophetic and prosperity gospel sub-forks.",
+    ylh: "The Black Church Fork represents one of the clearest demonstrations of what YLH calls counter-algorithm specification — a community that received a domination program and rewrote its governance rules from the inside.",
+    tags: [
+      { label: "Exodus paradigm", cls: "heb" },
+      { label: "Disinherited theology", cls: "afr" },
+      { label: "Counter-algorithm", cls: "heb" }
+    ]
+  },
+  {
+    id: "liberation",
+    version: "FORK_08",
+    name: "Liberation Theology Fork",
+    date: "c. 1968–present",
+    context: "Emerging from Latin America (Gutiérrez, Boff, Sobrino), Black theology (Cone), feminist theology (Schüssler Fiorenza, Johnson), womanist theology (Williams, Townes), Dalit theology, and Minjung theology. The 1968 Medellín Conference is the formal institutional moment. Liberation theology's methodological signature: the preferential option for the poor as hermeneutical key.",
+    rules: [
+      { cat: "Ontology", val: "Sin is structural — embedded in social, economic, and political systems, not only individual hearts. Structural sin requires structural conversion." },
+      { cat: "Cosmology", val: "The Kingdom of God is a this-worldly political reality. The church must be evaluated by its consequences for the poor." },
+      { cat: "Soteriology", val: "Salvation as integral liberation — spiritual, political, economic. Gutiérrez: 'There is no salvation outside the world.'" },
+      { cat: "Epistemology", val: "Orthopraxis over orthodoxy — correct practice precedes and tests correct doctrine. Doing justice is how we know God." },
+      { cat: "Anthropology", val: "The poor are theological subjects, not objects of charity. Their experience is the primary locus of theological reflection." },
+      { cat: "Authority", val: "Base communities (CEBs) — authority generated from below, from the practice of communities reading Scripture in light of their situation." }
+    ],
+    consequence: "Produces Basic Ecclesial Communities, land reform movements, literacy campaigns (Freire), and martyrs (Romero, Ellacuría). Also produces sustained Vatican opposition — the Congregation for the Doctrine of the Faith issued two instructions against it (1984, 1986).",
+    ylh: "Liberation theology is the closest contemporary parallel to Jerusalem Fork logic. Its suppression by both Catholic and Protestant establishments follows the same pattern: any fork that makes the poor the primary diagnostic metric threatens the governance architecture of established religion.",
+    tags: [
+      { label: "Hebrew prophetic", cls: "heb" },
+      { label: "Latin American context", cls: "afr" },
+      { label: "Structural sin analysis", cls: "heb" }
+    ]
+  },
+  {
+    id: "pentecostal",
+    version: "FORK_09",
+    name: "Pentecostal Fork",
+    date: "c. 1906–present",
+    context: "Emerging from the Azusa Street Revival (1906) under William J. Seymour — a Black preacher — Pentecostalism is the fastest-growing Christian fork globally. It crosses racial lines at its origin (unusual in 1906 America), emphasizes immediate experience of the Spirit, and produces a radically embodied, participatory form of worship. Its subsequent fragmentation produced everything from the Black Pentecostal tradition to white charismatic megachurches to the Global South renewal movements.",
+    rules: [
+      { cat: "Ontology", val: "The Spirit is immediately accessible to all — the poor, the marginalized, the unlettered. Gifts are distributed without regard to class or education." },
+      { cat: "Cosmology", val: "The Spirit is active now, healing, speaking, and moving. The supernatural is not closed — Cessationism is rejected." },
+      { cat: "Soteriology", val: "Salvation confirmed by experience — baptism in the Spirit, glossolalia, healing. The body is the site of salvific encounter." },
+      { cat: "Epistemology", val: "Direct revelatory experience alongside Scripture. The Spirit speaks to individuals and communities. This creates both liberation potential and manipulation vulnerability." },
+      { cat: "Anthropology", val: "The body is the site of divine encounter — healing, dance, tongues, weeping. Highly embodied worship practice." },
+      { cat: "Authority", val: "Charismatic — authority flows from demonstrated spiritual gifts. Initially radically egalitarian. Later, prosperity gospel sub-fork installs wealth as the sign of divine favor." }
+    ],
+    consequence: "The original Azusa Street fork produced cross-racial community and Spirit-democratization. The Global South Pentecostal movements today are largely liberation-oriented. The North American prosperity gospel sub-fork is one of the most effective tools of economic extraction inside Christian communities.",
+    ylh: "Pentecostalism contains one of the sharpest internal fork conflicts: Seymour's original egalitarian, cross-racial, Spirit-democratic vision vs. the white charismatic and prosperity gospel builds that absorbed and redirected its energy. Which Pentecostalism you're analyzing determines which consequences you're mapping.",
+    tags: [
+      { label: "Spirit-democratic", cls: "pent" },
+      { label: "Azusa Street origin", cls: "afr" },
+      { label: "Global South majority", cls: "afr" }
+    ]
+  }
+];
+
+let current = 0;
+
+function buildNav() {
+  const nav = document.getElementById('forkNav');
+  forks.forEach((f, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'fork-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = f.version + ' ' + f.name.replace(' Fork','');
+    btn.onclick = () => goTo(i);
+    btn.id = 'navBtn' + i;
+    nav.appendChild(btn);
+  });
+}
+
+function buildCards() {
+  const container = document.getElementById('cardContainer');
+  forks.forEach((f, i) => {
+    const rulesHTML = f.rules.map(r => `
+      <div class="rule-item">
+        <div class="rule-cat">${r.cat}</div>
+        <div class="rule-val">${r.val}</div>
+      </div>
+    `).join('');
+
+    const tagsHTML = f.tags.map(t => `<span class="tag ${t.cls}">${t.label}</span>`).join('');
+
+    container.innerHTML += `
+      <div class="fork-card ${i === 0 ? 'visible' : ''}" id="card${i}">
+        <div class="card-header">
+          <div>
+            <div class="fork-version">${f.version} · ${f.date}</div>
+            <div class="fork-name">${f.name}</div>
+          </div>
+          <div class="tag-row">${tagsHTML}</div>
+        </div>
+        <div class="card-body">
+          <div class="card-section">
+            <div class="section-label">// Historical Context</div>
+            <p>${f.context}</p>
+          </div>
+          <div class="card-section">
+            <div class="section-label">// Governing Rules of Reality</div>
+            <div class="rules-grid">${rulesHTML}</div>
+          </div>
+          <div class="card-section">
+            <div class="section-label">// Consequence Ecology</div>
+            <div class="consequence">
+              <div class="clabel">YLH → CONSEQUENCE MAPPING</div>
+              <p>${f.consequence}</p>
+            </div>
+          </div>
+          <div class="card-section">
+            <div class="ylh-flag">
+              <div class="flabel">► YLH DIAGNOSTIC FLAG</div>
+              <p>${f.ylh}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function goTo(i) {
+  document.getElementById('card' + current).classList.remove('visible');
+  document.getElementById('navBtn' + current).classList.remove('active');
+  current = i;
+  document.getElementById('card' + current).classList.add('visible');
+  document.getElementById('navBtn' + current).classList.add('active');
+  updateUI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function navigate(dir) {
+  const next = current + dir;
+  if (next >= 0 && next < forks.length) goTo(next);
+}
+
+function updateUI() {
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').disabled = current === forks.length - 1;
+  document.getElementById('forkCounter').textContent = (current + 1) + ' / ' + forks.length;
+  document.getElementById('progressFill').style.width = ((current + 1) / forks.length * 100) + '%';
+}
+
+buildNav();
+buildCards();
+updateUI();
+</script>
+</body>
+</html>
