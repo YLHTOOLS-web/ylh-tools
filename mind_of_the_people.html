@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind of the People · YLH Linguistic Timeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=IM+Fell+English:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f5f0e8; }
+
+  :root {
+    --parchment: #f5f0e8;
+    --charcoal: #2a2a2a;
+    --neutral: #e8e8e8;
+    --gold: #c9a227;
+    --dark-text: #1a1a1a;
+    --light-text: #ffffff;
+    --muted: #7a7060;
+  }
+
+  .wrapper {
+    background: var(--parchment);
+    color: var(--dark-text);
+    font-family: 'Space Mono', monospace, sans-serif;
+    padding: 2rem 1.5rem 3rem;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 1.5rem;
+  }
+
+  .header h1 {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--charcoal);
+    margin-bottom: 0.5rem;
+  }
+
+  .header p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    font-family: 'IM Fell English', Georgia, serif;
+    font-style: italic;
+  }
+
+  .attribution {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.4rem;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+
+  .stage-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .tab-btn {
+    background: var(--neutral);
+    border: 1px solid #ccc5b0;
+    color: #1a1a1a;
+    padding: 6px 12px;
+    font-size: 0.68rem;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .tab-btn:hover { border-color: var(--gold); color: var(--charcoal); }
+  .tab-btn.active { background: var(--charcoal); color: var(--gold); border-color: var(--charcoal); }
+
+  .stage-panel { display: none; }
+  .stage-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .stage-header { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; margin-bottom: 1.5rem; }
+
+  .stage-num {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    min-width: 52px;
+  }
+
+  .stage-meta h2 {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 1.05rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--charcoal);
+    margin-bottom: 0.25rem;
+  }
+
+  .stage-meta p { font-size: 0.82rem; color: var(--muted); font-family: Georgia, serif; font-style: italic; line-height: 1.5; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+
+  @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } .stage-tabs { gap: 4px; } }
+
+  .card { background: #fff; border: 0.5px solid #d4cdb8; border-radius: 2px; padding: 1rem 1.1rem; }
+
+  .card-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+  }
+
+  .card-title { font-family: 'Cinzel', Georgia, serif; font-size: 0.95rem; color: var(--charcoal); margin-bottom: 0.35rem; }
+  .card p { font-size: 0.8rem; color: #5a5248; line-height: 1.6; font-family: Georgia, serif; }
+
+  .word-cards { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
+
+  .word-chip {
+    background: var(--charcoal);
+    color: var(--gold);
+    padding: 6px 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    border-radius: 2px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .word-chip:hover, .word-chip.selected { background: var(--gold); color: var(--charcoal); }
+
+  .word-detail {
+    background: #fff;
+    border-left: 3px solid var(--gold);
+    border-radius: 0 2px 2px 0;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1.25rem;
+    min-height: 80px;
+  }
+
+  .word-detail .w-name { font-family: 'IM Fell English', Georgia, serif; font-size: 1.2rem; font-style: italic; color: var(--charcoal); margin-bottom: 0.2rem; }
+  .word-detail .w-heb { font-size: 1rem; color: var(--gold); font-family: 'Times New Roman', serif; margin-bottom: 0.4rem; }
+  .word-detail .w-body { font-size: 0.8rem; color: #5a5248; line-height: 1.7; font-family: Georgia, serif; }
+  .word-detail .w-verse { font-size: 0.75rem; color: var(--muted); margin-top: 0.5rem; font-style: italic; border-top: 0.5px solid #d4cdb8; padding-top: 0.4rem; font-family: Georgia, serif; }
+
+  .drift-box { background: var(--charcoal); color: var(--light-text); padding: 1rem 1.1rem; border-radius: 2px; margin-bottom: 1rem; }
+  .drift-box .d-label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); font-family: 'Space Mono', monospace; font-weight: 700; margin-bottom: 0.5rem; }
+  .drift-row { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; font-family: 'Space Mono', monospace; margin-bottom: 4px; flex-wrap: wrap; }
+  .drift-row .from { color: #b8b0a0; }
+  .drift-row .arrow { color: var(--gold); }
+  .drift-row .to { color: #fff; }
+
+  .override-alert { background: #3a1a0a; border: 1px solid #c04a1a; color: #f5c0a0; padding: 0.85rem 1rem; border-radius: 2px; font-size: 0.78rem; font-family: Georgia, serif; line-height: 1.6; margin-bottom: 1rem; }
+  .override-alert strong { color: #ffb080; font-weight: 700; }
+
+  .jesus-alert { background: #0a2a1a; border: 1px solid #1a7a4a; color: #a0f0c0; padding: 0.85rem 1rem; border-radius: 2px; font-size: 0.78rem; font-family: Georgia, serif; line-height: 1.6; margin-bottom: 1rem; }
+  .jesus-alert strong { color: #60e0a0; font-weight: 700; }
+
+  .nav-row { display: flex; justify-content: space-between; margin-top: 1.5rem; border-top: 0.5px solid #d4cdb8; padding-top: 1rem; }
+
+  .nav-btn {
+    background: transparent;
+    border: 1px solid #ccc5b0;
+    color: #1a1a1a;
+    padding: 7px 18px;
+    font-size: 0.72rem;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover { border-color: var(--gold); color: var(--charcoal); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .progress-bar { height: 2px; background: #d4cdb8; margin-bottom: 2rem; border-radius: 1px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--gold); transition: width 0.3s ease; }
+
+  .formula-box {
+    display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;
+    padding: 1rem; background: #fff; border: 0.5px solid #d4cdb8; margin-bottom: 1.25rem;
+    font-family: 'Space Mono', monospace; font-size: 0.68rem; color: var(--muted);
+  }
+
+  .formula-box .f-node { background: var(--charcoal); color: var(--gold); padding: 4px 10px; border-radius: 2px; font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; }
+  .formula-box .f-arr { color: var(--gold); font-size: 1rem; }
+  .placeholder { color: #9a9080; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <h1>Mind of the People</h1>
+    <p>Ethnogenesis &amp; Epistemology · A Linguistic Timeline</p>
+    <p class="attribution">CC BY 4.0 · Brandy D. Cannon-Mitchell · Yahwist Liberation Hermeneutic</p>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:16.6%"></div></div>
+
+  <div class="stage-tabs">
+    <button class="tab-btn active" onclick="goTo(0)">I · Shared Experience</button>
+    <button class="tab-btn" onclick="goTo(1)">II · Memory → Knowledge</button>
+    <button class="tab-btn" onclick="goTo(2)">III · Category Containers</button>
+    <button class="tab-btn" onclick="goTo(3)">IV · Institutions Stabilize</button>
+    <button class="tab-btn" onclick="goTo(4)">V · Jesus in His World</button>
+    <button class="tab-btn" onclick="goTo(5)">VI · System Override</button>
+  </div>
+
+  <!-- STAGE 1 -->
+  <div class="stage-panel active" id="panel-0">
+    <div class="stage-header">
+      <div class="stage-num">I</div>
+      <div class="stage-meta">
+        <h2>Shared Experience</h2>
+        <p>Ethnogenesis begins. Common events forge a people. The vocabulary of survival precedes the vocabulary of theology.</p>
+      </div>
+    </div>
+    <div class="formula-box">
+      <span class="f-node">Kinship Groups</span><span class="f-arr">→</span>
+      <span class="f-node">Shared Ancestors</span><span class="f-arr">→</span>
+      <span class="f-node">Settlement</span><span class="f-arr">→</span>
+      <span class="f-node">Covenant</span><span class="f-arr">→</span>
+      <span class="f-node">Kingship</span>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-label">Formative Events</div>
+        <div class="card-title">The Foundational Loop</div>
+        <p>Egyptian oppression → Exodus tradition → Wilderness → Canaan settlement → Monarchy → Exile → Restoration. Each event doesn't merely happen — it reshapes how the community understands reality itself.</p>
+      </div>
+      <div class="card">
+        <div class="card-label">What Language Carries</div>
+        <div class="card-title">Embedded Social Memory</div>
+        <p>Language is the strongest carrier of ethnogenesis. Hebrew terms accumulate generations of meaning — not dictionary entries but encoded social practices, legal expectations, and historical memory compressed into sound.</p>
+      </div>
+    </div>
+    <div class="card-label" style="margin-bottom:0.5rem">Key Terms — click to explore</div>
+    <div class="word-cards">
+      <button class="word-chip" onclick="showWord(0,'am')">ʿam (עַם)</button>
+      <button class="word-chip" onclick="showWord(0,'goy')">goy (גּוֹי)</button>
+      <button class="word-chip" onclick="showWord(0,'erets')">ʾerets (אֶרֶץ)</button>
+      <button class="word-chip" onclick="showWord(0,'yad')">yad (יָד)</button>
+    </div>
+    <div class="word-detail" id="wd-0"><p class="w-body placeholder">Select a term above to examine its embedded meaning.</p></div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>← Previous</button>
+      <button class="nav-btn" onclick="goTo(1)">Next →</button>
+    </div>
+  </div>
+
+  <!-- STAGE 2 -->
+  <div class="stage-panel" id="panel-1">
+    <div class="stage-header">
+      <div class="stage-num">II</div>
+      <div class="stage-meta">
+        <h2>Memory Becomes Knowledge</h2>
+        <p>A people doesn't simply remember events — it organizes them. Organized memory becomes epistemology: a way of interpreting reality, not merely information about it.</p>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-label">The Epistemological Questions</div>
+        <div class="card-title">Why did this happen?</div>
+        <p>Who are we? Who are our enemies? Who belongs? What makes us different? These survival questions become theological axioms. The Deuteronomistic History is this process made text.</p>
+      </div>
+      <div class="card">
+        <div class="card-label">Exile as Reconstruction</div>
+        <div class="card-title">Did YHWH lose?</div>
+        <p>The Babylonian exile forces epistemological reconstruction. Is Marduk stronger? Were the prophets wrong? Is the covenant broken? Can worship exist without a temple? New interpretations emerge to preserve identity under radically changed circumstances.</p>
+      </div>
+    </div>
+    <div class="card-label" style="margin-bottom:0.5rem">Key Terms — click to explore</div>
+    <div class="word-cards">
+      <button class="word-chip" onclick="showWord(1,'berit')">berît (בְּרִית)</button>
+      <button class="word-chip" onclick="showWord(1,'hesed')">ḥesed (חֶסֶד)</button>
+      <button class="word-chip" onclick="showWord(1,'tsedek')">ṣedeq (צֶדֶק)</button>
+      <button class="word-chip" onclick="showWord(1,'deror')">deror (דְּרוֹר)</button>
+    </div>
+    <div class="word-detail" id="wd-1"><p class="w-body placeholder">Select a term above to examine its embedded meaning.</p></div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goTo(0)">← Previous</button>
+      <button class="nav-btn" onclick="goTo(2)">Next →</button>
+    </div>
+  </div>
+
+  <!-- STAGE 3 -->
+  <div class="stage-panel" id="panel-2">
+    <div class="stage-header">
+      <div class="stage-num">III</div>
+      <div class="stage-meta">
+        <h2>Category Containers</h2>
+        <p>Stories become organizing frameworks. A historical memory — Exodus — becomes a category that contains: liberation, covenant, wilderness, divine kingship, identity, resistance to empire.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-label">What a Category Container Does</div>
+      <p style="font-size:0.82rem;line-height:1.7;color:#5a5248;font-family:Georgia,serif">A category container is not merely a concept — it is an inherited interpretive lens. When "Exodus" is invoked, it activates a whole framework of expectations, ethics, and identity. The container determines what questions are even askable.</p>
+    </div>
+    <div class="card-label" style="margin-bottom:0.5rem">Major Category Containers — click to unpack</div>
+    <div class="word-cards">
+      <button class="word-chip" onclick="showWord(2,'exodus')">Exodus</button>
+      <button class="word-chip" onclick="showWord(2,'shabbat')">Shabbat (שַׁבָּת)</button>
+      <button class="word-chip" onclick="showWord(2,'shalom')">shalom (שָׁלוֹם)</button>
+      <button class="word-chip" onclick="showWord(2,'malkut')">malkût YHWH (מַלְכוּת)</button>
+    </div>
+    <div class="word-detail" id="wd-2"><p class="w-body placeholder">Select a term above to examine its embedded meaning.</p></div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goTo(1)">← Previous</button>
+      <button class="nav-btn" onclick="goTo(3)">Next →</button>
+    </div>
+  </div>
+
+  <!-- STAGE 4 -->
+  <div class="stage-panel" id="panel-3">
+    <div class="stage-header">
+      <div class="stage-num">IV</div>
+      <div class="stage-meta">
+        <h2>Institutions Stabilize</h2>
+        <p>Schools, scribes, rituals, festivals, laws, songs, genealogies — these preserve not only history but how history should be interpreted. The difference between history and collective memory.</p>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-label">Stabilizing Institutions</div>
+        <div class="card-title">The Priestly Architecture</div>
+        <p>The P source (Priestly tradition) doesn't just tell stories — it encodes a cosmic structure. Purity laws are epistemological categories: defining what belongs where, who belongs to whom, what counts as order vs. chaos.</p>
+      </div>
+      <div class="card">
+        <div class="card-label">Scribal Transmission</div>
+        <div class="card-title">The Deuteronomistic School</div>
+        <p>The DtrH applies a consistent framework — obedience/prosperity, disobedience/disaster — across centuries of narrative. The framework shapes what is remembered and how. Interpretation is built into the archive.</p>
+      </div>
+    </div>
+    <div class="card-label" style="margin-bottom:0.5rem">Terms Shaped by Institutional Transmission — click to explore</div>
+    <div class="word-cards">
+      <button class="word-chip" onclick="showWord(3,'torah')">Torah (תּוֹרָה)</button>
+      <button class="word-chip" onclick="showWord(3,'mishpat')">mishpat (מִשְׁפָּט)</button>
+      <button class="word-chip" onclick="showWord(3,'qodesh')">qodesh (קֹדֶשׁ)</button>
+      <button class="word-chip" onclick="showWord(3,'zakar')">zâkar (זָכַר)</button>
+    </div>
+    <div class="word-detail" id="wd-3"><p class="w-body placeholder">Select a term above to examine its embedded meaning.</p></div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goTo(2)">← Previous</button>
+      <button class="nav-btn" onclick="goTo(4)">Next →</button>
+    </div>
+  </div>
+
+  <!-- STAGE 5: JESUS -->
+  <div class="stage-panel" id="panel-4">
+    <div class="stage-header">
+      <div class="stage-num">V</div>
+      <div class="stage-meta">
+        <h2>Jesus in His Epistemic World</h2>
+        <p>Before the Greek transmission layer. Jesus operates entirely within the conceptual world of Second Temple Judaism — its controversies, categories, and liberation hopes.</p>
+      </div>
+    </div>
+    <div class="jesus-alert">
+      <strong>YLH Methodological Anchor:</strong> To read Jesus through Greek philosophical categories without first establishing his Second Temple Jewish substrate is to interpret the output without understanding the operating system. The Galilean peasant-sage is embedded in a specific ethnogenesis — Israelite, post-exilic, under Roman occupation — and his language carries that entire tradition.
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-label">Second Temple Context</div>
+        <div class="card-title">Competing Epistemologies</div>
+        <p>Jesus inherits a tradition already in debate: Pharisees, Sadducees, Essenes, Zealots, and various prophetic movements all offer different answers to the same post-exilic questions. His teaching is positioned within these debates — not above them.</p>
+      </div>
+      <div class="card">
+        <div class="card-label">Roman Imperial Pressure</div>
+        <div class="card-title">The Colonial Condition</div>
+        <p>First-century Galilee is a colonized territory. Taxation, land dispossession, debt bondage, and the theology of Roman peace (Pax Romana) form the material backdrop of every parable. The Kingdom announcement is political speech in an occupied land.</p>
+      </div>
+    </div>
+    <div class="card-label" style="margin-bottom:0.5rem">Jesus's Operating Vocabulary — click to explore</div>
+    <div class="word-cards">
+      <button class="word-chip" onclick="showWord(4,'malkuta')">malkuta d'Alaha (Aramaic)</button>
+      <button class="word-chip" onclick="showWord(4,'abba')">Abba (אַבָּא)</button>
+      <button class="word-chip" onclick="showWord(4,'ptochos')">ptōchos (πτωχός)</button>
+      <button class="word-chip" onclick="showWord(4,'aphesis')">aphesis (ἄφεσις)</button>
+    </div>
+    <div class="word-detail" id="wd-4"><p class="w-body placeholder">Select a term above to examine its embedded meaning.</p></div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card">
+        <div class="card-label">What Jesus Did Not Teach</div>
+        <div class="card-title">Absent Categories</div>
+        <p>No ontological Trinity. No immortal soul (Greek psychē). No atonement theory. No original sin doctrine. No separation of sacred from political. These categories emerge after — and often against — his Second Temple Jewish framework.</p>
+      </div>
+      <div class="card">
+        <div class="card-label">The Hermeneutical Marker</div>
+        <div class="card-title">His Own Reading Method</div>
+        <p>Luke 4:16-21 — Jesus reads Isaiah 61 in the synagogue and announces its fulfillment. He uses deror (release/liberty) as his programmatic category. His hermeneutic is consequence-first: the poor have good news, captives are released, the oppressed go free.</p>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goTo(3)">← Previous</button>
+      <button class="nav-btn" onclick="goTo(5)">Next →</button>
+    </div>
+  </div>
+
+  <!-- STAGE 6: SYSTEM OVERRIDE -->
+  <div class="stage-panel" id="panel-5">
+    <div class="stage-header">
+      <div class="stage-num">VI</div>
+      <div class="stage-meta">
+        <h2>System Override</h2>
+        <p>The receiving framework no longer explains the older one — it becomes the default operating system. The original questions disappear. New questions, previously unthinkable, become the center.</p>
+      </div>
+    </div>
+    <div class="override-alert">
+      <strong>YLH Alert:</strong> This is not merely translation. When Hebrew category containers are run through a Greek metaphysical OS, the kernel changes. Questions that organized the entire tradition — <em>Who belongs to the covenant? What does justice require of the community? How does liberation come?</em> — become secondary to: <em>What is the nature of God's substance? What is the metaphysical relation of the persons of the Trinity?</em>
+    </div>
+    <div class="drift-box">
+      <div class="d-label">The Drift Map · Hebrew Kernel → Greek OS</div>
+      <div class="drift-row"><span class="from">berît (covenant)</span><span class="arrow">→</span><span class="to">sacrament (ritual efficacy)</span></div>
+      <div class="drift-row"><span class="from">ṣedeq (relational justice)</span><span class="arrow">→</span><span class="to">dikaiosynē (legal imputation)</span></div>
+      <div class="drift-row"><span class="from">ḥesed (loyal kinship love)</span><span class="arrow">→</span><span class="to">agapē (abstract universal love)</span></div>
+      <div class="drift-row"><span class="from">malkût YHWH (liberation reign)</span><span class="arrow">→</span><span class="to">Basileia (spiritual / otherworldly kingdom)</span></div>
+      <div class="drift-row"><span class="from">nefesh (embodied living being)</span><span class="arrow">→</span><span class="to">psychē (immortal soul / Greek dualism)</span></div>
+      <div class="drift-row"><span class="from">dâbâr (word as event / action)</span><span class="arrow">→</span><span class="to">Logos (eternal rational principle)</span></div>
+    </div>
+    <div class="card-label" style="margin-bottom:0.5rem">Pivotal Terms — click to trace the drift</div>
+    <div class="word-cards">
+      <button class="word-chip" onclick="showWord(5,'nefesh')">nefesh (נֶפֶשׁ)</button>
+      <button class="word-chip" onclick="showWord(5,'dabar')">dâbâr (דָּבָר)</button>
+      <button class="word-chip" onclick="showWord(5,'logos')">Logos (λόγος)</button>
+      <button class="word-chip" onclick="showWord(5,'dikaiosyne')">dikaiosynē (δικαιοσύνη)</button>
+    </div>
+    <div class="word-detail" id="wd-5"><p class="w-body placeholder">Select a term above to trace its drift.</p></div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goTo(4)">← Previous</button>
+      <button class="nav-btn" disabled>End of Timeline</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const words = {
+  0: {
+    'am': { name:'ʿam', heb:'עַם', body:'People in the sense of kinship group — those bound together by shared blood, land, and covenant obligation. Not an abstract "nation-state" concept but an organic, relational unit. When YHWH says "you shall be my ʿam," this is adoption language — the expansion of kinship bonds.', verse:'Ex. 6:7 — "I will take you as my ʿam and I will be your God." · The covenant is a kinship contract, not a legal charter.' },
+    'goy': { name:'goy', heb:'גּוֹי', body:'Initially, any organized people-group, including Israel (Gen. 12:2 — "I will make you a great goy"). Later, under Persian and Hellenistic influence, goy narrows to mean "non-Israelite." This semantic drift encodes the ethnogenesis of separation and identity formation under imperial pressure.', verse:'Gen. 12:2 — "I will make you a great goy." · Ps. 2:1 — "Why do the goyim rage?" · The drift from neutral to "other" is itself a historical record.' },
+    'erets': { name:'ʾerets', heb:'אֶרֶץ', body:'Land — but not as property. ʾErets is the space of covenantal belonging. YHWH owns the land; Israel is tenant. Dispossession of the land (exile) is therefore not merely political catastrophe but covenantal rupture. Restoration to the land is restoration to relationship.', verse:'Lev. 25:23 — "The land is mine; you are but strangers and sojourners with me." · The land is a theological actor, not a commodity.' },
+    'yad': { name:'yad', heb:'יָד', body:'Hand — but as concentrated power, agency, and intervention. "The yad of YHWH" is not anatomy but the assertion that divine power acts within history. This is a profoundly anti-deist concept: the deity is not removed from events but extends into them. Yad encodes a theology of history.', verse:'Ex. 13:3 — "Remember this day by which you came out of Egypt, out of the house of slavery, by the strength of yad." · Agency, liberation, embodied action.' }
+  },
+  1: {
+    'berit': { name:'berît', heb:'בְּרִית', body:'Covenant — but not a contract between equals. berît is a binding commitment, often sealed in blood, that creates kinship where none biologically existed. It carries obligation on both parties and defines belonging. The berît at Sinai makes former slaves into a people with YHWH as their sovereign-kinsman.', verse:'Gen. 15:18 — "On that day YHWH cut a berît with Abram." · The verb is kârat (to cut) — the covenant is enacted through sacrifice, through bodies.' },
+    'hesed': { name:'ḥesed', heb:'חֶסֶד', body:'Often translated "steadfast love" or "mercy," but ḥesed is specifically loyalty within a covenantal kinship bond. It is what you owe your people. Not sentiment but obligation — the social glue that holds the covenant community together across generations. When YHWH shows ḥesed, it is kinship faithfulness, not mere benevolence.', verse:'Hos. 6:6 — "I desire ḥesed, not sacrifice." · Micah 6:8 — "Love ḥesed." · This is structural social commitment, not feeling.' },
+    'tsedek': { name:'ṣedeq / ṣedaqah', heb:'צֶדֶק / צְדָקָה', body:'Justice — but relational, not abstract. ṣedeq is right-ordering within community: giving each member what the relationship requires. This includes material redistribution. When the poor are abandoned, ṣedeq is violated — not because a rule was broken, but because the relational fabric of the community was torn.', verse:'Amos 5:24 — "Let justice (mishpat) roll down like waters, and righteousness (ṣedaqah) like an ever-flowing stream." · Not a legal principle — a social ecology.' },
+    'deror': { name:'deror', heb:'דְּרוֹר', body:'Release, liberty — specifically the release of debt-slaves and restoration of land in the Jubilee year. deror is not abstract freedom but concrete, calendrically structured liberation from economic bondage. When Jesus reads Isaiah 61 in Luke 4, deror is the operative term. Liberation is literal before it is metaphorical.', verse:'Lev. 25:10 — "You shall proclaim deror throughout the land." · Isa. 61:1 — "to proclaim deror to the captives." · Luke 4:18 uses aphesis — the Greek equivalent — but the Hebrew referent is economic liberation.' }
+  },
+  2: {
+    'exodus': { name:'Exodus', heb:'יְצִיאַת מִצְרַיִם', body:"Originally an event — yetsi'at Mitsrayim, 'going out from Egypt.' By Deuteronomy, Exodus has become a full category container: the defining act of YHWH's character, the basis for sabbath law, the model for all future liberation, the reason for care of the stranger. Every subsequent generation is instructed to re-inhabit the Exodus event as if they themselves were there.", verse:'Deut. 5:15 — "Remember that you were a slave in Egypt... therefore YHWH commanded you to keep the sabbath." · The sabbath is grounded in Exodus, not cosmic creation (cf. Ex. 20 vs. Deut. 5 — two different framings).' },
+    'shabbat': { name:'Shabbat', heb:'שַׁבָּת', body:'Rest — but encoded with both creation theology (P source: God rests on day 7) and liberation theology (D source: rest because you were slaves). These are two different epistemological containers for the same practice. The P tradition grounds sabbath in cosmic order; the D tradition grounds it in social memory and human dignity. The tension is productive — both are simultaneously true.', verse:'Ex. 20:11 (P) — "For in six days YHWH made heaven and earth..." · Deut. 5:15 (D) — "Remember that you were a slave in Egypt." · Same practice, different epistemological grounding.' },
+    'shalom': { name:'shalom', heb:'שָׁלוֹם', body:'Usually translated "peace" — but shalom means wholeness, completeness, the right-functioning of every relationship in the community. It is the social ecosystem in full health. Shalom is absent not merely when there is violence but when there is economic exploitation, when the widow goes unprotected, when the stranger is turned away. It is the goal-state of ṣedeq.', verse:'Isa. 32:17 — "The effect of ṣedaqah will be shalom." · Jer. 29:7 — "Seek the shalom of the city where I have sent you into exile." · Shalom is political-social, not merely psychological.' },
+    'malkut': { name:'malkût YHWH', heb:'מַלְכוּת יהוה', body:"The reign of YHWH — the social order that emerges when YHWH's values govern community life. This is not a heavenly realm but a this-world political reality. When Jesus announces the malkût (malkuta in Aramaic, basileia in Greek), he is announcing the in-breaking of YHWH's social order against imperial domination. The spatial and temporal displacement of the Kingdom to 'heaven' and 'after death' is a later theological move.", verse:'Mark 1:15 — "The malkuta of God has come near; repent and believe." · Present tense, proximate — not future, not otherworldly. The Aramaic substrate carries covenantal-political weight that Greek basileia partially loses.' }
+  },
+  3: {
+    'torah': { name:'Torah', heb:'תּוֹרָה', body:"Usually translated 'law' — but Torah means instruction, teaching, guidance. It is relational wisdom from a sovereign to a people who are loved. The Greek translation nomos (law) narrows this to legal code, shifting the epistemological frame from relational pedagogy to legal obligation. Paul's wrestling with 'law' in Romans is partly a wrestling with this translation layer.", verse:"Ps. 119:97 — 'Oh how I love your Torah! It is my meditation all the day.' · This is not the language of legal compliance — it is the language of delight in a relationship." },
+    'mishpat': { name:'mishpat', heb:'מִשְׁפָּט', body:'Justice as verdict, process, and customary right. mishpat covers both the act of judging and the established pattern of social obligation — including the specific rights of the vulnerable: the widow, the orphan, the stranger. When the prophets indict Israel, mishpat is the term for what has been violated.', verse:'Micah 6:8 — "What does YHWH require of you but to do mishpat, love ḥesed, and walk humbly with your God." · Isa. 1:17 — "Learn to do good; seek mishpat, correct oppression."' },
+    'qodesh': { name:'qodesh', heb:'קֹדֶשׁ', body:'Holiness — not moral purity in the Greek sense but set-apartness, belonging to YHWH. The H source extends holiness to the entire community: "You shall be qodesh, for I YHWH your God am qodesh." This democratizes a cultic category. The command is not individual virtue but communal identity — a different order of social organization from the surrounding empires.', verse:'Lev. 19:2 — "You shall be qodesh, for I YHWH your God am qodesh." · Then immediately: care for the poor, fair wages, honest scales. Holiness is social ethics, not ritual status.' },
+    'zakar': { name:'zâkar', heb:'זָכַר', body:'To remember — but in Hebrew, memory is active and generative, not merely cognitive. When YHWH "remembers" Noah or the covenant, it means YHWH acts on the memory. When Israel is commanded to "remember Egypt," it means to allow that memory to structure present ethics. Institutional memory (Passover, sabbath, reading of Torah) is epistemological infrastructure.', verse:'Deut. 8:2 — "Remember the whole way YHWH your God has led you." · Ex. 20:8 — "Remember the sabbath day." · Memory is a practice, not a faculty.' }
+  },
+  4: {
+    'malkuta': { name:"malkuta d'Alaha", heb:'Aramaic: מַלְכוּתָא דַּאֲלָהָא', body:"The reign/kingdom of God in Jesus's native Aramaic. This is not a spatial location but an active sovereign presence breaking into history. In Aramaic-speaking first-century Galilee, this phrase would have resonated against Roman imperial claims to universal sovereignty (imperium). To announce another king's reign is sedition. The execution of Jesus by Roman crucifixion — reserved for political insurrectionists — confirms the political register of his announcement.", verse:'Mark 1:15 (Greek rendering of Aramaic original) — "The kingdom of God has come near." · The Aramaic substrate: not "I will take you to heaven" but "the order of God is arriving here."' },
+    'abba': { name:'Abba', heb:'אַבָּא', body:'Father — in the intimate, household register. Not formal address but the word a child uses within the family. When Jesus uses Abba for YHWH (Mark 14:36; cf. Rom. 8:15, Gal. 4:6), he is claiming intimate kinship access to the covenant God. This is not philosophical discourse about divine nature — it is a claim about relationship and belonging. The later theological move toward divine substance (ousia) is a different register entirely.', verse:'Mark 14:36 — "Abba, Father, all things are possible for you. Remove this cup from me." · The word is kept in Aramaic even in the Greek text — a signal of its originary intimacy.' },
+    'ptochos': { name:'ptōchos', heb:'πτωχός (Greek for Aramaic ʿanaw/dal)', body:"Poor — but ptōchos is the destitute, those crushed by poverty, the ones who have lost all social standing through economic collapse. Not merely 'humble in spirit' but materially dispossessed. When Jesus says 'blessed are the poor' (Luke 6:20 vs. Matthew 5:3's 'poor in spirit'), the Lukan form is the more original — it names a social class, not a spiritual disposition. The spiritualization of poverty is itself a system-override move.", verse:'Luke 6:20 — "Blessed are you who are poor, for yours is the kingdom of God." · Luke 4:18 — "He has anointed me to proclaim good news to the ptōchoi." · Economic address, not metaphor.' },
+    'aphesis': { name:'aphesis', heb:'ἄφεσις (Greek for Hebrew deror)', body:'Release, forgiveness, cancellation of debt. aphesis in Luke 4:18 translates the Hebrew deror — the Jubilee release. When Jesus teaches "forgive us our debts" (opheilēmata in Matthew 6:12), he is likely using aphesis in its economic sense: cancel what is owed. The later theological narrowing to purely spiritual/moral forgiveness loses the economic substrate — the release of actual debt obligations — that deror carried in the Jubilee tradition.', verse:"Luke 4:18 — 'to proclaim aphesis to the captives.' · Matt. 6:12 — 'forgive us our debts (opheilēmata), as we also have forgiven our debtors.' · The Lord's Prayer is Jubilee economics embedded in liturgy." }
+  },
+  5: {
+    'nefesh': { name:'nefesh', heb:'נֶפֶשׁ', body:'The whole living being — embodied, animated, hungry, creaturely. In Gen. 2:7, the human becomes a nefesh hayah (living being) when breath enters. The nefesh does not inhabit the body — the nefesh IS the body animated. There is no Hebrew category for "soul" in the Greek dualist sense. Greek psychē, and especially later Platonic translations, import a body/soul split foreign to the Hebrew text. Resurrection (not immortality of the soul) is the Hebrew response to death.', verse:'Gen. 2:7 — "The human became a living nefesh." · Ps. 63:1 — "My nefesh thirsts for you." · The nefesh eats, thirsts, suffers. It is not a spiritual substance — it is creaturely life itself.' },
+    'dabar': { name:'dâbâr', heb:'דָּבָר', body:'Word — but as event, action, and force in history. The dâbâr of YHWH goes out and accomplishes things (Isa. 55:11). The Ten Commandments are "Ten Words" (Deut. 4:13) — not propositions but events that structure reality. When Greek philosophy encounters dâbâr, it maps it onto Logos — but Logos is eternal rational principle, while dâbâr is historical action. The Prologue of John (1:1-14) holds both, but the Greek context increasingly dominates interpretation.', verse:'Isa. 55:11 — "So shall my dâbâr be that goes from my mouth; it shall not return to me empty, but shall accomplish what I purpose." · Word as agent, not merely information.' },
+    'logos': { name:'Logos', heb:'λόγος (Greek)', body:"The Greek Logos tradition (Heraclitus → Stoics → Philo → John 1) means the rational principle ordering the cosmos. Eternal, non-historical, metaphysical. When John 1:1 opens 'In the beginning was the Logos,' it is an extraordinary juxtaposition: Genesis's creation account meets Greek cosmic rationalism. YLH asks: which container does the Logos end up inhabiting by the time of Nicaea? The dâbâr-that-acts-in-history, or the eternal metaphysical substance?", verse:"John 1:1,14 — 'In the beginning was the Logos... and the Logos became flesh.' · The incarnation ('became flesh') is the Hebrew correction to Logos — but later theology increasingly interprets backwards from Greek Logos toward the eternal pre-existent Christ, away from the historical dâbâr." },
+    'dikaiosyne': { name:'dikaiosynē', heb:'δικαιοσύνη (Greek)', body:"Righteousness/justice in Greek — translating both ṣedeq and ṣedaqah in the LXX. But where ṣedeq is relational right-ordering in community (including redistribution), dikaiosynē can be rendered as adherence to abstract law or (in Paul's Protestant reception) legal imputation. The drift from communal ecology to individual legal status is one of the most consequential category shifts in the tradition. Liberationist interpreters insist on returning to the ṣedeq substrate.", verse:"Rom. 3:21-22 — 'the dikaiosynē of God through faith...' · Luther's reading: imputed legal righteousness. Liberation theology's reading: God's right-ordering activity on behalf of the oppressed. Same Greek word — two different Hebrew substrates." }
+  }
+};
+
+function showWord(stageIdx, key) {
+  const data = words[stageIdx][key];
+  const el = document.getElementById('wd-' + stageIdx);
+  el.innerHTML = '<div class="w-name">'+data.name+'</div><div class="w-heb">'+data.heb+'</div><p class="w-body">'+data.body+'</p><p class="w-verse">'+data.verse+'</p>';
+  document.querySelectorAll('#panel-' + stageIdx + ' .word-chip').forEach(b => b.classList.remove('selected'));
+  event.target.classList.add('selected');
+}
+
+function goTo(idx) {
+  document.querySelectorAll('.stage-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  document.getElementById('progress').style.width = ((idx + 1) / 6 * 100) + '%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
