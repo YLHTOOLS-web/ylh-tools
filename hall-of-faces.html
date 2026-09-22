@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hall of Faces — The Multifaced YHWH</title>
+<style>
+  :root{
+    --gold:#c9a227;
+    --stone-1:#1c1a17;
+    --stone-2:#26221d;
+    --stone-3:#312b23;
+    --stone-hi:#4a4030;
+    --flame:#e8a13a;
+    --parchment:#f5f0e8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#050403;}
+  body{
+    font-family:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    color:var(--parchment);
+    overflow-x:hidden;
+  }
+  .sans{ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+
+  /* ---------- intro ---------- */
+  header{
+    position:relative;
+    padding:70px 24px 50px;
+    text-align:center;
+    background:radial-gradient(ellipse at 50% 0%, #1a1611 0%, #050403 70%);
+    border-bottom:1px solid #2a2419;
+  }
+  header .kicker{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11px;
+    letter-spacing:0.16em;
+    color:var(--gold);
+    margin-bottom:18px;
+  }
+  h1{
+    font-size:clamp(34px,6vw,58px);
+    font-weight:400;
+    margin:0 0 16px;
+    color:#f0e6d0;
+    text-shadow:0 0 30px rgba(201,162,39,0.25);
+  }
+  header p{
+    max-width:56ch;
+    margin:0 auto;
+    color:#a89e88;
+    font-size:16px;
+  }
+  .scroll-hint{
+    margin-top:34px;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11px;
+    letter-spacing:0.1em;
+    color:#6b5f45;
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:0.4;} 50%{opacity:1;} }
+
+  /* ---------- era rail ---------- */
+  .era-rail{
+    position:sticky; top:0; z-index:40;
+    background:linear-gradient(180deg,#0a0806 0%, #0a0806cc 85%, transparent);
+    backdrop-filter:blur(6px);
+    padding:14px 0 10px;
+    border-bottom:1px solid #241f17;
+  }
+  .era-track{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding:0 20px;
+    max-width:1000px;
+    margin:0 auto;
+    justify-content:center;
+  }
+  .era-track::-webkit-scrollbar{display:none;}
+  .era-chip{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11.5px;
+    white-space:nowrap;
+    background:transparent;
+    border:1px solid #3a3226;
+    color:#9c9078;
+    padding:7px 14px;
+    border-radius:20px;
+    cursor:pointer;
+    transition:all .2s ease;
+    flex:0 0 auto;
+  }
+  .era-chip:hover{ border-color:var(--gold); color:var(--gold); }
+  .era-chip.active{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:#1a1508;
+    font-weight:600;
+  }
+
+  /* ---------- the hall ---------- */
+  .hall{
+    position:relative;
+    padding:60px 20px 40px;
+    max-width:1400px;
+    margin:0 auto;
+  }
+  .hall-floor{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    height:120px;
+    background:linear-gradient(180deg, transparent, #000 90%);
+    pointer-events:none;
+    z-index:5;
+  }
+
+  .wall{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:14px;
+    position:relative;
+  }
+  @media (max-width:1000px){
+    .wall{ grid-template-columns:repeat(3, 1fr); }
+  }
+
+  .niche{
+    position:relative;
+    aspect-ratio:3/4;
+    border-radius:50% 50% 8px 8px / 40% 40% 8px 8px;
+    cursor:pointer;
+    background:
+      radial-gradient(ellipse at 50% 30%, var(--stone-hi) 0%, var(--stone-3) 55%, var(--stone-1) 100%);
+    box-shadow:
+      inset 0 8px 20px rgba(0,0,0,0.7),
+      inset 0 -6px 14px rgba(0,0,0,0.6),
+      0 6px 18px rgba(0,0,0,0.55);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    overflow:hidden;
+    transition:transform .35s ease, box-shadow .35s ease, filter .35s ease;
+    opacity:0;
+    transform:translateY(14px);
+    animation:rise .6s ease forwards;
+  }
+  .niche.hidden{ display:none; }
+  @keyframes rise{ to{ opacity:1; transform:translateY(0); } }
+
+  /* carved relief face — real profile silhouette (headdress, beard, features) via SVG */
+  .relief-svg{
+    position:absolute;
+    top:12%;
+    left:50%;
+    width:52%;
+    height:58%;
+    transform:translateX(-50%);
+    filter:drop-shadow(0 0 10px rgba(0,0,0,0.6));
+    opacity:0.97;
+    pointer-events:none;
+  }
+  .relief-svg.flip{ transform:translateX(-50%) scaleX(-1); }
+  .relief-fill{ fill:url(#stoneGradA); }
+  .niche:nth-child(4n) .relief-fill{ fill:url(#stoneGradB); }
+  .niche:nth-child(5n) .relief-fill{ fill:url(#stoneGradC); }
+  .relief-line{ fill:none; stroke:rgba(0,0,0,0.45); stroke-width:1.1; }
+  .relief-shadow{ fill:rgba(0,0,0,0.28); }
+  .relief-hi{ fill:rgba(255,255,255,0.06); }
+  .relief-rim{ fill:rgba(232,161,58,0.35); }
+
+  .niche:hover, .niche:focus-visible{
+    transform:translateY(-6px) scale(1.035);
+    filter:brightness(1.18);
+    box-shadow:
+      inset 0 8px 20px rgba(0,0,0,0.7),
+      inset 0 -6px 14px rgba(0,0,0,0.5),
+      0 0 0 1px rgba(201,162,39,0.4),
+      0 10px 28px rgba(0,0,0,0.6),
+      0 0 34px rgba(201,162,39,0.18);
+  }
+
+  .torch{
+    position:relative;
+    width:100%;
+    height:52px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:3;
+  }
+  .torch-bracket{
+    position:absolute;
+    bottom:3px; left:50%;
+    transform:translateX(-50%);
+    width:16px; height:7px;
+    background:linear-gradient(180deg,#3a332a,#1c1712);
+    border-radius:2px 2px 0 0;
+    box-shadow:0 1px 2px rgba(0,0,0,0.7);
+  }
+  .torch-stick{
+    position:absolute;
+    bottom:8px; left:50%;
+    transform:translateX(-50%);
+    width:4px; height:20px;
+    background:linear-gradient(90deg,#241c14,#4a3a24 40%,#241c14);
+    border-radius:1px;
+  }
+  .torch-wrap{
+    position:absolute;
+    bottom:20px; left:50%;
+    transform:translateX(-50%);
+    width:8px; height:9px;
+    background:linear-gradient(90deg,#1a1510,#3a2e1c,#1a1510);
+    border-radius:1px;
+  }
+  .torch-flame{
+    position:absolute;
+    bottom:26px; left:50%;
+    transform:translateX(-50%);
+    width:20px; height:30px;
+    transform-origin:50% 100%;
+    animation:torchsway 2.6s ease-in-out infinite;
+  }
+  .flame-glow{
+    position:absolute;
+    bottom:-4px; left:50%;
+    transform:translateX(-50%);
+    width:44px; height:44px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(232,161,58,0.35), rgba(232,161,58,0.08) 55%, transparent 75%);
+    filter:blur(1px);
+    animation:glowpulse 2.6s ease-in-out infinite;
+  }
+  .flame-outer,.flame-mid,.flame-core{
+    position:absolute;
+    bottom:0; left:50%;
+    border-radius:50% 50% 50% 50% / 70% 70% 30% 30%;
+  }
+  .flame-outer{
+    width:18px; height:30px;
+    transform:translateX(-50%);
+    background:linear-gradient(180deg,#ff8a2e 0%, #e8621a 55%, #b23a12 100%);
+    box-shadow:0 0 14px 4px rgba(232,120,40,0.5);
+    animation:flicker1 1.6s ease-in-out infinite;
+  }
+  .flame-mid{
+    width:11px; height:20px;
+    transform:translateX(-50%);
+    background:linear-gradient(180deg,#ffcf5e 0%, #f5941f 70%);
+    animation:flicker2 1.3s ease-in-out infinite;
+  }
+  .flame-core{
+    width:5px; height:11px;
+    transform:translateX(-50%);
+    background:linear-gradient(180deg,#fff6d8, #ffd35e 80%);
+    box-shadow:0 0 6px 2px rgba(255,235,180,0.8);
+    animation:flicker3 1s ease-in-out infinite;
+  }
+  @keyframes torchsway{
+    0%,100%{ transform:translateX(-50%) rotate(0deg); }
+    25%{ transform:translateX(-50%) rotate(-2.5deg); }
+    50%{ transform:translateX(-50%) rotate(1deg); }
+    75%{ transform:translateX(-50%) rotate(-1.5deg); }
+  }
+  @keyframes flicker1{
+    0%,100%{ transform:translateX(-50%) scaleY(1) scaleX(1); opacity:0.95; }
+    30%{ transform:translateX(-52%) scaleY(1.08) scaleX(0.92); opacity:1; }
+    60%{ transform:translateX(-48%) scaleY(0.9) scaleX(1.05); opacity:0.9; }
+  }
+  @keyframes flicker2{
+    0%,100%{ transform:translateX(-50%) scaleY(1); }
+    40%{ transform:translateX(-47%) scaleY(1.15); }
+    70%{ transform:translateX(-53%) scaleY(0.88); }
+  }
+  @keyframes flicker3{
+    0%,100%{ transform:translateX(-50%) scaleY(1); }
+    50%{ transform:translateX(-50%) scaleY(1.2); }
+  }
+  @keyframes glowpulse{
+    0%,100%{ opacity:0.8; transform:translateX(-50%) scale(1); }
+    50%{ opacity:1; transform:translateX(-50%) scale(1.12); }
+  }
+  .niche:nth-child(3n) .torch-flame{ animation-duration:2.2s; }
+  .niche:nth-child(4n) .torch-flame{ animation-duration:3s; }
+  .niche:nth-child(5n) .flame-outer{ animation-duration:1.4s; }
+
+  .niche-label{
+    position:absolute;
+    bottom:56px; left:0; right:0;
+    text-align:center;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:10.5px;
+    letter-spacing:0.03em;
+    color:#d8cba8;
+    padding:0 8px;
+    text-shadow:0 1px 3px rgba(0,0,0,0.9);
+    line-height:1.25;
+    z-index:2;
+  }
+
+  #faceCount{
+    text-align:center;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11.5px;
+    letter-spacing:0.06em;
+    color:#5c5340;
+    margin-bottom:26px;
+  }
+
+  /* ---------- modal: torn from the wall ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.78);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:100;
+  }
+  .overlay.open{ display:flex; }
+  .modal{
+    background:linear-gradient(180deg,#0e0c09,#050403);
+    max-width:640px;
+    width:100%;
+    max-height:88vh;
+    overflow-y:auto;
+    border:1px solid #3a3226;
+    box-shadow:0 0 60px rgba(201,162,39,0.15), 0 20px 60px rgba(0,0,0,0.8);
+    border-radius:4px;
+  }
+  .modal-head{
+    padding:32px 30px 22px;
+    border-bottom:1px solid #241f17;
+    position:relative;
+    background:radial-gradient(ellipse at 20% 0%, rgba(201,162,39,0.08), transparent 60%);
+  }
+  .modal-trad{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11px;
+    letter-spacing:0.1em;
+    color:var(--gold);
+    margin-bottom:10px;
+  }
+  .modal-title{
+    font-size:28px;
+    font-weight:400;
+    color:#f2e8d0;
+    margin:0;
+    line-height:1.2;
+  }
+  .closeBtn{
+    position:absolute; top:22px; right:24px;
+    background:transparent;
+    border:1px solid #3a3226;
+    color:#a89e88;
+    width:32px;height:32px;
+    border-radius:50%;
+    cursor:pointer;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  .closeBtn:hover{ border-color:var(--gold); color:var(--gold); }
+  .modal-body{ padding:26px 30px 34px; }
+
+  .section-label{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    color:var(--gold);
+    margin:22px 0 8px;
+  }
+  .section-label:first-child{ margin-top:0; }
+  .modal-body p{ margin:0; font-size:15px; color:#cfc4a8; line-height:1.6; }
+  .texts-list{ list-style:none; margin:0; padding:0; }
+  .texts-list li{
+    font-size:14px;
+    padding:8px 0;
+    border-bottom:1px solid #201b14;
+    color:#b8ac8e;
+  }
+  .texts-list li:last-child{ border-bottom:none; }
+  .texts-list .ref{ font-weight:600; color:#e8dcc0; margin-right:6px; }
+  .wore-box{
+    background:#120f0a;
+    border-left:3px solid var(--gold);
+    padding:14px 16px;
+    margin-top:4px;
+    border-radius:0 3px 3px 0;
+  }
+  .wore-box p{ font-size:14px; }
+  .scholar-list{ list-style:none; margin:0; padding:0; }
+  .scholar-list li{
+    font-size:13.5px;
+    padding:9px 0;
+    border-bottom:1px solid #201b14;
+    color:#a89c80;
+    line-height:1.5;
+  }
+  .scholar-list li:last-child{ border-bottom:none; }
+  .scholar-list .cite{
+    display:block;
+    font-weight:600;
+    color:#d8c68a;
+    margin-bottom:2px;
+  }
+  .confidence{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11px;
+    display:inline-block;
+    margin-top:18px;
+    padding:5px 10px;
+    border-radius:3px;
+    border:1px solid #3a3226;
+    color:#8a8066;
+  }
+  .confidence.contested{ border-color:#a8762c; color:#d1a04a; }
+  .confidence.majority{ border-color:#3f5a4a; color:#7ea892; }
+
+  .bg-section{
+    border-top:1px solid #241f17;
+    padding:60px 24px 20px;
+    background:radial-gradient(ellipse at 50% 0%, #100d0a 0%, #050403 60%);
+  }
+  .bg-inner{ max-width:920px; margin:0 auto; }
+  .bg-kicker{
+    font-size:11px; letter-spacing:0.14em; color:var(--gold); margin-bottom:12px;
+  }
+  .bg-title{
+    font-size:clamp(24px,3.4vw,32px);
+    font-weight:400;
+    color:#f0e6d0;
+    margin:0 0 16px;
+  }
+  .bg-intro{
+    color:#a89e88;
+    font-size:15px;
+    max-width:70ch;
+    margin:0 0 34px;
+    line-height:1.65;
+  }
+  .bg-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:26px;
+    margin-bottom:28px;
+  }
+  .bg-card{
+    display:block;
+    margin:0;
+    padding:18px 20px 20px;
+    background:#0b0908;
+    border:1px solid #241f17;
+    border-radius:4px;
+    text-decoration:none;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .bg-card:hover{ border-color:var(--gold); background:#120f0a; }
+  .bg-card-top{
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    color:var(--gold);
+    margin-bottom:12px;
+    padding-bottom:12px;
+    border-bottom:1px solid #201b14;
+  }
+  .bg-cap-title{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    color:#e8dcc0;
+    margin-bottom:8px;
+  }
+  .bg-card p{
+    font-size:13.5px;
+    color:#a89e88;
+    line-height:1.6;
+    margin:0 0 12px;
+  }
+  .bg-card p em{ color:#c9b98a; font-style:italic; }
+  .bg-credit{
+    font-size:11px;
+    color:#6b5f45;
+    padding-top:10px;
+    border-top:1px solid #201b14;
+  }
+  .bg-credit a{ color:#a3822f; }
+  .bg-footnote{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:12.5px;
+    color:#6b5f45;
+    max-width:74ch;
+    line-height:1.6;
+    padding-top:10px;
+    border-top:1px solid #201b14;
+  }
+  .bg-footnote a{ color:#a3822f; }
+  @media (max-width:680px){
+    .bg-grid{ grid-template-columns:1fr; }
+  }
+
+  footer{
+    text-align:center;
+    padding:40px 24px 70px;
+    color:#4a4230;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11.5px;
+  }
+  footer p{ max-width:60ch; margin:0 auto; }
+
+  @media (max-width:640px){
+    .wall{ grid-template-columns:repeat(2, 1fr); }
+    header{ padding:50px 18px 36px; }
+  }
+  @media (max-width:680px){
+    .era-track{
+      flex-wrap:nowrap;
+      justify-content:flex-start;
+      overflow-x:auto;
+      scrollbar-width:none;
+    }
+    .era-track::-webkit-scrollbar{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="stoneGradA" cx="50%" cy="96%" r="85%">
+      <stop offset="0%" stop-color="#5a4322"/>
+      <stop offset="35%" stop-color="#221a10"/>
+      <stop offset="100%" stop-color="#040302"/>
+    </radialGradient>
+    <radialGradient id="stoneGradB" cx="50%" cy="96%" r="85%">
+      <stop offset="0%" stop-color="#4a3d2c"/>
+      <stop offset="35%" stop-color="#1e1a12"/>
+      <stop offset="100%" stop-color="#030302"/>
+    </radialGradient>
+    <radialGradient id="stoneGradC" cx="50%" cy="96%" r="85%">
+      <stop offset="0%" stop-color="#5e3a1e"/>
+      <stop offset="35%" stop-color="#241608"/>
+      <stop offset="100%" stop-color="#040201"/>
+    </radialGradient>
+
+    <!-- shadowy robed/hooded figure — deliberately featureless, lit only by the torch below -->
+    <symbol id="reliefFace" viewBox="0 0 160 220">
+      <path class="relief-fill" d="M80 8
+        C95 8 104 20 104 34
+        C104 42 100 48 94 52
+        C112 58 128 72 134 96
+        C140 122 138 152 128 178
+        C122 196 108 210 80 212
+        C52 210 38 196 32 178
+        C22 152 20 122 26 96
+        C32 72 48 58 66 52
+        C60 48 56 42 56 34
+        C56 20 65 8 80 8 Z"/>
+      <path class="relief-rim" d="M128 178 C136 154 138 124 132 98 C138 122 138 150 128 176 Z" opacity="0.5"/>
+      <path class="relief-rim" d="M32 178 C24 154 22 124 28 98 C22 122 22 150 32 176 Z" opacity="0.35"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header>
+  <div class="kicker sans">YLH TOOLS — CORPUS ARTIFACT</div>
+  <h1>The Hall of Faces</h1>
+  <p>One name, carved a dozen ways. Each niche in this wall holds a face the tradition gave to YHWH, under the pressure that produced it. Walk the hall, or filter by era. Touch a face to hear its story.</p>
+  <div class="scroll-hint sans">↓ SCROLL TO ENTER THE HALL</div>
+</header>
+
+<div class="era-rail">
+  <div class="era-track" id="eraTrack"></div>
+</div>
+
+<div class="hall">
+  <div id="faceCount" class="sans"></div>
+  <div class="wall" id="wall"></div>
+</div>
+
+<section class="bg-section">
+  <div class="bg-inner">
+    <div class="bg-kicker sans">ICONOGRAPHIC BACKGROUND</div>
+    <h2 class="bg-title">What the Stone Record Actually Shows</h2>
+    <p class="bg-intro">No surviving anthropomorphic image can presently be identified as YHWH with scholarly confidence. Israelite and Judahite religion was not uniformly imageless — figurines, sacred animals, trees, cherubim, seals, cult stands, and solar imagery are archaeologically abundant — but the existence and form of any YHWH cult statue remain disputed. The figures in the Hall above are original symbolic illustrations, not reconstructions of a lost artifact. What follows are real, physical objects that illuminate the larger West Semitic and imperial visual worlds YHWH's portrayal developed within.</p>
+
+    <div class="bg-grid">
+      <a class="bg-card" href="https://www.livius.org/pictures/syria/ras-shamra-ugarit/ugarit-temple-of-baal-stele-with-the-king-of-ugarit-in-front-of-the-god-baal-saphon/" target="_blank" rel="noopener">
+        <div class="bg-card-top sans">VIEW PHOTOGRAPH ↗</div>
+        <div class="bg-cap-title">Baal with Thunderbolt (Ugarit stele)</div>
+        <p>Limestone bas-relief, Temple of Baal, Ras Shamra/Ugarit, Syria, c. 1300–1150 BCE. Louvre, AO 15775. Depicts <em>Baal</em>, not YHWH. Biblical texts assign YHWH several functions and epithets from the West Semitic storm-god complex — cloud-riding, storm manifestation, combat against Sea, divine-warrior kingship — so this stele illustrates the regional iconographic world behind those motifs. It is not evidence that YHWH was pictured in this exact visual form; we have no surviving image of YHWH to compare it to.</p>
+        <div class="bg-credit sans">Photo © Jona Lendering / Livius.org, CC0 1.0</div>
+      </a>
+
+      <a class="bg-card" href="https://commons.wikimedia.org/wiki/File:Ajrud.jpg" target="_blank" rel="noopener">
+        <div class="bg-card-top sans">VIEW IMAGE ↗</div>
+        <div class="bg-cap-title">Kuntillet ʿAjrud Pithos A (reconstruction)</div>
+        <p>Painted storage jar, Sinai, c. 8th century BCE — not carved stone, included as one of the most important surviving artifacts combining an inscription naming YHWH with a larger program of drawings, though the inscription and the adjacent figures may have been added at different times and need not interpret one another. Inscription reads "...by YHWH of Samaria and his asherah" — whether "his asherah" names the goddess Asherah, her cultic object, or a conceptually entangled form of both remains debated. The standing figures are separately contested: once read as Yahweh and Asherah, most current analyses identify them as the Egyptian god Bes. This image is a modern digital redrawing of the faded original, not a period photograph or excavation photo — treat it as illustrative only.</p>
+        <div class="bg-credit sans">Digital reconstruction: Wikimedia contributor "Amplifysound," public domain</div>
+      </a>
+    </div>
+
+    <p class="bg-footnote">Also relevant for regional context: the Metropolitan Museum's <a href="https://www.metmuseum.org/art/collection/search/322614" target="_blank" rel="noopener">Winged Genius relief panel</a> from Ashurnasirpal II's Northwest Palace at Nimrud (Neo-Assyrian, c. 883–859 BCE). Neo-Assyrian palace reliefs like this show how supernatural beings, kingship, and protection were given monumental visual form under empire — useful background, but not portraits of YHWH and not a model for the Hall's featureless figures above.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Part of YLH Tools. Source-critical attributions draw on Documentary, Neo-Documentarian, and supplementary models of Pentateuchal composition — no single framework currently commands unanimous scholarly consent; contested dating is flagged rather than resolved, per CPVP.</p>
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <button class="closeBtn" id="closeBtn">✕</button>
+      <div class="modal-trad sans" id="modalTrad"></div>
+      <h2 class="modal-title" id="modalTitle"></h2>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const eras = [
+  {id:'all', name:'All Eras'},
+  {id:'tribal', period:'c. 1200–1000 BCE', name:'Tribal / Territorial'},
+  {id:'monarchy', period:'c. 1000–930 BCE', name:'Monarchical Formation'},
+  {id:'josiah', period:'c. 640–609 BCE', name:'Josianic Reform'},
+  {id:'defeat', period:'597–586 BCE', name:'Imperial Defeat'},
+  {id:'exile', period:'586–539 BCE', name:'Babylonian Exile'},
+  {id:'transition', period:'c. 550–500 BCE', name:'Late Exile / Persian Transition'},
+  {id:'persian', period:'539–332 BCE', name:'Persian Restoration'},
+  {id:'apocalyptic', period:'c. 200–100 BCE', name:'Apocalyptic Crisis'}
+];
+
+const faces = [
+  {id:'warrior', era:'tribal', trad:'Archaic or archaizing Hebrew poetry (Exod 15, Judg 5); composition and incorporation dates disputed', title:'The Warrior-Patron',
+   pressure:'Tribal and territorial conflict among early Israelite clans',
+   description:'YHWH appears as a storm-warrior deity fighting for one people against others — closely paralleling the wider West Semitic storm-god pattern (cf. Baal/Hadad). Frequently regarded as preserving some of the Bible\'s earliest poetic language and divine-warrior imagery, although both poems have complex and disputed compositional histories.',
+   texts:[{ref:'Exodus 15:3',note:'"YHWH is a man of war" — the Song of the Sea, widely regarded as archaic poetry'},
+          {ref:'Judges 5:4–5',note:'Song of Deborah — YHWH marching from Seir/Edom, storm-god imagery'},
+          {ref:'Deuteronomy 33:2',note:'YHWH "coming from Sinai" with a fiery entourage'}],
+   wore:'Probable social location: early Israelite or Judahite groups preserving collective memories of warfare and divine intervention. Possible function: forming communal identity through YHWH\'s portrayal as the divine warrior fighting for Israel.',
+   scholarship:[{cite:"Smith, *The Early History of God* (1990/2002)",note:"Argues — influentially but not without dissent — that YHWH originated as a warrior deity from Edom/Midian/Teman, later converging with El-language in the highland pantheon."},{cite:"Cross, *Canaanite Myth and Hebrew Epic* (1973)",note:"Foundational study of archaic Israelite poetry (Exod 15, Deut 33) and its storm-god/divine-warrior background."}],
+   confidence:'established'},
+  {id:'council', era:'tribal', trad:'Old poetry; Deut 32 (older reading)', title:'Presiding Over the Divine Council',
+   pressure:'Absorption of Canaanite/El-language divine assembly imagery',
+   description:'YHWH is depicted presiding over a council of divine beings inherited from the broader Northwest Semitic pantheon. Across the biblical corpus these other divine beings are variously presented as allotted rulers, council members, heavenly servants, condemned gods, angels, or powerless idols — configurations that cannot always be arranged into one uncontested chronological sequence.',
+   texts:[{ref:'Deuteronomy 32:8–9',note:'Qumran preserves a "sons of God / divine beings" reading; the Greek tradition renders the referents as divine messengers ("angels of God"). Both support a heavenly-beings reading against the Masoretic "sons of Israel."'},
+          {ref:'Psalm 82:1',note:'"God has taken his place in the divine council"'},
+          {ref:'1 Kings 22:19–22',note:'YHWH presiding over the heavenly host debating a plan'}],
+   wore:'Probable social location: Israelite and Judahite poetic, prophetic, and court traditions drawing on the wider Northwest Semitic divine-assembly complex. Possible function: locating YHWH within — and increasingly above — a heavenly government through which nations, judgment, and divine agency could be conceptualized.',
+   scholarship:[{cite:"Tigay, *JPS Torah Commentary: Deuteronomy* (1996), pp. 302–303, 513–515",note:"Discusses the 4QDeut(j) variant and the MT's likely scribal alteration of Deut 32:8."},{cite:"Smith, *The Origins of Biblical Monotheism* (2001)",note:"Details the four-tier Ugaritic/Canaanite divine council structure behind 'sons of God' language."},{cite:"Heiser, *The Unseen Realm* (2015)",note:"Popularized the Deut 32:8–9 textual variant for general readers; a more accessible starting point than the technical literature above."}],
+   confidence:'majority view — Qumran and Greek witnesses independently support a heavenly-beings reading against the Masoretic "sons of Israel," though their wording is not identical'},
+  {id:'kingmaker', era:'monarchy', trad:'Royal / Court theology (2 Sam 7)', title:'The Royal Kingmaker',
+   pressure:'Consolidation of the Davidic monarchy',
+   description:'YHWH is recast as the divine guarantor of a specific royal house, issuing a dynastic promise widely read as unconditional — though later texts (Ps 89\'s complaint against an apparently broken promise; 1 Kings 2\'s conditional echo) complicate that reading — converting a tribal patron into a monarchy-legitimating deity.',
+   texts:[{ref:'2 Samuel 7:12–16',note:'The Davidic covenant — dynasty promised "forever"'},
+          {ref:'Psalm 2:7',note:'"You are my son; today I have begotten you" — royal enthronement language'},
+          {ref:'Psalm 89:3–4, 19–37',note:'Extended dynastic covenant psalm, later strained by dynasty\'s apparent failure'}],
+   wore:'The Davidic court and its scribal apologists — the face authorized dynastic succession as divinely fixed.',
+   scholarship:[{cite:"Cross, *Canaanite Myth and Hebrew Epic* (1973), ch. 9",note:"Analyzes 2 Samuel 7 as royal ideology adapting Near Eastern dynastic-grant treaty forms."},{cite:"Mettinger, *King and Messiah* (1976)",note:"Comparative study of Israelite royal ideology against broader ANE kingship theology."}],
+   confidence:'established'},
+  {id:'zion', era:'monarchy', trad:'Zion theology (Pss 46, 48, 132)', title:'Enthroned in Zion',
+   pressure:'Jerusalem\'s rise as political and cultic center',
+   description:'YHWH\'s royal and cultic presence becomes intensely concentrated in Zion, while older traditions of mobility, heavenly enthronement, and extraterritorial action continue alongside it. Some Zion texts portray Jerusalem as divinely secured or exceptionally protected — an ideology contested within the Bible itself and catastrophically challenged in 586 BCE.',
+   texts:[{ref:'Psalm 132:13–14',note:'"YHWH has chosen Zion... this is my resting place forever"'},
+          {ref:'Psalm 46:4–5',note:'The city of God, unshaken because God is "in her midst"'},
+          {ref:'Isaiah 8:18',note:'YHWH "who dwells on Mount Zion"'}],
+   wore:'Jerusalem\'s priestly and royal establishment jointly — the face fused temple, throne, and city, making an attack on Jerusalem theologically unthinkable until 586 BCE forced revision.',
+   scholarship:[{cite:"Ollenburger, *Zion the City of the Great King* (1987)",note:"Standard treatment of Zion theology as a distinct pre-exilic tradition-complex."},{cite:"Levenson, *Sinai and Zion* (1985)",note:"Classic comparison of Sinai-covenant and Zion-royal theological streams within the Hebrew Bible."}],
+   confidence:'established'},
+  {id:'sebaot', era:'monarchy', trad:'Court / cultic tradition', title:'Ṣebaʾot, Commander of Hosts',
+   pressure:'Military organization under centralized kingship',
+   description:'A military-cosmic title: YHWH commands armies both heavenly and earthly. Its precise origin (Shiloh cult, ark tradition, or royal court) remains debated, but its consolidation tracks with monarchic state power.',
+   texts:[{ref:'1 Samuel 4:4',note:'Ark of "YHWH Ṣebaʾot who is enthroned on the cherubim"'},
+          {ref:'Isaiah 6:3',note:'Seraphic acclamation in the temple vision'},
+          {ref:'Psalm 24:10',note:'"YHWH Ṣebaʾot, he is the King of glory"'}],
+   wore:'State military and temple cult together — the title bound battlefield outcomes to temple legitimacy.',
+   scholarship:[{cite:"Mettinger, *The Dethronement of Sabaoth* (1982)",note:"Traces the title's cultic origins and its contested link to the ark tradition and Shiloh."},{cite:"Cross, *Canaanite Myth and Hebrew Epic* (1973)",note:"Discusses YHWH Ṣebaʾot alongside divine-warrior and ark traditions."}],
+   confidence:'contested — exact institutional origin (Shiloh vs. Jerusalem court) debated'},
+  {id:'covenant-enforcer', era:'josiah', trad:'D / Deuteronomistic', title:'The Exclusive Covenant Enforcer',
+   pressure:'Centralizing cultic-reform pressures across the late monarchy, traditionally tied to Josiah\'s reign (2 Kings 22–23) but likely reflecting a longer Deuteronomistic scribal trajectory',
+   description:'YHWH demands exclusive worship at one sanctuary and total rejection of other cults, with covenant blessing and curse as the operative logic — organizing a religiously plural landscape around exclusive allegiance to YHWH, centralized sacrifice, and covenantal sanctions.',
+   texts:[{ref:'Deuteronomy 12:5–14',note:'Worship confined to "the place YHWH will choose"'},
+          {ref:'Deuteronomy 28',note:'Systematic covenant blessings and curses'},
+          {ref:'2 Kings 23:4–20',note:'Josiah\'s purge of rival cult sites and objects'}],
+   wore:'The Josianic court and its Deuteronomistic scribes — the face authorized destruction of regional shrines and centralized both cult and political control in Jerusalem.',
+   scholarship:[{cite:"Weinfeld, *Deuteronomy and the Deuteronomic School* (1972)",note:"Foundational analysis of Deuteronomy's centralization theology and its scribal/court setting."},{cite:"Na'aman, 'The King Leading Cult Reforms in His Kingdom' (2006, *Zeitschrift für Altorientalische...*)",note:"Represents the historical-critical debate over how much of the Josiah narrative reflects 7th-century reality vs. later composition."}],
+   confidence:'contested — precise scope and historicity of the reform narrative debated among historians'},
+  {id:'herem', era:'josiah', trad:'D / DtrH conquest narratives', title:'Who Decrees Ḥerem',
+   pressure:'Retrospective legitimation of land claims via conquest narrative',
+   description:'YHWH commands total destruction of populations as an act of consecration. The ḥerem practice itself is not an Israelite invention — the Mesha Stele describes the Moabite king performing ḥerem against an Israelite town for the god Chemosh, so the category is regionally attested. What lacks archaeological support is the unified, total military conquest Joshua narrates; most historians read that conquest account as a later literary-ideological construction legitimating land claims, not a campaign-by-campaign historical record.',
+   texts:[{ref:'Deuteronomy 20:16–18',note:'Ḥerem commanded against Canaanite cities'},
+          {ref:'Joshua 6:17, 21',note:'Jericho placed under ḥerem'},
+          {ref:'1 Samuel 15:3',note:'Ḥerem against Amalek — later contested within the narrative itself'}],
+   wore:'Deuteronomistic scribes constructing a national origin story — the face retroactively sanctified land occupation as divine mandate.',
+   scholarship:[{cite:"Dever, *Who Were the Early Israelites and Where Did They Come From?* (2003)",note:"Archaeological case against a unified military conquest of Canaan as narrated in Joshua."},{cite:"Finkelstein & Silberman, *The Bible Unearthed* (2001)",note:"Widely cited synthesis of archaeological evidence against conquest-narrative historicity."},{cite:"Niditch, *War in the Hebrew Bible* (1993)",note:"Treats ḥerem primarily as an ideological/literary category within Israelite war ideology."},{cite:"Emerton, \"The Value of the Moabite Stone as an Historical Source,\" *Vetus Testamentum* 52 (2002): 483–492",note:"Discusses the Mesha inscription's line 17, which uses cognate ḥrm language for Mesha's dedication of Nebo to Ashtar-Chemosh — the external West Semitic comparison behind the regional-attestation claim."}],
+   confidence:'majority view — archaeology weighs against a unified conquest as narrated, though the ḥerem practice/ideology itself is independently attested in the region (cf. Mesha Stele)'},
+  {id:'judge-nations', era:'defeat', trad:'Pre-exilic and exilic prophecy', title:'Judge Who Wields Empire',
+   pressure:'Military defeat by Assyria and Babylon',
+   description:'Rather than abandon YHWH\'s sovereignty after defeat, this face reframes imperial conquest as YHWH\'s own instrument of judgment against Judah\'s covenant failure.',
+   texts:[{ref:'Jeremiah 25:8–9',note:'Nebuchadnezzar called YHWH\'s "servant" against Judah'},
+          {ref:'Isaiah 10:5–6',note:'Assyria as "the rod of my anger"'},
+          {ref:'2 Kings 24:20',note:'Judah\'s fall attributed directly to YHWH\'s anger'}],
+   wore:'Prophetic circles reinterpreting catastrophe for a shattered scribal and priestly elite — the face preserved sovereignty by making defeat theologically coherent.',
+   scholarship:[{cite:"Albertz, *A History of Israelite Religion in the Old Testament Period, Vol. 2* (1994)",note:"Situates prophetic theodicy (Jeremiah, Isaiah) within the political crisis of Assyrian and Babylonian conquest."}],
+   confidence:'established'},
+  {id:'mobile', era:'exile', trad:'Ezekiel; P (redacted)', title:'The Mobile Presence',
+   pressure:'Loss of temple and land in Babylonian exile',
+   description:'YHWH\'s glory is portrayed departing Jerusalem and appearing among the exiles in Babylon. Ezekiel develops divine mobility in an unprecedentedly sustained exilic form, drawing on older traditions in which YHWH marches from the south, descends at Sinai, travels with the ark, and appears beyond a single permanent sanctuary.',
+   texts:[{ref:'Ezekiel 1:1, 28',note:'Vision of YHWH\'s glory by the Chebar canal, in exile'},
+          {ref:'Ezekiel 10:18–19; 11:22–23',note:'The glory departing the Jerusalem temple'},
+          {ref:'Ezekiel 11:16',note:'YHWH as "a sanctuary" for the exiles "in the countries where they have gone"'}],
+   wore:'Exilic priestly circles (Ezekiel\'s tradition) reconstructing theological continuity without land or temple.',
+   scholarship:[{cite:"Block, *The Gods of the Nations* (2000)",note:"Discusses ancient Near Eastern assumptions about territorial deity and Ezekiel's departure of glory as a response to exile."},{cite:"Zimmerli, *Ezekiel 1* (Hermeneia, 1979)",note:"Standard critical commentary on the glory-departure visions (Ezek 1, 10–11)."}],
+   confidence:'established'},
+  {id:'creator', era:'transition', trad:'Deutero-Isaiah (late exilic); P/Genesis 1 (exilic or Persian-period, disputed)', title:'Universal Creator, Sole Sovereign',
+   pressure:'Babylonian imperial domination, the collapse of Judah\'s older political institutions, Cyrus\'s rise, and the reconstruction of communal identity in the late exile',
+   description:'Isaiah 40–55 gives unusually explicit expression to YHWH\'s exclusive cosmic sovereignty, subordinating or denying rivals and integrating creation, imperial history, and Israel\'s restoration under one divine agency. Earlier texts already assign YHWH cosmic powers, so what changes here is the explicitness and comprehensiveness of the claim, not its first appearance. Genesis 1 is widely classified as priestly, but whether P\'s composition belongs to the pre-exilic, exilic, or Persian period remains debated — it is a distinct dating question from Isaiah 40–55\'s.',
+   texts:[{ref:'Isaiah 45:5–7',note:'"I am YHWH, and there is no other... besides me there is no god"'},
+          {ref:'Isaiah 44:9–20',note:'Polemic against idol-making, denying rival gods\' reality'},
+          {ref:'Genesis 1:1–2:3',note:'Priestly creation account, cosmic and universal in scope'}],
+   wore:'Late-exilic prophetic circles (Deutero-Isaiah) and exilic-to-post-exilic priestly writers and editors (P) — their precise relationship and relative dates remain disputed.',
+   scholarship:[{cite:"Smith, *The Origins of Biblical Monotheism* (2001)",note:"Traces the rhetorical shift from monolatry to denial of other gods' existence in Deutero-Isaiah."},{cite:"Blenkinsopp, *Isaiah 40–55* (Anchor Bible, 2002)",note:"Critical commentary situating Deutero-Isaiah's universalism in the Persian-period restoration context."}],
+   confidence:'contested — Genesis 1 is widely classified as priestly, but whether its composition and the larger priestly corpus should be dated pre-exilic, exilic, or Persian-period remains debated'},
+  {id:'cyrus', era:'transition', trad:'Deutero-Isaiah', title:'Who Anoints a Foreign King',
+   pressure:'Dependence on Persian imperial policy for the return from exile',
+   description:'YHWH names a non-Israelite, non-Davidic king as "anointed" — a striking extension of māšîaḥ outside its usual royal-Israelite frame. The text accommodates Persian power while simultaneously denying its autonomy: Cyrus succeeds because YHWH has commissioned him, even though Cyrus "does not know" YHWH (Isa 45:4–5) — imperial collaboration and theological subordination of the emperor asserted together.',
+   texts:[{ref:'Isaiah 45:1',note:'"Thus says YHWH to his anointed, to Cyrus"'},
+          {ref:'Isaiah 44:28',note:'Cyrus named as YHWH\'s "shepherd" who will fulfill YHWH\'s purpose'},
+          {ref:'Ezra 1:1–2',note:'Cyrus\'s decree framed as YHWH stirring his spirit'}],
+   wore:'The restoration community\'s leadership, dependent on Persian favor — even as the text subordinates that favor to YHWH\'s own prior decree.',
+   scholarship:[{cite:"Blenkinsopp, *Isaiah 40–55* (Anchor Bible, 2002)",note:"Discusses the extension of māšîaḥ to Cyrus as a striking departure from royal-Israelite usage."},{cite:"Kuhrt, 'The Cyrus Cylinder and Achaemenid Imperial Policy' (1983, *Journal for the Study of the Old Testament*)",note:"Contextualizes Isaiah 45 against actual Persian imperial restoration policy."}],
+   confidence:'majority view — Isaiah 40–55 is widely dated to the late exilic/early Persian period, though its redactional layering and exact dating remain debated'},
+  {id:'apocalyptic', era:'apocalyptic', trad:'Daniel; late apocalyptic literature', title:'Judge Who Ends Empires',
+   pressure:'Hellenistic imperial oppression (esp. Seleucid persecution under Antiochus IV)',
+   description:'Daniel rarely names YHWH directly, preferring titles like "Ancient of Days," "Most High," and "God of Heaven" — within the Hall\'s framework this counts as a face of the same divine name-tradition, but it is worth naming the shift in address itself. Its government is heavily mediated and the offices stay distinct: empires appear as beasts judged by a heavenly court; "one like a son of man" receives dominion in the vision itself; the interpretation given afterward associates that kingdom with "the holy ones"; and Michael functions elsewhere in the book (Dan 10–12) as Israel\'s angelic prince and protector, not as the recipient of dominion. This is less a single deity "shifting" than a whole apocalyptic jurisdictional system appearing in the text.',
+   texts:[{ref:'Daniel 7:9–14',note:'The "Ancient of Days" and the judgment of the beastly kingdoms'},
+          {ref:'Daniel 2:44',note:'A kingdom that will "never be destroyed," ending the sequence of empires'},
+          {ref:'Daniel 12:1–3',note:'Resurrection and final vindication under cosmic distress'}],
+   wore:'Resistance circles under Hellenistic persecution — the face authorized hope for imperial collapse.',
+   scholarship:[{cite:"Collins, *The Apocalyptic Imagination* (1998)",note:"Standard reference on Daniel and Second Temple apocalyptic literature's historical setting under Hellenistic persecution."},{cite:"Portier-Young, *Apocalypse Against Empire* (2011)",note:"Reads Danielic apocalyptic explicitly as a literature of resistance to Seleucid imperial violence."}],
+   confidence:'established'}
+];
+
+let currentEra = 'all';
+
+function renderEraRail(){
+  const track = document.getElementById('eraTrack');
+  track.innerHTML = '';
+  eras.forEach(e=>{
+    const btn = document.createElement('button');
+    btn.className = 'era-chip sans' + (currentEra===e.id ? ' active' : '');
+    btn.textContent = e.id==='all' ? 'All Eras' : e.name;
+    btn.onclick = ()=>{ currentEra = e.id; renderEraRail(); renderWall(); };
+    track.appendChild(btn);
+  });
+}
+
+function renderWall(){
+  const wall = document.getElementById('wall');
+  wall.innerHTML = '';
+  const shown = currentEra==='all' ? faces : faces.filter(f=>f.era===currentEra);
+  document.getElementById('faceCount').textContent = `${shown.length} FACE${shown.length!==1?'S':''} IN THIS LIGHT`;
+  shown.forEach((f,i)=>{
+    const niche = document.createElement('div');
+    niche.className = 'niche';
+    niche.style.animationDelay = (i*0.04)+'s';
+    niche.tabIndex = 0;
+    const flip = i % 2 === 1 ? ' flip' : '';
+    niche.innerHTML = `
+      <svg class="relief-svg${flip}"><use href="#reliefFace"/></svg>
+      <div class="niche-label">${f.title}</div>
+      <div class="torch">
+        <div class="flame-glow"></div>
+        <div class="torch-flame">
+          <div class="flame-outer"></div>
+          <div class="flame-mid"></div>
+          <div class="flame-core"></div>
+        </div>
+        <div class="torch-wrap"></div>
+        <div class="torch-stick"></div>
+        <div class="torch-bracket"></div>
+      </div>`;
+    niche.onclick = ()=> openModal(f);
+    niche.onkeydown = (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openModal(f); } };
+    wall.appendChild(niche);
+  });
+}
+
+function openModal(f){
+  document.getElementById('modalTrad').textContent = f.trad;
+  document.getElementById('modalTitle').textContent = f.title;
+  let tier = '', badge = 'Textual profile strongly attested';
+  if (f.confidence.startsWith('contested')) { tier = 'contested'; badge = f.confidence; }
+  else if (f.confidence.startsWith('majority')) { tier = 'majority'; badge = f.confidence; }
+  document.getElementById('modalBody').innerHTML = `
+    <div class="section-label sans">HISTORICAL PRESSURE</div>
+    <p>${f.pressure}</p>
+    <div class="section-label sans">DESCRIPTION</div>
+    <p>${f.description}</p>
+    <div class="section-label sans">TEXTS</div>
+    <ul class="texts-list">${f.texts.map(t=>`<li><span class="ref">${t.ref}</span>${t.note}</li>`).join('')}</ul>
+    <div class="section-label sans">WHO WORE THIS FACE</div>
+    <div class="wore-box"><p>${f.wore}</p></div>
+    <div class="section-label sans">SCHOLARSHIP</div>
+    <ul class="scholar-list">${f.scholarship.map(s=>`<li><span class="cite">${s.cite}</span>${s.note}</li>`).join('')}</ul>
+    <span class="confidence sans ${tier}">${badge}</span>
+  `;
+  document.getElementById('overlay').classList.add('open');
+}
+document.getElementById('closeBtn').onclick = ()=> document.getElementById('overlay').classList.remove('open');
+document.getElementById('overlay').onclick = (e)=>{ if(e.target.id==='overlay') e.currentTarget.classList.remove('open'); };
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.getElementById('overlay').classList.remove('open'); });
+
+renderEraRail();
+renderWall();
+</script>
+</body>
+</html>
