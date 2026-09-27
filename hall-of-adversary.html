@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hall of the Adversary — How the Devil Was Assembled</title>
+<style>
+  :root{
+    --gold:#c9a227;
+    --stone-1:#1c1a17;
+    --stone-2:#26221d;
+    --stone-3:#312b23;
+    --stone-hi:#4a4030;
+    --flame:#e8a13a;
+    --parchment:#f5f0e8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#050403;}
+  body{
+    font-family:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    color:var(--parchment);
+    overflow-x:hidden;
+  }
+  .sans{ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+
+  /* ---------- intro ---------- */
+  header{
+    position:relative;
+    padding:70px 24px 50px;
+    text-align:center;
+    background:radial-gradient(ellipse at 50% 0%, #1a1611 0%, #050403 70%);
+    border-bottom:1px solid #2a2419;
+  }
+  header .kicker{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11px;
+    letter-spacing:0.16em;
+    color:var(--gold);
+    margin-bottom:18px;
+  }
+  h1{
+    font-size:clamp(34px,6vw,58px);
+    font-weight:400;
+    margin:0 0 16px;
+    color:#f0e6d0;
+    text-shadow:0 0 30px rgba(201,162,39,0.25);
+  }
+  header p{
+    max-width:56ch;
+    margin:0 auto;
+    color:#a89e88;
+    font-size:16px;
+  }
+  .scroll-hint{
+    margin-top:34px;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11px;
+    letter-spacing:0.1em;
+    color:#6b5f45;
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:0.4;} 50%{opacity:1;} }
+
+  /* ---------- era rail ---------- */
+  .era-rail{
+    position:sticky; top:0; z-index:40;
+    background:linear-gradient(180deg,#0a0806 0%, #0a0806cc 85%, transparent);
+    backdrop-filter:blur(6px);
+    padding:14px 0 10px;
+    border-bottom:1px solid #241f17;
+  }
+  .era-track{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding:0 20px;
+    max-width:1000px;
+    margin:0 auto;
+    justify-content:center;
+  }
+  .era-track::-webkit-scrollbar{display:none;}
+  .era-chip{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11.5px;
+    white-space:nowrap;
+    background:transparent;
+    border:1px solid #3a3226;
+    color:#9c9078;
+    padding:7px 14px;
+    border-radius:20px;
+    cursor:pointer;
+    transition:all .2s ease;
+    flex:0 0 auto;
+  }
+  .era-chip:hover{ border-color:var(--gold); color:var(--gold); }
+  .era-chip.active{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:#1a1508;
+    font-weight:600;
+  }
+
+  /* ---------- the hall ---------- */
+  .hall{
+    position:relative;
+    padding:60px 20px 40px;
+    max-width:1400px;
+    margin:0 auto;
+  }
+  .hall-floor{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    height:120px;
+    background:linear-gradient(180deg, transparent, #000 90%);
+    pointer-events:none;
+    z-index:5;
+  }
+
+  .wall{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:14px;
+    position:relative;
+  }
+  @media (max-width:1000px){
+    .wall{ grid-template-columns:repeat(3, 1fr); }
+  }
+
+  .niche{
+    position:relative;
+    aspect-ratio:3/4;
+    border-radius:50% 50% 8px 8px / 40% 40% 8px 8px;
+    cursor:pointer;
+    appearance:none;
+    -webkit-appearance:none;
+    border:none;
+    padding:0;
+    margin:0;
+    font:inherit;
+    color:inherit;
+    text-align:inherit;
+    background:
+      radial-gradient(ellipse at 50% 30%, var(--stone-hi) 0%, var(--stone-3) 55%, var(--stone-1) 100%);
+    box-shadow:
+      inset 0 8px 20px rgba(0,0,0,0.7),
+      inset 0 -6px 14px rgba(0,0,0,0.6),
+      0 6px 18px rgba(0,0,0,0.55);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    overflow:hidden;
+    transition:transform .35s ease, box-shadow .35s ease, filter .35s ease;
+    opacity:0;
+    transform:translateY(14px);
+    animation:rise .6s ease forwards;
+  }
+  .niche:focus-visible{
+    outline:2px solid var(--gold);
+    outline-offset:2px;
+  }
+  .niche.hidden{ display:none; }
+  @keyframes rise{ to{ opacity:1; transform:translateY(0); } }
+
+  /* carved relief face — real profile silhouette (headdress, beard, features) via SVG */
+  .relief-svg{
+    position:absolute;
+    top:12%;
+    left:50%;
+    width:52%;
+    height:58%;
+    transform:translateX(-50%);
+    filter:drop-shadow(0 0 10px rgba(0,0,0,0.6));
+    opacity:0.97;
+    pointer-events:none;
+  }
+  .relief-svg.flip{ transform:translateX(-50%) scaleX(-1); }
+  .relief-fill{ fill:url(#stoneGradA); }
+  .niche:nth-child(4n) .relief-fill{ fill:url(#stoneGradB); }
+  .niche:nth-child(5n) .relief-fill{ fill:url(#stoneGradC); }
+  .relief-line{ fill:none; stroke:rgba(0,0,0,0.45); stroke-width:1.1; }
+  .relief-shadow{ fill:rgba(0,0,0,0.28); }
+  .relief-hi{ fill:rgba(255,255,255,0.06); }
+  .relief-rim{ fill:rgba(232,161,58,0.35); }
+
+  .niche:hover, .niche:focus-visible{
+    transform:translateY(-6px) scale(1.035);
+    filter:brightness(1.18);
+    box-shadow:
+      inset 0 8px 20px rgba(0,0,0,0.7),
+      inset 0 -6px 14px rgba(0,0,0,0.5),
+      0 0 0 1px rgba(201,162,39,0.4),
+      0 10px 28px rgba(0,0,0,0.6),
+      0 0 34px rgba(201,162,39,0.18);
+  }
+
+  .torch{
+    position:relative;
+    width:100%;
+    height:52px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:3;
+  }
+  .torch-bracket{
+    position:absolute;
+    bottom:3px; left:50%;
+    transform:translateX(-50%);
+    width:16px; height:7px;
+    background:linear-gradient(180deg,#3a332a,#1c1712);
+    border-radius:2px 2px 0 0;
+    box-shadow:0 1px 2px rgba(0,0,0,0.7);
+  }
+  .torch-stick{
+    position:absolute;
+    bottom:8px; left:50%;
+    transform:translateX(-50%);
+    width:4px; height:20px;
+    background:linear-gradient(90deg,#241c14,#4a3a24 40%,#241c14);
+    border-radius:1px;
+  }
+  .torch-wrap{
+    position:absolute;
+    bottom:20px; left:50%;
+    transform:translateX(-50%);
+    width:8px; height:9px;
+    background:linear-gradient(90deg,#1a1510,#3a2e1c,#1a1510);
+    border-radius:1px;
+  }
+  .torch-flame{
+    position:absolute;
+    bottom:26px; left:50%;
+    transform:translateX(-50%);
+    width:20px; height:30px;
+    transform-origin:50% 100%;
+    animation:torchsway 2.6s ease-in-out infinite;
+  }
+  .flame-glow{
+    position:absolute;
+    bottom:-4px; left:50%;
+    transform:translateX(-50%);
+    width:44px; height:44px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(232,161,58,0.35), rgba(232,161,58,0.08) 55%, transparent 75%);
+    filter:blur(1px);
+    animation:glowpulse 2.6s ease-in-out infinite;
+  }
+  .flame-outer,.flame-mid,.flame-core{
+    position:absolute;
+    bottom:0; left:50%;
+    border-radius:50% 50% 50% 50% / 70% 70% 30% 30%;
+  }
+  .flame-outer{
+    width:18px; height:30px;
+    transform:translateX(-50%);
+    background:linear-gradient(180deg,#ff8a2e 0%, #e8621a 55%, #b23a12 100%);
+    box-shadow:0 0 14px 4px rgba(232,120,40,0.5);
+    animation:flicker1 1.6s ease-in-out infinite;
+  }
+  .flame-mid{
+    width:11px; height:20px;
+    transform:translateX(-50%);
+    background:linear-gradient(180deg,#ffcf5e 0%, #f5941f 70%);
+    animation:flicker2 1.3s ease-in-out infinite;
+  }
+  .flame-core{
+    width:5px; height:11px;
+    transform:translateX(-50%);
+    background:linear-gradient(180deg,#fff6d8, #ffd35e 80%);
+    box-shadow:0 0 6px 2px rgba(255,235,180,0.8);
+    animation:flicker3 1s ease-in-out infinite;
+  }
+  @keyframes torchsway{
+    0%,100%{ transform:translateX(-50%) rotate(0deg); }
+    25%{ transform:translateX(-50%) rotate(-2.5deg); }
+    50%{ transform:translateX(-50%) rotate(1deg); }
+    75%{ transform:translateX(-50%) rotate(-1.5deg); }
+  }
+  @keyframes flicker1{
+    0%,100%{ transform:translateX(-50%) scaleY(1) scaleX(1); opacity:0.95; }
+    30%{ transform:translateX(-52%) scaleY(1.08) scaleX(0.92); opacity:1; }
+    60%{ transform:translateX(-48%) scaleY(0.9) scaleX(1.05); opacity:0.9; }
+  }
+  @keyframes flicker2{
+    0%,100%{ transform:translateX(-50%) scaleY(1); }
+    40%{ transform:translateX(-47%) scaleY(1.15); }
+    70%{ transform:translateX(-53%) scaleY(0.88); }
+  }
+  @keyframes flicker3{
+    0%,100%{ transform:translateX(-50%) scaleY(1); }
+    50%{ transform:translateX(-50%) scaleY(1.2); }
+  }
+  @keyframes glowpulse{
+    0%,100%{ opacity:0.8; transform:translateX(-50%) scale(1); }
+    50%{ opacity:1; transform:translateX(-50%) scale(1.12); }
+  }
+  .niche:nth-child(3n) .torch-flame{ animation-duration:2.2s; }
+  .niche:nth-child(4n) .torch-flame{ animation-duration:3s; }
+  .niche:nth-child(5n) .flame-outer{ animation-duration:1.4s; }
+
+  .niche-label{
+    position:absolute;
+    bottom:56px; left:0; right:0;
+    text-align:center;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:10.5px;
+    letter-spacing:0.03em;
+    color:#d8cba8;
+    padding:0 8px;
+    text-shadow:0 1px 3px rgba(0,0,0,0.9);
+    line-height:1.25;
+    z-index:2;
+  }
+
+  #faceCount{
+    text-align:center;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11.5px;
+    letter-spacing:0.06em;
+    color:#5c5340;
+    margin-bottom:26px;
+  }
+
+  /* ---------- modal: torn from the wall ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.78);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:100;
+  }
+  .overlay.open{ display:flex; }
+  .modal{
+    background:linear-gradient(180deg,#0e0c09,#050403);
+    max-width:640px;
+    width:100%;
+    max-height:88vh;
+    overflow-y:auto;
+    border:1px solid #3a3226;
+    box-shadow:0 0 60px rgba(201,162,39,0.15), 0 20px 60px rgba(0,0,0,0.8);
+    border-radius:4px;
+  }
+  .modal-head{
+    padding:32px 30px 22px;
+    border-bottom:1px solid #241f17;
+    position:relative;
+    background:radial-gradient(ellipse at 20% 0%, rgba(201,162,39,0.08), transparent 60%);
+  }
+  .modal-trad{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11px;
+    letter-spacing:0.1em;
+    color:var(--gold);
+    margin-bottom:10px;
+  }
+  .modal-title{
+    font-size:28px;
+    font-weight:400;
+    color:#f2e8d0;
+    margin:0;
+    line-height:1.2;
+  }
+  .closeBtn{
+    position:absolute; top:22px; right:24px;
+    background:transparent;
+    border:1px solid #3a3226;
+    color:#a89e88;
+    width:32px;height:32px;
+    border-radius:50%;
+    cursor:pointer;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  .closeBtn:hover{ border-color:var(--gold); color:var(--gold); }
+  .modal-body{ padding:26px 30px 34px; }
+
+  .section-label{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    color:var(--gold);
+    margin:22px 0 8px;
+  }
+  .section-label:first-child{ margin-top:0; }
+  .modal-body p{ margin:0; font-size:15px; color:#cfc4a8; line-height:1.6; }
+  .texts-list{ list-style:none; margin:0; padding:0; }
+  .texts-list li{
+    font-size:14px;
+    padding:8px 0;
+    border-bottom:1px solid #201b14;
+    color:#b8ac8e;
+  }
+  .texts-list li:last-child{ border-bottom:none; }
+  .texts-list .ref{ font-weight:600; color:#e8dcc0; margin-right:6px; }
+  .wore-box{
+    background:#120f0a;
+    border-left:3px solid var(--gold);
+    padding:14px 16px;
+    margin-top:4px;
+    border-radius:0 3px 3px 0;
+  }
+  .wore-box p{ font-size:14px; }
+  .scholar-list{ list-style:none; margin:0; padding:0; }
+  .scholar-list li{
+    font-size:13.5px;
+    padding:9px 0;
+    border-bottom:1px solid #201b14;
+    color:#a89c80;
+    line-height:1.5;
+  }
+  .scholar-list li:last-child{ border-bottom:none; }
+  .scholar-list .cite{
+    display:block;
+    font-weight:600;
+    color:#d8c68a;
+    margin-bottom:2px;
+  }
+  .confidence{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11px;
+    display:inline-block;
+    margin-top:18px;
+    padding:5px 10px;
+    border-radius:3px;
+    border:1px solid #3a3226;
+    color:#8a8066;
+  }
+  .confidence.contested{ border-color:#a8762c; color:#d1a04a; }
+  .confidence.majority{ border-color:#3f5a4a; color:#7ea892; }
+
+  .bg-section{
+    border-top:1px solid #241f17;
+    padding:60px 24px 20px;
+    background:radial-gradient(ellipse at 50% 0%, #100d0a 0%, #050403 60%);
+  }
+  .bg-inner{ max-width:920px; margin:0 auto; }
+  .bg-kicker{
+    font-size:11px; letter-spacing:0.14em; color:var(--gold); margin-bottom:12px;
+  }
+  .bg-title{
+    font-size:clamp(24px,3.4vw,32px);
+    font-weight:400;
+    color:#f0e6d0;
+    margin:0 0 16px;
+  }
+  .bg-intro{
+    color:#a89e88;
+    font-size:15px;
+    max-width:70ch;
+    margin:0 0 34px;
+    line-height:1.65;
+  }
+  .bg-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:26px;
+    margin-bottom:28px;
+  }
+  .bg-card{
+    display:block;
+    margin:0;
+    padding:18px 20px 20px;
+    background:#0b0908;
+    border:1px solid #241f17;
+    border-radius:4px;
+    text-decoration:none;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .bg-card:hover{ border-color:var(--gold); background:#120f0a; }
+  .bg-card-top{
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    color:var(--gold);
+    margin-bottom:12px;
+    padding-bottom:12px;
+    border-bottom:1px solid #201b14;
+  }
+  .bg-cap-title{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    color:#e8dcc0;
+    margin-bottom:8px;
+  }
+  .bg-card p{
+    font-size:13.5px;
+    color:#a89e88;
+    line-height:1.6;
+    margin:0 0 12px;
+  }
+  .bg-card p em{ color:#c9b98a; font-style:italic; }
+  .bg-credit{
+    font-size:11px;
+    color:#6b5f45;
+    padding-top:10px;
+    border-top:1px solid #201b14;
+  }
+  .bg-credit a{ color:#a3822f; }
+  .bg-footnote{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:12.5px;
+    color:#6b5f45;
+    max-width:74ch;
+    line-height:1.6;
+    padding-top:10px;
+    border-top:1px solid #201b14;
+  }
+  .bg-footnote a{ color:#a3822f; }
+  @media (max-width:680px){
+    .bg-grid{ grid-template-columns:1fr; }
+  }
+
+  footer{
+    text-align:center;
+    padding:40px 24px 70px;
+    color:#4a4230;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:11.5px;
+  }
+  footer p{ max-width:60ch; margin:0 auto; }
+
+  @media (max-width:700px){
+    .wall{ grid-template-columns:repeat(2, 1fr); }
+    header{ padding:50px 18px 36px; }
+  }
+  @media (max-width:680px){
+    .era-track{
+      flex-wrap:nowrap;
+      justify-content:flex-start;
+      overflow-x:auto;
+      scrollbar-width:none;
+    }
+    .era-track::-webkit-scrollbar{ display:none; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .flame-outer, .flame-mid, .flame-core, .torch-flame, .flame-glow,
+    .niche, .scroll-hint{
+      animation:none !important;
+    }
+    .niche{ opacity:1; transform:none; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="stoneGradA" cx="50%" cy="96%" r="85%">
+      <stop offset="0%" stop-color="#5a4322"/>
+      <stop offset="35%" stop-color="#221a10"/>
+      <stop offset="100%" stop-color="#040302"/>
+    </radialGradient>
+    <radialGradient id="stoneGradB" cx="50%" cy="96%" r="85%">
+      <stop offset="0%" stop-color="#4a3d2c"/>
+      <stop offset="35%" stop-color="#1e1a12"/>
+      <stop offset="100%" stop-color="#030302"/>
+    </radialGradient>
+    <radialGradient id="stoneGradC" cx="50%" cy="96%" r="85%">
+      <stop offset="0%" stop-color="#5e3a1e"/>
+      <stop offset="35%" stop-color="#241608"/>
+      <stop offset="100%" stop-color="#040201"/>
+    </radialGradient>
+
+    <!-- shadowy robed/hooded figure — deliberately featureless, lit only by the torch below -->
+    <symbol id="reliefFace" viewBox="0 0 160 220">
+      <path class="relief-fill" d="M80 8
+        C95 8 104 20 104 34
+        C104 42 100 48 94 52
+        C112 58 128 72 134 96
+        C140 122 138 152 128 178
+        C122 196 108 210 80 212
+        C52 210 38 196 32 178
+        C22 152 20 122 26 96
+        C32 72 48 58 66 52
+        C60 48 56 42 56 34
+        C56 20 65 8 80 8 Z"/>
+      <path class="relief-rim" d="M128 178 C136 154 138 124 132 98 C138 122 138 150 128 176 Z" opacity="0.5"/>
+      <path class="relief-rim" d="M32 178 C24 154 22 124 28 98 C22 122 22 150 32 176 Z" opacity="0.35"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header>
+  <div class="kicker sans">YLH TOOLS — CORPUS ARTIFACT</div>
+  <h1>The Hall of the Adversary</h1>
+  <p>This hall runs backward. YHWH's hall held one name wearing many faces. This one holds many names, offices, monsters, and human enemies — gradually compressed into one face. Walk the hall, or filter by era. Touch a name to see what it was before it became "the Devil."</p>
+  <div class="scroll-hint sans">↓ SCROLL TO ENTER THE HALL</div>
+</header>
+
+<div class="era-rail">
+  <div class="era-track" id="eraTrack"></div>
+</div>
+
+<div class="hall">
+  <div id="faceCount" class="sans"></div>
+  <div class="wall" id="wall"></div>
+</div>
+
+<section class="bg-section">
+  <div class="bg-inner">
+    <div class="bg-kicker sans">METHODOLOGICAL NOTE</div>
+    <h2 class="bg-title">Why There's No Single Icon Here</h2>
+    <p class="bg-intro">The companion Hall of Faces could point to real carved stone — not of YHWH, but of the storm-god iconography around him. This hall can't quite do that: no single, visually standardized Devil had yet emerged during the biblical period, so there's no settled image to show.</p>
+
+    <div class="bg-grid">
+      <div class="bg-card" style="cursor:default;">
+        <div class="bg-cap-title">What the sources actually give us</div>
+        <p>Second Temple literature gives us Watchers, Belial, Mastema, Azazel, satans, and other hostile spirits — but as distinct figures belonging to different textual worlds. Surviving Jewish art does not give us securely identified portraits of most of them, much less a standardized image labeled "Satan." The familiar Devil had not yet acquired one universally recognizable face.</p>
+      </div>
+
+      <div class="bg-card" style="cursor:default;">
+        <div class="bg-cap-title">Where the horns and hooves actually come from</div>
+        <p>The familiar horned, cloven-hooved Devil is a medieval European assembly, not an ancient Near Eastern one — and not a clean single borrowing either. It draws on several visual traditions at once: classical satyrs and Pan-like beings, medieval monster iconography, animal symbolism, and biblical or apocalyptic imagery, stitched together well after Revelation made the decisive textual fusion and patristic writers continued assembling the biography in prose. The look came last, and from more than one mythological family.</p>
+      </div>
+    </div>
+
+    <p class="bg-footnote">On the medieval visual invention specifically: Jeffrey Burton Russell, <em>The Devil: Perceptions of Evil from Antiquity to Primitive Christianity</em> (1977) and Richard Raiswell &amp; David R. Winter, eds., <em>The Medieval Devil: A Reader</em> (University of Toronto Press, 2022), both trace this iconographic history directly.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Part of YLH Tools, a companion to the Hall of Faces. This hall's method runs in reverse: where YHWH's texts are read for one name accumulating many configurations, this hall's texts are read for many originally distinct figures accumulating into one name. Contested dating and disputed referents are flagged rather than resolved, per CPVP.</p>
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <button class="closeBtn" id="closeBtn" aria-label="Close">✕</button>
+      <div class="modal-trad sans" id="modalTrad"></div>
+      <h2 class="modal-title" id="modalTitle"></h2>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const eras = [
+  {id:'all', name:'All Eras'},
+  {id:'adversary', period:'narrative setting c. 900s\u2013700s BCE; composition disputed', name:'Ordinary Adversary'},
+  {id:'court', period:'Zechariah: late 6th c. BCE; Job\u2019s prose framework: date disputed', name:'Persian/Postexilic Heavenly Court'},
+  {id:'pivot', period:'late Persian\u2013early Hellenistic, date debated', name:'Chronicles\u2019 Redistribution'},
+  {id:'second-temple', period:'c. 300 BCE\u201370 CE', name:'Second Temple Demonology'},
+  {id:'translation', period:'c. 3rd\u20132nd century BCE', name:'Greek Translation'},
+  {id:'gospels-epistles', period:'c. 50\u2013100 CE', name:'New Testament'},
+  {id:'reception', period:'c. 1st c. BCE \u2013 4th c. CE', name:'Serpent Reception'},
+  {id:'apocalypse', period:'c. 90s CE', name:'Apocalyptic Fusion'},
+  {id:'patristic', period:'c. 2nd\u20134th century CE', name:'Patristic Retrojection'}
+];
+
+const faces = [
+  {id:'road-adversary', era:'adversary', trad:'Numbers 22; 1 Kings 11 \u2014 pre-personal, functional usage of \u015b\u0101\u1e6d\u0101n', title:'The Adversary in the Road',
+   pressure:'Ordinary political and narrative situations requiring an obstructing or opposing agent \u2014 no cosmic theology yet in view',
+   description:'The Hebrew noun \u015b\u0101\u1e6d\u0101n names a role, not a person: an adversary, opponent, or obstructing agent. In Numbers 22:22 the messenger of YHWH stands in Balaam\'s path "as an adversary" \u2014 a satan against him, carrying out YHWH\'s own purpose. In 1 Kings 11:14, 23, 25, YHWH raises up Hadad the Edomite and Rezon son of Eliada as satans against Solomon \u2014 human political opponents, not supernatural beings. The category precedes the character.',
+   texts:[{ref:'Numbers 22:22',note:'the messenger of YHWH stands "as an adversary" (satan) against Balaam \u2014 the word is a function, not a name'},
+          {ref:'1 Kings 11:14, 23, 25',note:'YHWH raises Hadad and Rezon as satans against Solomon \u2014 human political adversaries'}],
+   wore:'Probable social location: court and narrative traditions explaining political and military setbacks as divinely permitted or commissioned obstruction. Possible function: naming an opposing agent without yet requiring a cosmic explanation for evil.',
+   scholarship:[{cite:"Stokes, *The Satan: How God's Executioner Became the Enemy* (2019)",note:"Traces the pre-personal, functional usage of \u015b\u0101\u1e6d\u0101n across these earliest occurrences before any single \'Satan\' figure exists."},{cite:"Day, *An Adversary in Heaven: \u015a\u0101\u1e6d\u0101n in the Hebrew Bible* (1988)",note:"Foundational technical study establishing \u015b\u0101\u1e6d\u0101n as role-language across its Hebrew Bible occurrences."}],
+   confidence:'established'},
+
+  {id:'court-executioner', era:'court', trad:'Job 1\u20132; Zechariah 3 \u2014 heavenly-court literature; Zechariah is securely Persian-period, Job\u2019s prose framework\u2019s date is disputed', title:"YHWH's Executioner in the Court",
+   pressure:'Zechariah 3 reflects Persian-period concerns surrounding the restored priesthood and the heavenly authorization of its leadership. Job\'s prose framework, whose date remains disputed, uses the same heavenly-court architecture to investigate whether human fidelity can survive the destruction of every material reason for maintaining it \u2014 a distinct question, not necessarily arising from the same social situation.',
+   description:'Job and Zechariah move the adversarial function into the heavenly court itself. In Zechariah 3, ha-satan \u2014 "the accuser" \u2014 stands ready to accuse the high priest Joshua; YHWH rebukes him. In Job 1\u20132, ha-satan participates among the "sons of God," questioning Job\'s motives and acting only within limits YHWH sets. Recent scholarship (Stokes) argues the figure is better understood as God\'s executioner than God\'s prosecutor: the satan does not merely file a complaint but carries out destructive testing \u2014 Job\'s servants and children die, his property is destroyed, his body is struck \u2014 while remaining unable to exceed YHWH\'s boundary. That framing is morally starker than "prosecutor," not gentler: the suffering is produced by an agent still inside God\'s administrative order.',
+   texts:[{ref:'Zechariah 3:1\u20132',note:'ha-satan stands at Joshua\'s right hand to accuse him; YHWH rebukes the accuser'},
+          {ref:'Job 1:6\u201312; 2:1\u20137',note:'ha-satan among the "sons of God," testing Job within limits YHWH sets'}],
+   wore:'Probable social location: Zechariah 3 likely reflects restoration-era priestly and prophetic circles negotiating the priesthood\'s legitimacy under Persian oversight; Job\'s wisdom circle is harder to place and may be earlier or later. Possible function, shared across both: keeping catastrophic suffering and institutional vulnerability theologically inside YHWH\'s jurisdiction rather than outside it.',
+   scholarship:[{cite:"Stokes, *The Satan: How God's Executioner Became the Enemy* (2019)",note:"Argues \u2014 a genuine revision of the standard \'prosecutor\' reading \u2014 that the satan of Job and Zechariah functions primarily as God's executioner."},{cite:"Silverman, \"Vetting the Priest in Zechariah 3: The Satan between Divine and Achaemenid Administrations,\" *Journal of Hebrew Scriptures* 14 (2014)",note:"Reads the Zechariah 3 scene as modeled on Achaemenid administrative vetting of provincial officials \u2014 political Persian influence rather than Zoroastrian theology. Not the consensus view, but a serious methodological alternative."},{cite:"Day, *An Adversary in Heaven* (1988)",note:"Standard technical study of the Job and Zechariah material specifically."}],
+   confidence:'majority view \u2014 Stokes\' executioner framing is a recent, influential revision of the older "prosecutor" consensus and is not yet uniformly adopted; Silverman\'s Achaemenid-administrative reading of Zechariah 3 is an explicitly non-consensus alternative to Zoroastrian-influence accounts'},
+
+  {id:'pivot-mover', era:'pivot', trad:'1 Chronicles 21:1 (contrast: 2 Samuel 24:1) \u2014 late Persian or early Hellenistic Chronicles, precise date debated', title:'The Adversary Who Moves',
+   pressure:'Intensifying claims about divine goodness creating theological pressure to relocate morally troubling agency away from YHWH \u2014 or, on the minority reading, simply continuing the divine-intermediary pattern already visible in Job and Zechariah',
+   description:'2 Samuel 24:1 has YHWH\'s anger incite David to a census that brings deadly punishment. 1 Chronicles 21:1 retells the same episode: "Satan" \u2014 or possibly "an adversary" \u2014 incites David instead. The Hebrew lacks the definite article here, which matters but does not settle the question. Chronicles makes the adversarial agent grammatically more independent than in Samuel \u2014 or at least appears to. Many scholars see this as a redistribution of morally troubling agency away from YHWH; others understand the figure as an anonymous heavenly adversary still operating under divine commission, the same office as in Numbers 22, not yet the later archenemy of God. We do not need to settle that debate to see the narrative change: the parallel texts let us watch morally troubling agency move \u2014 or appear to move \u2014 away from the deity.',
+   texts:[{ref:'1 Chronicles 21:1',note:'"Satan" (or "an adversary" \u2014 article absent) incites David to number Israel'},
+          {ref:'2 Samuel 24:1',note:'parallel text: YHWH\'s own anger incites David to the same census'}],
+   wore:'Probable social location: post-exilic Chronicles\' scribal circles retelling Israel\'s royal history, working within an increased role for divine intermediaries generally. Possible function: managing a theodicy problem by giving troubling agency a name to carry, whether or not that name was yet fully personal.',
+   scholarship:[{cite:"Japhet, *I & II Chronicles* (Old Testament Library, 1993)",note:"Standard critical commentary discussing the Chronicler's replacement of YHWH's anger with \'Satan\' in the parallel census narrative."},{cite:"Evans, \"Divine Intermediaries in 1 Chronicles 21: An Overlooked Aspect of the Chronicler's Theology,\" *Biblica* 85 (2004): 545\u2013558",note:"Argues the Chronicler's satan functions as a divine intermediary distinguished from but still commissioned by YHWH \u2014 an important stage toward, but not yet, the later archenemy of God."},{cite:"Stokes, *The Satan* (2019)",note:"Surveys the range of scholarly positions on whether 1 Chr 21:1 introduces a proper name or retains the ordinary adversarial sense."}],
+   confidence:'contested \u2014 whether 1 Chr 21:1 introduces an early form of Satan-as-proper-name, or still refers to a divinely-commissioned adversary in the same office as Numbers 22, remains genuinely disputed'},
+
+  {id:'watchers', era:'second-temple', trad:'1 Enoch (Book of Watchers, chs. 6\u201316); reception of Genesis 6:1\u20134 \u2014 3rd to early 2nd century BCE', title:'The Fallen Watchers',
+   pressure:'Explaining the origin of violence, illicit knowledge, and cosmic disorder beyond ordinary human sin, by reading an enigmatic older text into fuller myth',
+   description:'The Watchers are heavenly beings who cross forbidden boundaries, take human wives, disclose prohibited knowledge, and generate violent offspring. Genesis 6:1\u20134 supplies only a few enigmatic verses; 1 Enoch expands them into a full myth of angelic rebellion. Asael/Azazel becomes especially associated with corrupting instruction and judgment; Semjaza leads the oath-bound descent. This mythology develops Genesis 6, but it is not simply an earlier telling of the Christian Satan story \u2014 the Watchers are a distinct, multi-figure tradition in their own right.',
+   texts:[{ref:'Genesis 6:1\u20134',note:'the enigmatic base text: "sons of God" take human wives, producing the Nephilim'},
+          {ref:'1 Enoch 6\u201316 (Book of Watchers)',note:'expands Genesis 6 into a full narrative of angelic descent, forbidden instruction, and judgment'}],
+   wore:'Probable social location: Second Temple scribal and visionary circles working through astronomy, revelation, and the origins of evil outside ordinary human agency. Possible function: locating cosmic disorder in a datable primordial rebellion rather than in YHWH\'s own governance.',
+   scholarship:[{cite:"Wright, *The Origin of Evil Spirits: The Reception of Genesis 6:1\u20134 in Early Jewish Literature* (rev. ed. 2015)",note:"Standard study tracing how Genesis 6:1-4 was expanded into the Watchers mythology across Second Temple literature."},{cite:"Stuckenbruck, *The Myth of Rebellious Angels: Studies in Second Temple Judaism and New Testament Texts* (2014)",note:"Traces the afterlife of the Watchers myth into New Testament texts."},{cite:"Reed, *Fallen Angels and the History of Judaism and Christianity* (2005)",note:"Traces the Watchers tradition's long reception history across Jewish and Christian sources."}],
+   confidence:'established'},
+
+  {id:'mastema', era:'second-temple', trad:'Jubilees \u2014 2nd century BCE', title:'Mastema, Prince of Hostility',
+   pressure:'Second Temple concern to keep some destructive spirits operative in the world after a purge, while preserving divine sovereignty over them',
+   description:'Jubilees gives us Mastema, a hostile chief who requests that a portion of the destructive spirits remain under his authority after the Watchers\' judgment, so evil can continue to test and punish humanity. He tests, accuses, and obstructs \u2014 functions that overlap with the satan of Job and Zechariah \u2014 yet he still operates beneath, not against, divine sovereignty. Mastema\'s overlap with later Satan traditions is real, but "Mastema" is not a transparent alternate spelling of the same settled person; Jubilees has its own internal logic for why this figure exists.',
+   texts:[{ref:'Jubilees 10:1\u201311',note:'Mastema requests that some spirits remain under his authority to continue corrupting and testing humanity'},
+          {ref:'Jubilees 17:16; 48:1\u201319',note:'Mastema tests Abraham and later opposes Moses \u2014 functions paralleling the satan of Job'}],
+   wore:'Probable social location: a priestly-legal circle reworking Genesis and Exodus into a systematized calendar and covenant theology. Possible function: explaining continuing evil and testing after the Watchers\' judgment without surrendering divine sovereignty over it.',
+   scholarship:[{cite:"Wright, *The Origin of Evil Spirits* (rev. ed. 2015)",note:"Discusses Mastema's role within Jubilees' reworking of the Watchers tradition."},{cite:"Stokes, *The Satan* (2019)",note:"Situates Mastema among the range of Second Temple figures overlapping, but not identical, with the satan/Satan trajectory."}],
+   confidence:'established'},
+
+  {id:'belial', era:'second-temple', trad:'Qumran \u2014 War Scroll (1QM), Community Rule (1QS), Damascus Document (CD) \u2014 2nd\u20131st century BCE', title:'Belial, Lord of Darkness',
+   pressure:'Sectarian self-definition under conditions of communal separation, imagining history as a decisive cosmic battle between light and darkness',
+   description:'At Qumran, Belial rules the "lot of darkness," standing opposite the "Prince of Light" and commanding the "sons of darkness" against the community\'s "sons of light." The War Scroll imagines a real eschatological battle; the Community Rule\'s Two Spirits teaching organizes the cosmos and the human heart alike around this same light-darkness axis. Belial\'s presence is not confined to sectarian-authored texts: Kenneth Atkinson argues the Damascus Document\'s "three nets of Belial" \u2014 fornication, wealth, and pollution of the sanctuary \u2014 reflects a pre-Qumran tradition the sect inherited rather than invented, meaning Belial\'s conceptual history exceeds the institutional history of the settlement that preserved these texts.',
+   texts:[{ref:'1QM (War Scroll) 1:1\u201315',note:'Belial commands the "sons of darkness" against the "sons of light" in a final battle'},
+          {ref:'1QS (Community Rule) 3:13\u20134:26 (Two Spirits)',note:'cosmos and human heart organized around a light/darkness dualism traced to two created spirits'},
+          {ref:'CD (Damascus Document) 4:12\u201319',note:'the "three nets of Belial" \u2014 fornication, wealth, sanctuary pollution \u2014 used to characterize opponents'}],
+   wore:'Probable social location: a self-separating covenantal community explaining its own marginalization as participation in a real cosmic war. Possible function: converting communal and doctrinal disagreement into eschatological battle lines.',
+   scholarship:[{cite:"Atkinson, \"The 'Three Nets of Belial' in the Dead Sea Scrolls: A Pre-Qumran Tradition\" (2019)",note:"Argues the 'three nets of Belial' material predates the Qumran settlement itself, extending Belial's tradition-history beyond the sect."},{cite:"Xeravits, ed., *Dualism in Qumran* (2010)",note:"Standard collection on the structure and sources of Qumran's light/darkness dualism."}],
+   confidence:'established'},
+
+  {id:'diabolos', era:'translation', trad:'Septuagint (Greek translation of Hebrew scripture) \u2014 3rd\u20132nd century BCE', title:'The Translated Accuser',
+   pressure:'The practical work of translation across languages and, eventually, across originally distinct textual traditions',
+   description:'Greek translators of Jewish scripture frequently rendered Hebrew \u015b\u0101\u1e6d\u0101n with diabolos \u2014 "accuser" or "slanderer." This is a conceptual, not just linguistic, development: translation does not merely carry an already-completed character from Hebrew into Greek, it creates a pathway along which separately-named adversarial figures can be recognized as belonging together. Once the words share a referent, the traditions attached to each word start to merge.',
+   texts:[{ref:'e.g. LXX Job 1:6; Zechariah 3:1',note:'ha-satan rendered as ho diabolos in the Greek translation'}],
+   wore:'Probable social location: Hellenistic-Jewish translators and their reading communities working across Hebrew and Greek. Possible function: an infrastructural, largely unintentional step that later enabled the merger of originally separate adversarial figures under one vocabulary.',
+   scholarship:[{cite:"Stokes, *The Satan* (2019)",note:"Traces how LXX translation choices contributed to the later conceptual consolidation of adversarial figures under 'diabolos.'"}],
+   confidence:'established'},
+
+  {id:'kingdom-satan', era:'gospels-epistles', trad:'Synoptic Gospels (Mark, Matthew, Luke) \u2014 mid-to-late 1st century CE', title:'Satan With a Kingdom',
+   pressure:"Intra-Jewish conflict, Roman domination, and disputes over Jesus' authority requiring a cosmic frame for human opposition",
+   description:'By the Synoptic Gospels, Satan is no longer confined to an office inside the heavenly court. He tempts Jesus in the wilderness, snatches the seed of proclamation, binds a suffering woman, demands to sift the disciples, and enters Judas. Jesus\' exorcisms are interpreted as an invasion of Satan\'s house: "if Satan has risen up against himself, he cannot stand" (Mark 3:26). That sentence assumes jurisdiction \u2014 Satan now has a kingdom, a household, subordinates, and captives. The political function of this shift is inseparable from its theology: human opponents, rival teachers, and Roman power can now be placed inside a cosmic administration.',
+   texts:[{ref:'Mark 1:12\u201313; Matthew 4:1\u201311; Luke 4:1\u201313',note:'the wilderness temptation of Jesus by Satan/the devil'},
+          {ref:'Mark 3:22\u201327',note:'"if Satan has risen up against himself, he cannot stand" \u2014 Jesus\' exorcisms read as invading Satan\'s house'},
+          {ref:'Luke 22:3; 22:31',note:'Satan "enters into" Judas; Satan demands to "sift" the disciples like wheat'}],
+   wore:'Probable social location: early Jesus-movement communities negotiating rejection, exorcism practice, and internal betrayal under intra-Jewish and imperial conflict. Possible function: recoding human disagreement, illness, and political domination as episodes in an ongoing cosmic war with a defined enemy kingdom.',
+   scholarship:[{cite:"Pagels, *The Origin of Satan* (1995)",note:"Foundational study of how Gospel-era Satan language marks social and communal boundaries, especially against the intimate rival rather than the distant stranger."},{cite:"Stokes, *The Satan* (2019)",note:"Includes a chapter extending the Second Temple trajectory into New Testament usage."}],
+   confidence:'established'},
+
+  {id:'ruler-world', era:'gospels-epistles', trad:'Gospel of John; Pauline letters \u2014 mid-to-late 1st century CE', title:'Ruler of This World, God of This Age',
+   pressure:"Explaining cosmic-scale opposition to the Jesus movement's message and communities across the wider Greco-Roman world",
+   description:'John repeatedly names Satan "the ruler of this world" \u2014 a title of territorial jurisdiction rather than mere accusation. Paul can speak of "the god of this age" who blinds unbelievers, alongside the tempter and the deceiver corrupting communities from without and within. The officer of the heavenly court has become something closer to a counter-sovereign, with a domain that overlaps and contests God\'s own.',
+   texts:[{ref:'John 12:31; 14:30; 16:11',note:'Satan named "the ruler of this world" \u2014 jurisdictional language'},
+          {ref:'2 Corinthians 4:4',note:'"the god of this age has blinded the minds of unbelievers" \u2014 commonly identified with Satan, though the passage itself does not explicitly supply that name'}],
+   wore:'Probable social location: Johannine and Pauline communities theologizing their marginal, contested position within the wider Greco-Roman world. Possible function: explaining large-scale resistance to the gospel message as the activity of a rival cosmic sovereign rather than ordinary human indifference or hostility.',
+   scholarship:[{cite:"Pagels, *The Origin of Satan* (1995)",note:"Discusses the escalation of adversarial titles across the Johannine and Pauline corpus."}],
+   confidence:'established'},
+
+  {id:'unnamed-serpent', era:'reception', trad:'Genesis 3; Wisdom of Solomon 2:24; Life of Adam and Eve \u2014 composition dates span centuries and remain disputed', title:'The Serpent Before It Had a Name',
+   pressure:'A gap in the archive: an unnamed, ambiguous tempter figure inviting later reinterpretation',
+   description:'The serpent in Genesis 3 is crafty, speaks, and persuades \u2014 but Genesis does not call it Satan, narrate any angelic rebellion behind it, or explain why it acts as it does. The Wisdom of Solomon moves closer, saying death entered the world "through the envy of the diabolos" (2:24) \u2014 though whether that word identifies the Genesis serpent, Cain, or a more generic slanderous adversary remains genuinely debated among interpreters. The Life of Adam and Eve traditions elaborate Satan\'s hostility toward humanity and his use of the serpent explicitly, but this text survives in multiple divergent recensions (Greek, Latin, Slavonic, Armenian, Georgian) with disputed dates spanning roughly the 1st century BCE to the 4th century CE and no single stable original.',
+   texts:[{ref:'Genesis 3:1\u201315',note:'the serpent tempts; unnamed, unexplained, not identified as Satan'},
+          {ref:'Wisdom of Solomon 2:24',note:'"through the envy of the diabolos, death entered the world" \u2014 referent debated'},
+          {ref:'Life of Adam and Eve 12\u201317 (Vita/Apocalypse recensions)',note:'Satan explicitly explains his fall and his use of the serpent \u2014 but across textually unstable, variously-dated recensions'}],
+   wore:'Probable social location: Hellenistic-Jewish and early Christian interpretive communities filling a narrative gap left open by Genesis itself. Possible function: retroactively supplying the Eden story with the villain later theology already needed.',
+   scholarship:[{cite:"Pagels, *The Origin of Satan* (1995)",note:"Discusses the gradual identification of the Genesis serpent with Satan across Second Temple and early Christian reception."},{cite:"Stokes, *The Satan* (2019)",note:"Surveys the disputed referent of Wisdom of Solomon 2:24 and the composite, multi-recension nature of the Life of Adam and Eve tradition."}],
+   confidence:'contested \u2014 the referent of Wisdom of Solomon 2:24\'s "diabolos" and the dating/relationship of the Life of Adam and Eve recensions remain open questions'},
+
+  {id:'ancient-serpent', era:'apocalypse', trad:'Revelation 12 \u2014 commonly dated near the end of the 1st century CE', title:'The Ancient Serpent, Called the Devil and Satan',
+   pressure:'Apocalyptic crisis under Roman imperial power, requiring a single, comprehensive cosmic enemy to match a single comprehensive imperial adversary',
+   description:'Revelation performs the explicit identification earlier texts left implicit: the dragon is "that ancient serpent, who is called the Devil and Satan" (12:9). One sentence joins monster, Edenic memory, Greek title, and Hebrew-derived name into a single figure. Revelation embeds this composite being within combat mythology and imperial critique: the dragon empowers the beast, and the beast\'s authority is expressed through empire, worship, economic control, and violence. The supernatural enemy and the political enemy become mutually interpretable \u2014 this is not merely character development, it is identity construction through textual linkage.',
+   texts:[{ref:'Revelation 12:9',note:'"the great dragon was thrown down, that ancient serpent, who is called the Devil and Satan" \u2014 the explicit fusion'},
+          {ref:'Revelation 13:1\u20134',note:'the dragon empowers the beast, whose authority is expressed through empire and worship'}],
+   wore:'Probable social location: a Roman-provincial apocalyptic community under real or anticipated imperial pressure. Possible function: fusing every prior adversarial thread into one figure capacious enough to also name the empire itself as ultimately defeatable.',
+   scholarship:[{cite:"Pagels, *The Origin of Satan* (1995)",note:"Discusses Revelation's identification of dragon, serpent, Devil, and Satan as the culmination of the tradition's consolidation."}],
+   confidence:'established'},
+
+  {id:'borrowed-kings', era:'patristic', trad:'Isaiah 14 and Ezekiel 28 (originally 8th\u20136th century BCE prophetic taunts); read into Satan\'s biography by patristic writers, c. 2nd\u20134th century CE', title:'The Borrowed Kings',
+   pressure:'A completed cosmic villain needing an origin story \u2014 a "before," not just a "during"',
+   description:'Isaiah 14 addresses the king of Babylon through the image of h\u00ealel ben-\u0161a\u1e25ar, "Day Star, son of Dawn" \u2014 a figure who tries to ascend and enthrone himself among the divine assembly and is instead brought down to Sheol. In its own setting this is a taunt against an arrogant human ruler using West Semitic astral and divine-mountain imagery. The Latin Vulgate rendered the shining figure lucifer, "light-bearer"; Lucifer was not originally Satan\'s personal name, it became one through reception. Ezekiel 28\'s lament over the king of Tyre undergoes a parallel relocation: its Edenic, priestly, and cherubic imagery \u2014 magnificence, corruption, downfall \u2014 was lifted from its political target and inserted into Satan\'s prehistory by later interpreters. Together these two royal-taunt poems supply the "created as a magnificent being, corrupted by pride, cast down" sequence that no biblical author actually narrates as one continuous story about Satan.',
+   texts:[{ref:'Isaiah 14:12\u201315',note:'h\u00ealel ben-\u0161a\u1e25ar ("Day Star, son of Dawn") \u2014 a taunt against the king of Babylon, later read as Satan\'s fall via the Vulgate\'s "Lucifer"'},
+          {ref:'Ezekiel 28:11\u201319',note:'lament over the king of Tyre using Edenic/cherubic imagery \u2014 later relocated into Satan\'s prehistory'}],
+   wore:'Probable social location: patristic interpreters (2nd\u20134th century CE) assembling a complete villain biography out of scripture\'s existing vocabulary. Possible function: giving the already-cosmic New Testament and Revelation Satan a "before" \u2014 an origin story explaining how a being opposed to God could exist at all inside a monotheistic system.',
+   scholarship:[{cite:"Wright, *Satan and the Problem of Evil: From the Bible to the Early Church Fathers* (2022)",note:"Traces exactly this patristic-era relocation of Isaiah 14 and Ezekiel 28 into Satan's biography, distinguishing it from the texts' own original political targets."},{cite:"Forsyth, *The Old Enemy: Satan and the Combat Myth* (1987)",note:"Classic study connecting Isaiah 14's imagery to the wider ancient Near Eastern combat-myth tradition mobilized for Satan's later biography."}],
+   confidence:'established \u2014 that Isaiah 14 and Ezekiel 28 are originally royal taunts later relocated into Satan\'s biography is broad scholarly consensus, distinct from the (also well-established) fact that both texts predate any Satan association by centuries'}
+];
+
+let currentEra = 'all';
+
+function renderEraRail(){
+  const track = document.getElementById('eraTrack');
+  track.innerHTML = '';
+  eras.forEach(e=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'era-chip sans' + (currentEra===e.id ? ' active' : '');
+    btn.textContent = e.id==='all' ? 'All Eras' : e.name;
+    btn.setAttribute('aria-pressed', currentEra===e.id ? 'true' : 'false');
+    btn.onclick = ()=>{ currentEra = e.id; renderEraRail(); renderWall(); };
+    track.appendChild(btn);
+  });
+}
+
+function renderWall(){
+  const wall = document.getElementById('wall');
+  wall.innerHTML = '';
+  const shown = currentEra==='all' ? faces : faces.filter(f=>f.era===currentEra);
+  document.getElementById('faceCount').textContent = `${shown.length} FACE${shown.length!==1?'S':''} IN THIS LIGHT`;
+  shown.forEach((f,i)=>{
+    const niche = document.createElement('button');
+    niche.type = 'button';
+    niche.className = 'niche';
+    niche.style.animationDelay = (i*0.04)+'s';
+    niche.setAttribute('aria-label', 'Open ' + f.title);
+    const flip = i % 2 === 1 ? ' flip' : '';
+    niche.innerHTML = `
+      <svg class="relief-svg${flip}" aria-hidden="true"><use href="#reliefFace"/></svg>
+      <div class="niche-label">${f.title}</div>
+      <div class="torch" aria-hidden="true">
+        <div class="flame-glow"></div>
+        <div class="torch-flame">
+          <div class="flame-outer"></div>
+          <div class="flame-mid"></div>
+          <div class="flame-core"></div>
+        </div>
+        <div class="torch-wrap"></div>
+        <div class="torch-stick"></div>
+        <div class="torch-bracket"></div>
+      </div>`;
+    niche.onclick = ()=> openModal(f);
+    wall.appendChild(niche);
+  });
+}
+
+let lastFocused = null;
+
+function openModal(f){
+  lastFocused = document.activeElement;
+  document.getElementById('modalTrad').textContent = f.trad;
+  document.getElementById('modalTitle').textContent = f.title;
+  let tier = '', badge = 'Textual profile strongly attested';
+  if (f.confidence.startsWith('contested')) { tier = 'contested'; badge = f.confidence; }
+  else if (f.confidence.startsWith('majority')) { tier = 'majority'; badge = f.confidence; }
+  document.getElementById('modalBody').innerHTML = `
+    <div class="section-label sans">HISTORICAL PRESSURE</div>
+    <p>${f.pressure}</p>
+    <div class="section-label sans">DESCRIPTION</div>
+    <p>${f.description}</p>
+    <div class="section-label sans">TEXTS</div>
+    <ul class="texts-list">${f.texts.map(t=>`<li><span class="ref">${t.ref}</span>${t.note}</li>`).join('')}</ul>
+    <div class="section-label sans">WHO WORE THIS FACE</div>
+    <div class="wore-box"><p>${f.wore}</p></div>
+    <div class="section-label sans">SCHOLARSHIP</div>
+    <ul class="scholar-list">${f.scholarship.map(s=>`<li><span class="cite">${s.cite}</span>${s.note}</li>`).join('')}</ul>
+    <span class="confidence sans ${tier}">${badge}</span>
+  `;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('closeBtn').focus();
+}
+
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+}
+
+function trapFocus(e){
+  if (e.key !== 'Tab') return;
+  if (!document.getElementById('overlay').classList.contains('open')) return;
+  const modal = document.querySelector('.modal');
+  const focusables = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (!focusables.length) return;
+  const first = focusables[0], last = focusables[focusables.length-1];
+  if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+}
+
+document.getElementById('closeBtn').onclick = closeModal;
+document.getElementById('overlay').onclick = (e)=>{ if(e.target.id==='overlay') closeModal(); };
+document.addEventListener('keydown', e=>{
+  if (e.key==='Escape') closeModal();
+  trapFocus(e);
+});
+
+renderEraRail();
+renderWall();
+</script>
+</body>
+</html>
